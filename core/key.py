@@ -79,6 +79,30 @@ class ABRA_OT_key_shapekeys(bpy.types.Operator):
                         area.tag_redraw()
         return {"FINISHED"}
 
+class ABRA_OT_key_armature(bpy.types.Operator):
+    bl_idname = "screen.at_key_armature"
+    bl_label = "Key Whole Armature"
+    bl_description = "Keys every single bone on the armature. This saves you a couple [A] and [I] keypresses"
+    bl_options = {"REGISTER", "UNDO"}
+
+    def execute(self, context):
+        oldSet = None
+        if bpy.context.mode == "POSE":
+            oldSet = bpy.context.scene.keying_sets.active
+            bpy.context.scene.keying_sets.active
+            for obj in bpy.context.selected_objects:
+                if obj.type == "ARMATURE":
+                    bpy.context.scene.keying_sets_all.active = bpy.context.scene.keying_sets_all["Whole Character"]
+                    bpy.ops.anim.keyframe_insert_menu(type='__ACTIVE__') 
+
+                bpy.context.scene.keying_sets_all.active = oldSet
+
+                for window in bpy.context.window_manager.windows:
+                    for area in window.screen.areas:
+                        area.tag_redraw()
+                
+        return {"FINISHED"}
+
 class ABRA_OT_tangent_keypath(bpy.types.Operator):
     bl_idname = "screen.at_key_path"
     bl_label = "Calculate Motion Path"
@@ -237,4 +261,4 @@ class ABRA_OT_tangent_autoclamp(bpy.types.Operator):
         api.set_tangent("AUTO_CLAMPED")
         return {"FINISHED"}
         
-cls = (ABRA_OT_key_selected,ABRA_OT_key_visible,ABRA_OT_key_copy,ABRA_OT_key_paste,ABRA_OT_key_shapekeys,ABRA_OT_tangent_keypath,ABRA_OT_tangent_keypathclear,ABRA_OT_range_to_selection,ABRA_OT_tangent_free,ABRA_OT_tangent_aligned,ABRA_OT_tangent_vector,ABRA_OT_tangent_auto,ABRA_OT_tangent_autoclamp)
+cls = (ABRA_OT_key_selected,ABRA_OT_key_visible,ABRA_OT_key_copy,ABRA_OT_key_paste,ABRA_OT_key_shapekeys,ABRA_OT_key_armature,ABRA_OT_tangent_keypath,ABRA_OT_tangent_keypathclear,ABRA_OT_range_to_selection,ABRA_OT_tangent_free,ABRA_OT_tangent_aligned,ABRA_OT_tangent_vector,ABRA_OT_tangent_auto,ABRA_OT_tangent_autoclamp)

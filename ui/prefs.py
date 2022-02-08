@@ -103,6 +103,12 @@ class AbraToolsPrefs(AddonPreferences):
         default = True
     )
 
+    vis_keyarmature: BoolProperty(
+        name = key.ABRA_OT_key_armature.bl_label,
+        description = key.ABRA_OT_key_armature.bl_description,
+        default = True
+    )
+
     vis_keypath: BoolProperty(
         name = key.ABRA_OT_tangent_keypath.bl_label,
         description = key.ABRA_OT_tangent_keypath.bl_description,

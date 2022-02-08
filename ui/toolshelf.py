@@ -117,6 +117,8 @@ def prefsHeaderWrite(self, context):
         layout.operator(key.ABRA_OT_key_paste.bl_idname, text='', icon="PASTEDOWN")
     if (prefs.vis_keyshape): 
         layout.operator(key.ABRA_OT_key_shapekeys.bl_idname, text='', icon="MOD_LINEART")
+    if (prefs.vis_keyarmature): 
+        layout.operator(key.ABRA_OT_key_armature.bl_idname, text='', icon="OUTLINER_DATA_ARMATURE")
 
     ## TANGENTS ## 
     layout.separator()
@@ -174,6 +176,7 @@ def prefsBodyWrite(self, context):
         col.prop(prefs, "vis_keycopy")
         col.prop(prefs, "vis_keypaste")
         col.prop(prefs, "vis_keyshape")
+        col.prop(prefs, "vis_keyarmature")
     if (prefs.toolshelf_pages == "tangents"):
         col.prop(prefs, "vis_tanfree")
         col.prop(prefs, "vis_tanaligned")
