@@ -30,7 +30,7 @@ class ABRA_OT_key_visible(bpy.types.Operator):
         area.type = 'GRAPH_EDITOR'
 
         if api.get_visible_fcurves():
-            api.anim_insert_key("ALL")
+            bpy.ops.graph.keyframe_insert(type='ALL')
 
         area.type = old
         return {"FINISHED"}
