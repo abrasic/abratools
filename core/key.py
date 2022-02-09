@@ -95,11 +95,11 @@ class ABRA_OT_key_armature(bpy.types.Operator):
                     bpy.context.scene.keying_sets_all.active = bpy.context.scene.keying_sets_all["Whole Character"]
                     bpy.ops.anim.keyframe_insert_menu(type='__ACTIVE__') 
 
-                bpy.context.scene.keying_sets_all.active = oldSet
+            bpy.context.scene.keying_sets_all.active = oldSet
 
-                for window in bpy.context.window_manager.windows:
-                    for area in window.screen.areas:
-                        area.tag_redraw()
+            for window in bpy.context.window_manager.windows:
+                for area in window.screen.areas:
+                    area.tag_redraw()
                 
         return {"FINISHED"}
 

@@ -162,7 +162,11 @@ def prefsBodyWrite(self, context):
         col.label(text="Welcome to the AbraTools Toolshelf!")
         col.label(text="Here you can access header tools and change how the header looks!")
         col.label(text="To utilize AbraTools, shrink this panel so you only see the header!")
-        col.label(text="If you ever want to change things, expand this panel to show the options.")
+
+        col.separator()
+
+        col.operator("wm.url_open", text="Documentation").url = "https://docs.abx.gg"
+        col.operator("wm.url_open", text="GitHub").url = "https://github.com/abrasic/abratools"
     if (prefs.toolshelf_pages == "quickview"):
         col.prop(prefs, "vis_viewloc")
         col.prop(prefs, "vis_viewrot")
@@ -186,7 +190,7 @@ def prefsBodyWrite(self, context):
     if (prefs.toolshelf_pages == "other"):
         col.prop(prefs, "vis_rangesel")
         col.prop(prefs, "vis_keypath")
-    layout.label(text="Alpha 2")
+    layout.label(text="aT | alpha2")
 
     return 
     
