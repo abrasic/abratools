@@ -3,11 +3,9 @@
 
 AbraTools is an **unfinished animation toolset** for Blender 3. It utilizes the Preferences header so you're able to move the panel where you desire. It comes with some basic tools to help make certian animation tasks a bit less tedious:
 
-
 * **Download** AbraTools [here](https://github.com/abrasic/abratools/releases). 
 * **Installation instructions** [here](https://docs.abx.gg/support/download-and-setup). 
 * **Read the docs** [here](https://docs.abx.gg).
-
 
 # TOOLS
 ## Quick Motion Path Setup
