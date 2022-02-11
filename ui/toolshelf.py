@@ -6,6 +6,7 @@ from .icons import icons_coll
 prefsHeaderOld = None
 prefsBodyOld = None
 prefsSidebarOld = None
+prefsOldHeaderCol = bpy.context.preferences.themes[0].preferences.space.header[:]
 
 class ABRA_OT_togglePrefs(bpy.types.Operator):
     bl_idname      = "at.toggleprefs"
@@ -41,6 +42,8 @@ def writeOnPrefs():
         
     prefsSidebarOld = bpy.types.USERPREF_PT_navigation_bar.draw
     bpy.types.USERPREF_PT_navigation_bar.draw = prefsSidebarWrite
+
+    bpy.context.preferences.themes[0].preferences.space.header = prefs.header_col
     
     prefs.abraon = True
     
@@ -55,6 +58,9 @@ def drawToggle(self, context):
     ic = icons_coll["icons"]
     logo = ic["logo"]
     self.layout.operator("at.toggleprefs",text="",icon_value=logo.icon_id)
+
+def updateHeader(self, context):
+    bpy.context.preferences.themes[0].preferences.space.header = self.header_col
 
 def restorePrefs():
 
@@ -71,6 +77,8 @@ def restorePrefs():
 
     bpy.types.USERPREF_HT_header.draw = prefsHeaderOld
     prefsHeaderOld = None 
+
+    bpy.context.preferences.themes[0].preferences.space.header = bpy.context.preferences.themes[0].text_editor.space.header ## Temporary
 
     for window in bpy.context.window_manager.windows:
         for area in window.screen.areas:
@@ -190,6 +198,9 @@ def prefsBodyWrite(self, context):
     if (prefs.toolshelf_pages == "other"):
         col.prop(prefs, "vis_rangesel")
         col.prop(prefs, "vis_keypath")
+    if (prefs.toolshelf_pages == "settings"):
+        col.prop(prefs, "header_col")
+
     layout.label(text="aT | alpha2")
 
     return 

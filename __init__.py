@@ -19,6 +19,8 @@ classes = quickView.cls + key.cls + prefs.cls + panels.cls + toolshelf.cls
 icons_coll = {}
 
 def register():
+    bpy.context.preferences.themes[0].preferences.space.header = bpy.context.preferences.themes[0].text_editor.space.header ## Temporary
+    
     for cls in classes:
         bpy.utils.register_class(cls)
 
@@ -29,10 +31,13 @@ def register():
 
 def unregister():
 
+    bpy.context.preferences.themes[0].preferences.space.header = toolshelf.prefsOldHeaderCol
+    bpy.types.USERPREF_HT_header.remove(toolshelf.drawToggle)
+    
     for cls in classes:
         bpy.utils.unregister_class(cls)
 
-    bpy.types.USERPREF_HT_header.remove(toolshelf.drawToggle)
+
 
 if __name__ == "__main__":
     register()

@@ -16,6 +16,8 @@ class AbraToolsPrefs(AddonPreferences):
             ('fastkey', 'Keying', '', '', 2),
             ('tangents', 'Tangents', '', '', 3),
             ('other', 'Other', '', '', 4),
+            None,
+            ('settings', 'Settings', '', '', 5),
 
         ],
         default='home'
@@ -180,6 +182,18 @@ class AbraToolsPrefs(AddonPreferences):
         default = "TAILS",
     )
 
+    ###############################
+
+    header_col: bpy.props.FloatVectorProperty(  
+        name = "Header Color",
+        subtype = 'COLOR',
+        size = 4,
+        min = 0.0, max = 1.0,
+        description = "The color of the header while AbraTools is in use.",
+        update = toolshelf.updateHeader
+    )
+
+    ###############################
     def draw(self, context):
         prefs = bpy.context.preferences.addons["abTools"].preferences
         layout = self.layout
