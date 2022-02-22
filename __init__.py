@@ -26,9 +26,6 @@ def register():
 
     bpy.types.USERPREF_HT_header.append(toolshelf.drawToggle)
 
-    # This should always be false on boot
-    bpy.context.preferences.addons["abTools"].preferences.abraon = False
-
 def unregister():
 
     bpy.context.preferences.themes[0].preferences.space.header = toolshelf.prefsOldHeaderCol
@@ -36,8 +33,6 @@ def unregister():
     
     for cls in classes:
         bpy.utils.unregister_class(cls)
-
-
 
 if __name__ == "__main__":
     register()

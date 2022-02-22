@@ -55,6 +55,7 @@ def writeOnPrefs():
     return None
     
 def drawToggle(self, context):
+    bpy.context.preferences.addons["abTools"].preferences.abraon = False
     ic = icons_coll["icons"]
     logo = ic["logo"]
     self.layout.operator("at.toggleprefs",text="",icon_value=logo.icon_id)
@@ -63,6 +64,7 @@ def updateHeader(self, context):
     bpy.context.preferences.themes[0].preferences.space.header = self.header_col
 
 def restorePrefs():
+    """Restores original preferences window when AbraTools is toggled off."""
 
     prefs = bpy.context.preferences.addons["abTools"].preferences
     if prefs.abraon == False:
@@ -89,6 +91,7 @@ def restorePrefs():
     return None
 
 def prefsHeaderWrite(self, context):
+    """Draw aT header and tools"""
     prefs = bpy.context.preferences.addons["abTools"].preferences
     layout = self.layout
 
@@ -162,10 +165,12 @@ def prefsHeaderWrite(self, context):
     return 
     
 def prefsBodyWrite(self, context):
+    """Draw aT body (visibility options and settings)"""
+
     layout = self.layout
     prefs = bpy.context.preferences.addons["abTools"].preferences
     row = layout.box()
-    col=row.column()
+    col = row.column()
     if (prefs.toolshelf_pages == "home"):
         col.label(text="Welcome to the AbraTools Toolshelf!")
         col.label(text="Here you can access header tools and change how the header looks!")
@@ -206,6 +211,7 @@ def prefsBodyWrite(self, context):
     return 
     
 def prefsSidebarWrite(self, context):
+    """Draw sidebar tabs"""
     layout = self.layout
     prefs = bpy.context.preferences.addons["abTools"].preferences
 

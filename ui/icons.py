@@ -1,4 +1,4 @@
-import bpy, os
+import bpy.utils.previews, os
 
 icons_coll = {}
 

@@ -4,7 +4,7 @@ from . import prefs
 
 class ABRA_OT_mpathpanel(bpy.types.Operator):
     bl_label = "Motion Path Settings"
-    bl_idname= "message.mpathpanel"
+    bl_idname = "message.mpathpanel"
  
     def execute(self, context):
         self.report({'INFO'}, "Changes saved")
