@@ -1,3 +1,6 @@
+**At this time it's advised that you download from [RELEASES](https://github.com/abrasic/abratools/releases) instead of directly from the REPOSITRORY.**
+
+
 # AbraTools Alpha
 ### IMPORTANT: **Code is a mess. Be careful using it in production. Bug reports, feature requests and PRs are appreciated.**
 
