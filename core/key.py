@@ -129,21 +129,27 @@ class ABRA_OT_tangent_keypath(bpy.types.Operator):
                 prefs = bpy.context.preferences.addons["abTools"].preferences
                 range = api.get_frame_range()
                 currentFrame = api.get_current_frame()
-                if prefs.path_calc == "range":
-                    if bpy.context.mode == "POSE":
-                        opcode.paths_calculate(start_frame=range[0], end_frame=range[1], bake_location=prefs.path_loc)
-                    else:
-                        opcode.paths_calculate(start_frame=range[0], end_frame=range[1])
-                if prefs.path_calc == "currentEnd" and currentFrame < range[1]:
-                    if bpy.context.mode == "POSE":
-                        opcode.paths_calculate(start_frame=currentFrame, end_frame=range[1], bake_location=prefs.path_loc)
-                    else:
-                        opcode.paths_calculate(start_frame=currentFrame, end_frame=range[1])
-                if prefs.path_calc == "currentAdd":  
-                    if bpy.context.mode == "POSE":
-                        opcode.paths_calculate(start_frame=currentFrame, end_frame=currentFrame + prefs.path_add + 1, bake_location=prefs.path_loc)
-                    else:
-                        opcode.paths_calculate(start_frame=currentFrame, end_frame=currentFrame + prefs.path_add + 1)
+                if bpy.app.version < (3, 2, 0):
+                    if prefs.path_calc == "range":
+                        if bpy.context.mode == "POSE":
+                            opcode.paths_calculate(start_frame=range[0], end_frame=range[1], bake_location=prefs.path_loc)
+                        else:
+                            opcode.paths_calculate(start_frame=range[0], end_frame=range[1])
+                    if prefs.path_calc == "currentEnd" and currentFrame < range[1]:
+                        if bpy.context.mode == "POSE":
+                            opcode.paths_calculate(start_frame=currentFrame, end_frame=range[1], bake_location=prefs.path_loc)
+                        else:
+                            opcode.paths_calculate(start_frame=currentFrame, end_frame=range[1])
+                    if prefs.path_calc == "currentAdd":  
+                        if bpy.context.mode == "POSE":
+                            opcode.paths_calculate(start_frame=currentFrame, end_frame=currentFrame + prefs.path_add + 1, bake_location=prefs.path_loc)
+                        else:
+                            opcode.paths_calculate(start_frame=currentFrame, end_frame=currentFrame + prefs.path_add + 1)
+                else:
+                    active = bpy.context.active_object
+                    if active:
+                        if bpy.context.mode == "POSE" and active.pose:
+                            bpy.ops.pose.paths_calculate()
 
                 return {"FINISHED"}
             else:
@@ -200,8 +206,8 @@ class ABRA_OT_range_to_selection(bpy.types.Operator):
                 maximum = omax
 
             if minimum != maximum:
-                bpy.context.scene.frame_start = minimum
-                bpy.context.scene.frame_end = maximum
+                bpy.context.scene.frame_start = int(minimum)
+                bpy.context.scene.frame_end = int(maximum)
         else:
             area.type = old_type
             return {"CANCELLED"}

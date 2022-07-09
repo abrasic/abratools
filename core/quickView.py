@@ -1,6 +1,35 @@
 import bpy, re
 from . import api
 
+class ABRA_OT_isolate_func(bpy.types.Operator):
+    bl_idname = "screen.at_isolate_function"
+    bl_label = "Isolate Curves (Exec)"
+    bl_description = "Internal use only"
+    bl_options = {"REGISTER"}
+
+    def execute(self, context):
+        prefs = bpy.context.preferences.addons["abTools"].preferences
+        wm = context.window_manager
+        if(context.area.type == "GRAPH_EDITOR"):
+            if prefs.isolate_curves:
+                bpy.ops.graph.hide(unselected=True)
+                return {"FINISHED"}
+            else:
+                return {'CANCELLED'}
+        else:
+            return {'CANCELLED'}
+    
+class ABRA_OT_isolate_curves(bpy.types.Operator):
+    bl_idname = "screen.at_isolate_curves"
+    bl_label = "Isolate Curves [BETA]"
+    bl_description = "While enabled, AbraTools will automatically hide F-Curve channels that aren't selected. This is a beta feature"
+    bl_options = {"REGISTER"}
+
+    def execute(self, context):
+        prefs = bpy.context.preferences.addons["abTools"].preferences
+        prefs.isolate_curves = not prefs.isolate_curves
+        return {"FINISHED"}
+      
 class ABRA_OT_visible_loc(bpy.types.Operator):
     bl_idname = "screen.at_visible_loc"
     bl_label = "Quick View Location"
@@ -125,4 +154,4 @@ class ABRA_OT_visible_const(bpy.types.Operator):
         area.type = old
         return {"FINISHED"}
 
-cls = (ABRA_OT_visible_loc,ABRA_OT_visible_rot,ABRA_OT_visible_scl,ABRA_OT_visible_keys,ABRA_OT_visible_props,ABRA_OT_visible_const,)
+cls = (ABRA_OT_isolate_func,ABRA_OT_isolate_curves,ABRA_OT_visible_loc,ABRA_OT_visible_rot,ABRA_OT_visible_scl,ABRA_OT_visible_keys,ABRA_OT_visible_props,ABRA_OT_visible_const,)

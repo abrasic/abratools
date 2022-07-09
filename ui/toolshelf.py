@@ -15,7 +15,6 @@ class ABRA_OT_togglePrefs(bpy.types.Operator):
 
     def execute(self, context):
         abraOn = bpy.context.preferences.addons["abTools"].preferences.abraon
-        print("EXEC" + str(abraOn))
         if abraOn == False:
             writeOnPrefs()
         else:  
@@ -30,6 +29,7 @@ def writeOnPrefs():
     
     if prefs.abraon == True:
         return None
+
     
     # Store native prefs content while aT is in use.
     global prefsHeaderOld, prefsBodyOld, prefsSidebarOld
@@ -50,6 +50,8 @@ def writeOnPrefs():
     for window in bpy.context.window_manager.windows:
         for area in window.screen.areas:
             if(area.type == 'PREFERENCES'):
+                if not bpy.context.preferences.active_section == "ADDONS": ## This needs to check otherwise the interface wont draw
+                    bpy.context.preferences.active_section = "ADDONS"
                 area.tag_redraw()
 
     return None
@@ -100,6 +102,8 @@ def prefsHeaderWrite(self, context):
     layout = self.layout
 
     ## QUICK VIEW ##
+    if (prefs.vis_isolate):
+        layout.operator(quickView.ABRA_OT_isolate_curves.bl_idname, text='', depress=prefs.isolate_curves, icon="FCURVE")
     if (prefs.vis_viewloc):
         layout.operator(quickView.ABRA_OT_visible_loc.bl_idname, text='', icon="CON_LOCLIMIT")
     if (prefs.vis_viewrot):
@@ -133,7 +137,7 @@ def prefsHeaderWrite(self, context):
 
     ## TANGENTS ## 
     layout.separator()
-    
+
     if (prefs.vis_tanfree): 
         layout.operator(key.ABRA_OT_tangent_free.bl_idname, text='', icon="HANDLE_FREE")
     if (prefs.vis_tanaligned): 
@@ -181,6 +185,7 @@ def prefsBodyWrite(self, context):
         col.operator("wm.url_open", text="Documentation").url = "https://docs.abx.gg"
         col.operator("wm.url_open", text="GitHub").url = "https://github.com/abrasic/abratools"
     if (prefs.toolshelf_pages == "quickview"):
+        col.prop(prefs, "vis_isolate")
         col.prop(prefs, "vis_viewloc")
         col.prop(prefs, "vis_viewrot")
         col.prop(prefs, "vis_viewscl")
@@ -206,7 +211,7 @@ def prefsBodyWrite(self, context):
     if (prefs.toolshelf_pages == "settings"):
         col.prop(prefs, "header_col")
 
-    layout.label(text="aT | alpha2")
+    layout.label(text="aT | alpha3")
 
     return 
     

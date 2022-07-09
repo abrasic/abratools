@@ -29,10 +29,16 @@ class AbraToolsPrefs(AddonPreferences):
         default = False
     )
 
-    viewloc: BoolProperty(
-        name = quickView.ABRA_OT_visible_loc.bl_label,
-        description = quickView.ABRA_OT_visible_loc.bl_description,
+    vis_isolate: BoolProperty(
+        name = quickView.ABRA_OT_isolate_curves.bl_label,
+        description = quickView.ABRA_OT_isolate_curves.bl_description,
         default = True
+    )
+
+    isolate_curves: BoolProperty(
+        name = "Isolate Curves Enabled",
+        description = "For internal use. Checks if user enabled Isolate Curves",
+        default = False
     )
 
     vis_viewloc: BoolProperty(
@@ -189,7 +195,7 @@ class AbraToolsPrefs(AddonPreferences):
         subtype = 'COLOR',
         size = 4,
         min = 0.0, max = 1.0,
-        description = "The color of the header while AbraTools is in use.",
+        description = "The color of the header while AbraTools is in use",
         update = toolshelf.updateHeader
     )
 
@@ -197,9 +203,6 @@ class AbraToolsPrefs(AddonPreferences):
     def draw(self, context):
         prefs = bpy.context.preferences.addons["abTools"].preferences
         layout = self.layout
-        layout.label(text="AbraTools works using a customized preferences page. In order to access it, click the button below.")
-        rowAppend = layout.row()
-        rowAppend.scale_y = 3
-        rowAppend.operator("at.toggleprefs",text="Enter Toolshelf",icon="ASSET_MANAGER")
+        layout.label(text="AbraTools works using a customized preferences page. For the best experience, add a Preferences menu into your workspace and press the 'aT' icon at the top right of the menu.")
 
 cls = (AbraToolsPrefs,)
