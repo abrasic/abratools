@@ -10,7 +10,18 @@ AbraTools is an **unfinished animation toolset** for Blender 3. It utilizes the 
 * **Installation instructions** [here](https://docs.abx.gg/support/download-and-setup). 
 * **Read the docs** [here](https://docs.abx.gg).
 
+# SETUP
+<img src='https://1352856054-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FVEvUhh6zNMLIFbTZCBjF%2Fuploads%2F6Dt25W2vwT9be0SgVuJg%2Fworkspace_setup.gif?alt=media&token=74f79393-b2c3-4d40-ace5-460f3f7753a4' height='325'>
+
+The best way to use the Toolshelf is by dragging out a new area (by clicking and dragging up on a corner of an existing area) and switch it to the Preferences window. From there, click on the 'aT' icon at the right side of the header and it's ready to go!
+
+You can shrink the panel so only the buttons in the header are shown (as shown in the gif above). If you ever want to make changes to your toolshelf, you can do so by expanding it again and you can access the Toolshelf settings.
+
 # TOOLS
+## Isolate Curves
+Automatically hide F-Curves that aren't selected. Bye-bye, `Shift+H`!
+<img src='https://1352856054-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FVEvUhh6zNMLIFbTZCBjF%2Fuploads%2FB98EYtCW0t2zu5VVcmc5%2Fisolate_curves.gif?alt=media&token=666c8e89-8091-45f0-a795-c76f662997e2' height='325'>
+
 ## Quick Motion Path Setup
 Avoid the tedious work of setting up motion paths. One click and you're ready to rock.
 
