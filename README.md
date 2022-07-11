@@ -1,4 +1,10 @@
-**At this time it's advised that you download from [RELEASES](https://github.com/abrasic/abratools/releases) instead of directly from the REPOSITRORY.**
+## **At this time it's advised that you download from [RELEASES](https://github.com/abrasic/abratools/releases) instead of directly from the REPOSITRORY.**
+
+## **We currently give support for Blender 3.0 and higher.**
+
+
+
+
 
 
 # AbraTools Alpha
