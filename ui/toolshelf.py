@@ -231,7 +231,7 @@ def prefsBodyWrite(self, context):
         col.prop(prefs, "header_col")
         col.prop(prefs, "button_width")
 
-    layout.label(text="aT | alpha3")
+    layout.label(text="aT | alpha4")
 
     return 
     
