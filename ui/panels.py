@@ -60,7 +60,9 @@ class ABRA_OT_mpathpanel(bpy.types.Operator):
                     layout.prop(prefs, "path_loc")
                 else:
                     layout.label(text="No active object is selected.")
-
+            else:
+                layout.label(text="Unsupported object")
+                layout.label(text="Try selecting something in object/pose mode")
 
  
 cls = (ABRA_OT_mpathpanel,)
