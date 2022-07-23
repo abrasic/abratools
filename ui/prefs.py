@@ -110,6 +110,7 @@ class AbraToolsPrefs(AddonPreferences):
         description = key.ABRA_OT_key_delete.bl_description,
         default = True
     )
+    
     vis_keyshape: BoolProperty(
         name = key.ABRA_OT_key_shapekeys.bl_label,
         description = key.ABRA_OT_key_shapekeys.bl_description,
@@ -153,6 +154,7 @@ class AbraToolsPrefs(AddonPreferences):
         description = key.ABRA_OT_tangent_vector.bl_description,
         default = False
     )
+
     vis_tanauto: BoolProperty(
         name = key.ABRA_OT_tangent_auto.bl_label,
         description = key.ABRA_OT_tangent_auto.bl_description,
