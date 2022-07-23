@@ -164,6 +164,25 @@ def key_clipboard(self, type=None):
             bpy.ops.graph.paste()
         except RuntimeError:
             self.report({"INFO"}, "No keys to paste")
+
+    elif (type=="delete"):
+        try:
+            bpy.ops.graph.reveal()
+            curves = get_visible_fcurves()
+            curves_are_active = False
+            if curves:
+                for curve in curves:
+                    if curve.select:
+                        curves_are_active = True
+                        break
+            if curves_are_active:
+                bpy.ops.graph.delete()
+            else:
+                bpy.ops.graph.select_column(mode='CFRA')
+                bpy.ops.graph.delete()
+        except RuntimeError:
+            self.report({"INFO"}, "No keys to delete")
+
             
     area.type = old_type
  

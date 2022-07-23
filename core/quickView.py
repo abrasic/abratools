@@ -33,7 +33,7 @@ class ABRA_OT_isolate_curves(bpy.types.Operator):
 class ABRA_OT_visible_loc(bpy.types.Operator):
     bl_idname = "screen.at_visible_loc"
     bl_label = "Quick View Location"
-    bl_description = "Quick operation to only show Location F-Curves"
+    bl_description = "Quick operation to only show location F-Curves"
     bl_options = {"REGISTER"}
 
     def execute(self, context):
@@ -54,7 +54,7 @@ class ABRA_OT_visible_loc(bpy.types.Operator):
 class ABRA_OT_visible_rot(bpy.types.Operator):
     bl_idname = "screen.at_visible_rot"
     bl_label = "Quick View Rotation"
-    bl_description = "Quick operation to only show Euler Rotation F-Curves. Hold Shift + Click to show Quaternion F-Curves"
+    bl_description = "Quick operation to only show euler rotation F-Curves. Hold Shift + Click to show quaternion F-Curves"
     bl_options = {"REGISTER"}
 
     def invoke(self, context, event):
@@ -77,7 +77,7 @@ class ABRA_OT_visible_rot(bpy.types.Operator):
 class ABRA_OT_visible_scl(bpy.types.Operator):
     bl_idname = "screen.at_visible_scl"
     bl_label = "Quick View Scale"
-    bl_description = "Quick operation to only show Scale F-Curves"
+    bl_description = "Quick operation to only show scale F-Curves"
     bl_options = {"REGISTER"}
 
     def execute(self, context):
@@ -97,7 +97,7 @@ class ABRA_OT_visible_scl(bpy.types.Operator):
 class ABRA_OT_visible_keys(bpy.types.Operator):
     bl_idname = "screen.at_visible_keys"
     bl_label = "Quick View Shape Keys"
-    bl_description = "Quick operation to only show Shape Key F-Curves"
+    bl_description = "Quick operation to only show shape key F-Curves"
     bl_options = {"REGISTER"}
 
     def execute(self, context):
@@ -117,7 +117,7 @@ class ABRA_OT_visible_keys(bpy.types.Operator):
 class ABRA_OT_visible_props(bpy.types.Operator):
     bl_idname = "screen.at_visible_props"
     bl_label = "Quick View Custom Properties"
-    bl_description = "Quick operation to only show Custom Property F-Curves"
+    bl_description = "Quick operation to only show custom property F-Curves"
     bl_options = {"REGISTER"}
 
     def execute(self, context):
@@ -137,7 +137,7 @@ class ABRA_OT_visible_props(bpy.types.Operator):
 class ABRA_OT_visible_const(bpy.types.Operator):
     bl_idname = "screen.at_visible_constraint"
     bl_label = "Quick View Constraint Influence"
-    bl_description = "Quick operation to only show Custom Property F-Curves"
+    bl_description = "Quick operation to only show constraint influence F-Curves"
     bl_options = {"REGISTER"}
 
     def execute(self, context):

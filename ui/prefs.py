@@ -105,6 +105,11 @@ class AbraToolsPrefs(AddonPreferences):
         default = True
     )
 
+    vis_keydelete: BoolProperty(
+        name = key.ABRA_OT_key_delete.bl_label,
+        description = key.ABRA_OT_key_delete.bl_description,
+        default = True
+    )
     vis_keyshape: BoolProperty(
         name = key.ABRA_OT_key_shapekeys.bl_label,
         description = key.ABRA_OT_key_shapekeys.bl_description,
@@ -197,6 +202,13 @@ class AbraToolsPrefs(AddonPreferences):
         min = 0.0, max = 1.0,
         description = "The color of the header while AbraTools is in use",
         update = toolshelf.updateHeader
+    )
+
+    button_width: bpy.props.FloatProperty(
+        name = "Button Width",
+        min = 0.8, max = 2.0,
+        default = 1.0,
+        description = "Sets the width of buttons in the toolshelf"
     )
 
     ###############################

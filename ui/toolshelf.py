@@ -1,3 +1,4 @@
+from linecache import lazycache
 import bpy 
 
 from ..core import key, quickView
@@ -7,6 +8,28 @@ prefsHeaderOld = None
 prefsBodyOld = None
 prefsSidebarOld = None
 prefsOldHeaderCol = bpy.context.preferences.themes[0].preferences.space.header[:]
+
+ic = icons_coll["icons"]
+ic_logo = ic["logo"]
+
+ic_copy_keys = ic["copy_keys"]
+ic_create_path = ic["create_path"]
+ic_delete_keys = ic["delete_keys"]
+ic_delete_path = ic["delete_path"]
+ic_isolate_curves = ic["isolate_curves"]
+ic_key_all_shapes = ic["key_all_shapes"]
+ic_key_selected = ic["key_selected"]
+ic_key_visible = ic["key_visible"]
+ic_key_whole_armature = ic["key_whole_armature"]
+ic_paste_keys = ic["paste_keys"]
+ic_range_to_selection = ic["range_to_selection"]
+ic_view_const = ic["view_const"]
+ic_view_loc = ic["view_loc"]
+ic_view_props = ic["view_props"]
+ic_view_rot = ic["view_rot"]
+ic_view_scale = ic["view_scale"]
+ic_view_shapes = ic["view_shapes"]
+
 
 class ABRA_OT_togglePrefs(bpy.types.Operator):
     bl_idname      = "at.toggleprefs"
@@ -58,9 +81,7 @@ def writeOnPrefs():
     
 def drawToggle(self, context):
     bpy.context.preferences.addons["abTools"].preferences.abraon = False
-    ic = icons_coll["icons"]
-    logo = ic["logo"]
-    self.layout.operator("at.toggleprefs",text="",icon_value=logo.icon_id)
+    self.layout.operator("at.toggleprefs",text="",icon_value=ic_logo.icon_id)
 
 def updateHeader(self, context):
     bpy.context.preferences.themes[0].preferences.space.header = self.header_col
@@ -100,44 +121,43 @@ def prefsHeaderWrite(self, context):
     row = layout.row()
     row.template_header()
     layout = self.layout
+    layout.scale_x = prefs.button_width
 
     ## QUICK VIEW ##
     if (prefs.vis_isolate):
-        layout.operator(quickView.ABRA_OT_isolate_curves.bl_idname, text='', depress=prefs.isolate_curves, icon="FCURVE")
+        layout.operator(quickView.ABRA_OT_isolate_curves.bl_idname, text='', depress=prefs.isolate_curves, icon_value=ic_isolate_curves.icon_id)
     if (prefs.vis_viewloc):
-        layout.operator(quickView.ABRA_OT_visible_loc.bl_idname, text='', icon="CON_LOCLIMIT")
+        layout.operator(quickView.ABRA_OT_visible_loc.bl_idname, text='', icon_value=ic_view_loc.icon_id)
     if (prefs.vis_viewrot):
         layout.operator_context = "INVOKE_DEFAULT"
-        layout.operator(quickView.ABRA_OT_visible_rot.bl_idname, text='', icon="CON_ROTLIMIT")
+        layout.operator(quickView.ABRA_OT_visible_rot.bl_idname, text='', icon_value=ic_view_rot.icon_id)
         layout.operator_context = "EXEC_DEFAULT"
     if (prefs.vis_viewscl):
-        layout.operator(quickView.ABRA_OT_visible_scl.bl_idname, text='', icon="CON_SIZELIMIT")
+        layout.operator(quickView.ABRA_OT_visible_scl.bl_idname, text='', icon_value=ic_view_scale.icon_id)
     if (prefs.vis_viewshkey):
-        layout.operator(quickView.ABRA_OT_visible_keys.bl_idname, text='', icon="SHAPEKEY_DATA")
+        layout.operator(quickView.ABRA_OT_visible_keys.bl_idname, text='', icon_value=ic_view_shapes.icon_id)
     if (prefs.vis_viewprops):
-        layout.operator(quickView.ABRA_OT_visible_props.bl_idname, text='', icon="PROPERTIES")
+        layout.operator(quickView.ABRA_OT_visible_props.bl_idname, text='', icon_value=ic_view_props.icon_id)
     if (prefs.vis_viewinfl):
-        layout.operator(quickView.ABRA_OT_visible_const.bl_idname, text='', icon="CONSTRAINT")
+        layout.operator(quickView.ABRA_OT_visible_const.bl_idname, text='', icon_value=ic_view_const.icon_id)
 
     ## KEYING ##
-    layout.separator()
-
     if (prefs.vis_keysel):  
-        layout.operator(key.ABRA_OT_key_selected.bl_idname, text='', icon="KEYFRAME")
+        layout.operator(key.ABRA_OT_key_selected.bl_idname, text='', icon_value=ic_key_selected.icon_id)
     if (prefs.vis_keyvis): 
-        layout.operator(key.ABRA_OT_key_visible.bl_idname, text='', icon="KEYFRAME_HLT")
+        layout.operator(key.ABRA_OT_key_visible.bl_idname, text='', icon_value=ic_key_visible.icon_id)
     if (prefs.vis_keycopy):
-        layout.operator(key.ABRA_OT_key_copy.bl_idname, text='', icon="COPYDOWN")
+        layout.operator(key.ABRA_OT_key_copy.bl_idname, text='', icon_value=ic_copy_keys.icon_id)
     if (prefs.vis_keypaste): 
-        layout.operator(key.ABRA_OT_key_paste.bl_idname, text='', icon="PASTEDOWN")
+        layout.operator(key.ABRA_OT_key_paste.bl_idname, text='', icon_value=ic_paste_keys.icon_id)
+    if (prefs.vis_keydelete): 
+        layout.operator(key.ABRA_OT_key_delete.bl_idname, text='', icon_value=ic_delete_keys.icon_id)
     if (prefs.vis_keyshape): 
-        layout.operator(key.ABRA_OT_key_shapekeys.bl_idname, text='', icon="MOD_LINEART")
+        layout.operator(key.ABRA_OT_key_shapekeys.bl_idname, text='', icon_value=ic_key_all_shapes.icon_id)
     if (prefs.vis_keyarmature): 
-        layout.operator(key.ABRA_OT_key_armature.bl_idname, text='', icon="OUTLINER_DATA_ARMATURE")
+        layout.operator(key.ABRA_OT_key_armature.bl_idname, text='', icon_value=ic_key_whole_armature.icon_id)
 
     ## TANGENTS ## 
-    layout.separator()
-
     if (prefs.vis_tanfree): 
         layout.operator(key.ABRA_OT_tangent_free.bl_idname, text='', icon="HANDLE_FREE")
     if (prefs.vis_tanaligned): 
@@ -150,14 +170,12 @@ def prefsHeaderWrite(self, context):
         layout.operator(key.ABRA_OT_tangent_autoclamp.bl_idname, text='', icon="HANDLE_AUTOCLAMPED")
 
     ## OTHER ##
-    layout.separator()
-
     if (prefs.vis_rangesel): 
-        layout.operator(key.ABRA_OT_range_to_selection.bl_idname, text='', icon="FCURVE")
+        layout.operator(key.ABRA_OT_range_to_selection.bl_idname, text='', icon_value=ic_range_to_selection.icon_id)
     if (prefs.vis_keypath): 
         layout.operator_context = "INVOKE_DEFAULT"
-        layout.operator(key.ABRA_OT_tangent_keypath.bl_idname, text='', icon="FORCE_VORTEX")
-        layout.operator(key.ABRA_OT_tangent_keypathclear.bl_idname, text='', icon="X")
+        layout.operator(key.ABRA_OT_tangent_keypath.bl_idname, text='', icon_value=ic_create_path.icon_id)
+        layout.operator(key.ABRA_OT_tangent_keypathclear.bl_idname, text='', icon_value=ic_delete_path.icon_id)
         layout.operator_context = "EXEC_DEFAULT"
 
     layout.separator_spacer()
@@ -197,6 +215,7 @@ def prefsBodyWrite(self, context):
         col.prop(prefs, "vis_keyvis")
         col.prop(prefs, "vis_keycopy")
         col.prop(prefs, "vis_keypaste")
+        col.prop(prefs, "vis_keydelete")
         col.prop(prefs, "vis_keyshape")
         col.prop(prefs, "vis_keyarmature")
     if (prefs.toolshelf_pages == "tangents"):
@@ -210,6 +229,7 @@ def prefsBodyWrite(self, context):
         col.prop(prefs, "vis_keypath")
     if (prefs.toolshelf_pages == "settings"):
         col.prop(prefs, "header_col")
+        col.prop(prefs, "button_width")
 
     layout.label(text="aT | alpha3")
 

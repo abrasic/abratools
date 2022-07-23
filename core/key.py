@@ -58,6 +58,16 @@ class ABRA_OT_key_paste(bpy.types.Operator):
         api.key_clipboard(self, type="paste")
         return {"FINISHED"}
 
+class ABRA_OT_key_delete(bpy.types.Operator):
+    bl_idname = "screen.at_delete_keys"
+    bl_label = "Delete Keys"
+    bl_description = "Deletes selected keys. If nothing is selected, keys from the playhead will be deleted instead"
+    bl_options = {"REGISTER", "UNDO"}
+
+    def execute(self, context):
+        api.key_clipboard(self, type="delete")
+        return {"FINISHED"}
+
 #########################
 
 class ABRA_OT_key_shapekeys(bpy.types.Operator):
@@ -150,6 +160,8 @@ class ABRA_OT_tangent_keypath(bpy.types.Operator):
                     if active:
                         if bpy.context.mode == "POSE" and active.pose:
                             bpy.ops.pose.paths_calculate()
+                        elif bpy.context.mode == "OBJECT" and active:
+                            bpy.ops.object.paths_calculate()
 
                 return {"FINISHED"}
             else:
@@ -267,4 +279,4 @@ class ABRA_OT_tangent_autoclamp(bpy.types.Operator):
         api.set_tangent("AUTO_CLAMPED")
         return {"FINISHED"}
         
-cls = (ABRA_OT_key_selected,ABRA_OT_key_visible,ABRA_OT_key_copy,ABRA_OT_key_paste,ABRA_OT_key_shapekeys,ABRA_OT_key_armature,ABRA_OT_tangent_keypath,ABRA_OT_tangent_keypathclear,ABRA_OT_range_to_selection,ABRA_OT_tangent_free,ABRA_OT_tangent_aligned,ABRA_OT_tangent_vector,ABRA_OT_tangent_auto,ABRA_OT_tangent_autoclamp)
+cls = (ABRA_OT_key_selected,ABRA_OT_key_visible,ABRA_OT_key_copy,ABRA_OT_key_paste,ABRA_OT_key_delete,ABRA_OT_key_shapekeys,ABRA_OT_key_armature,ABRA_OT_tangent_keypath,ABRA_OT_tangent_keypathclear,ABRA_OT_range_to_selection,ABRA_OT_tangent_free,ABRA_OT_tangent_aligned,ABRA_OT_tangent_vector,ABRA_OT_tangent_auto,ABRA_OT_tangent_autoclamp)
