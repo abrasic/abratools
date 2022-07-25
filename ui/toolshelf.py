@@ -195,7 +195,8 @@ def prefsBodyWrite(self, context):
     layout = self.layout
     prefs = bpy.context.preferences.addons["abTools"].preferences
     row = layout.box()
-    col = row.column()
+    fill = row.split(factor=0.33)
+    col = fill.column()
     if (prefs.toolshelf_pages == "home"):
         col.label(text="Welcome to the AbraTools Toolshelf!")
         col.label(text="Here you can access header tools and change how the header looks!")
@@ -206,36 +207,36 @@ def prefsBodyWrite(self, context):
         col.operator("wm.url_open", text="Documentation").url = "https://docs.abx.gg"
         col.operator("wm.url_open", text="GitHub").url = "https://github.com/abrasic/abratools"
     if (prefs.toolshelf_pages == "quickview"):
-        col.prop(prefs, "vis_isolate")
-        col.prop(prefs, "vis_overlay")
-        col.prop(prefs, "vis_viewloc")
-        col.prop(prefs, "vis_viewrot")
-        col.prop(prefs, "vis_viewscl")
-        col.prop(prefs, "vis_viewshkey")
-        col.prop(prefs, "vis_viewprops")
-        col.prop(prefs, "vis_viewinfl")
+        col.prop(prefs, "vis_isolate", icon_value=ic_isolate_curves.icon_id)
+        col.prop(prefs, "vis_overlay", icon_value=ic_auto_overlay.icon_id)
+        col.prop(prefs, "vis_viewloc", icon_value=ic_view_loc.icon_id)
+        col.prop(prefs, "vis_viewrot", icon_value=ic_view_rot.icon_id)
+        col.prop(prefs, "vis_viewscl", icon_value=ic_view_scale.icon_id)
+        col.prop(prefs, "vis_viewshkey", icon_value=ic_view_shapes.icon_id)
+        col.prop(prefs, "vis_viewprops", icon_value=ic_view_props.icon_id)
+        col.prop(prefs, "vis_viewinfl", icon_value=ic_view_const.icon_id)
     if (prefs.toolshelf_pages == "fastkey"):
-        col.prop(prefs, "vis_keysel")
-        col.prop(prefs, "vis_keyvis")
-        col.prop(prefs, "vis_keycopy")
-        col.prop(prefs, "vis_keypaste")
-        col.prop(prefs, "vis_keydelete")
-        col.prop(prefs, "vis_keyshape")
-        col.prop(prefs, "vis_keyarmature")
+        col.prop(prefs, "vis_keysel", icon_value=ic_key_selected.icon_id)
+        col.prop(prefs, "vis_keyvis", icon_value=ic_key_visible.icon_id)
+        col.prop(prefs, "vis_keycopy", icon_value=ic_copy_keys.icon_id)
+        col.prop(prefs, "vis_keypaste", icon_value=ic_paste_keys.icon_id)
+        col.prop(prefs, "vis_keydelete", icon_value=ic_delete_keys.icon_id)
+        col.prop(prefs, "vis_keyshape", icon_value=ic_key_all_shapes.icon_id)
+        col.prop(prefs, "vis_keyarmature", icon_value=ic_key_whole_armature.icon_id)
     if (prefs.toolshelf_pages == "tangents"):
-        col.prop(prefs, "vis_tanfree")
-        col.prop(prefs, "vis_tanaligned")
-        col.prop(prefs, "vis_tanvector")
-        col.prop(prefs, "vis_tanauto")
-        col.prop(prefs, "vis_tanautoclamp")
+        col.prop(prefs, "vis_tanfree", icon="HANDLE_FREE")
+        col.prop(prefs, "vis_tanaligned", icon="HANDLE_ALIGNED")
+        col.prop(prefs, "vis_tanvector", icon="HANDLE_VECTOR")
+        col.prop(prefs, "vis_tanauto", icon="HANDLE_AUTO")
+        col.prop(prefs, "vis_tanautoclamp", icon="HANDLE_AUTOCLAMPED")
     if (prefs.toolshelf_pages == "other"):
-        col.prop(prefs, "vis_rangesel")
-        col.prop(prefs, "vis_keypath")
+        col.prop(prefs, "vis_rangesel", icon_value=ic_range_to_selection.icon_id)
+        col.prop(prefs, "vis_keypath", icon_value=ic_create_path.icon_id)
     if (prefs.toolshelf_pages == "settings"):
         col.prop(prefs, "header_col")
         col.prop(prefs, "button_width")
 
-    layout.label(text="aT | alpha4")
+    layout.label(text="aT | alpha5")
 
     return 
     
