@@ -12,6 +12,7 @@ prefsOldHeaderCol = bpy.context.preferences.themes[0].preferences.space.header[:
 ic = icons_coll["icons"]
 ic_logo = ic["logo"]
 
+ic_auto_overlay = ic["auto_overlay"]
 ic_copy_keys = ic["copy_keys"]
 ic_create_path = ic["create_path"]
 ic_delete_keys = ic["delete_keys"]
@@ -126,6 +127,8 @@ def prefsHeaderWrite(self, context):
     ## QUICK VIEW ##
     if (prefs.vis_isolate):
         layout.operator(quickView.ABRA_OT_isolate_curves.bl_idname, text='', depress=prefs.isolate_curves, icon_value=ic_isolate_curves.icon_id)
+    if (prefs.vis_overlay):
+        layout.operator(quickView.ABRA_OT_auto_overlay.bl_idname, text='', depress=prefs.auto_overlay, icon_value=ic_auto_overlay.icon_id)
     if (prefs.vis_viewloc):
         layout.operator(quickView.ABRA_OT_visible_loc.bl_idname, text='', icon_value=ic_view_loc.icon_id)
     if (prefs.vis_viewrot):
@@ -204,6 +207,7 @@ def prefsBodyWrite(self, context):
         col.operator("wm.url_open", text="GitHub").url = "https://github.com/abrasic/abratools"
     if (prefs.toolshelf_pages == "quickview"):
         col.prop(prefs, "vis_isolate")
+        col.prop(prefs, "vis_overlay")
         col.prop(prefs, "vis_viewloc")
         col.prop(prefs, "vis_viewrot")
         col.prop(prefs, "vis_viewscl")

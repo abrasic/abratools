@@ -17,8 +17,7 @@ class ABRA_OT_isolate_func(bpy.types.Operator):
             else:
                 return {'CANCELLED'}
         else:
-            return {'CANCELLED'}
-    
+            return {'CANCELLED'}                
 class ABRA_OT_isolate_curves(bpy.types.Operator):
     bl_idname = "screen.at_isolate_curves"
     bl_label = "Isolate Curves [BETA]"
@@ -29,6 +28,28 @@ class ABRA_OT_isolate_curves(bpy.types.Operator):
         prefs = bpy.context.preferences.addons["abTools"].preferences
         prefs.isolate_curves = not prefs.isolate_curves
         return {"FINISHED"}
+
+class ABRA_OT_auto_overlay(bpy.types.Operator):
+    bl_idname = "screen.at_auto_overlay"
+    bl_label = "Automatic Overlay"
+    bl_description = "While enabled, AbraTools will automatically turn off overlays while animation is playing"
+    bl_options = {"REGISTER"}
+
+    def execute(self, context):
+        prefs = bpy.context.preferences.addons["abTools"].preferences
+        prefs.auto_overlay = not prefs.auto_overlay
+        return {"FINISHED"}
+
+def overlay_func(self, context):
+    prefs = bpy.context.preferences.addons["abTools"].preferences
+    print(prefs.auto_overlay)
+    if prefs.auto_overlay:
+        isPlaying = bpy.context.screen.is_animation_playing
+        for area in bpy.context.screen.areas:
+            if area.type == 'VIEW_3D':
+                for space in area.spaces:
+                    if space.type == 'VIEW_3D':
+                        space.overlay.show_overlays = not isPlaying
       
 class ABRA_OT_visible_loc(bpy.types.Operator):
     bl_idname = "screen.at_visible_loc"
@@ -154,4 +175,4 @@ class ABRA_OT_visible_const(bpy.types.Operator):
         area.type = old
         return {"FINISHED"}
 
-cls = (ABRA_OT_isolate_func,ABRA_OT_isolate_curves,ABRA_OT_visible_loc,ABRA_OT_visible_rot,ABRA_OT_visible_scl,ABRA_OT_visible_keys,ABRA_OT_visible_props,ABRA_OT_visible_const,)
+cls = (ABRA_OT_isolate_func,ABRA_OT_isolate_curves,ABRA_OT_auto_overlay,ABRA_OT_visible_loc,ABRA_OT_visible_rot,ABRA_OT_visible_scl,ABRA_OT_visible_keys,ABRA_OT_visible_props,ABRA_OT_visible_const,)

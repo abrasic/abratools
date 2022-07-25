@@ -26,6 +26,7 @@ def register():
         bpy.utils.register_class(cls)
 
     bpy.types.USERPREF_HT_header.append(toolshelf.drawToggle)
+    bpy.app.handlers.frame_change_post.append(quickView.overlay_func)
 
     wm = bpy.context.window_manager
     kc = wm.keyconfigs.addon
@@ -44,6 +45,7 @@ def unregister():
 
     bpy.context.preferences.themes[0].preferences.space.header = toolshelf.prefsOldHeaderCol
     bpy.types.USERPREF_HT_header.remove(toolshelf.drawToggle)
+    bpy.app.handlers.frame_change_post.remove(quickView.overlay_func)
     
     for cls in classes:
         bpy.utils.unregister_class(cls)

@@ -41,6 +41,18 @@ class AbraToolsPrefs(AddonPreferences):
         default = False
     )
 
+    vis_overlay: BoolProperty(
+        name = quickView.ABRA_OT_auto_overlay.bl_label,
+        description = quickView.ABRA_OT_auto_overlay.bl_description,
+        default = True
+    )
+
+    auto_overlay: BoolProperty(
+        name = "Auto Overlay Enabled",
+        description = "For internal use. Checks if user enabled Auto Overlay",
+        default = False
+    )
+
     vis_viewloc: BoolProperty(
         name = quickView.ABRA_OT_visible_loc.bl_label,
         description = quickView.ABRA_OT_visible_loc.bl_description,
