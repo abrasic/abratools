@@ -1,4 +1,5 @@
 import bpy, re
+from bpy.app.handlers import persistent
 from . import api
 
 class ABRA_OT_isolate_func(bpy.types.Operator):
@@ -40,6 +41,7 @@ class ABRA_OT_auto_overlay(bpy.types.Operator):
         prefs.auto_overlay = not prefs.auto_overlay
         return {"FINISHED"}
 
+@persistent
 def overlay_func(self, context):
     prefs = bpy.context.preferences.addons["abTools"].preferences
     print(prefs.auto_overlay)
