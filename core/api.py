@@ -147,8 +147,13 @@ def set_tangent(tan):
 def key_clipboard(self, type=None):
     area = bpy.context.area
     old_type = area.type
+    only_show_selected = use_oss()
     area.type = 'GRAPH_EDITOR'
-    
+    area.spaces[0].dopesheet.show_only_selected = only_show_selected[0]
+
+    if only_show_selected[1]:
+        bpy.ops.graph.reveal() # Dopesheet elemtsn cannot be hidden; this is so you expect all visible keys to be removed
+
     if (type=="copy"):
         if get_visible_fcurves():
             bpy.ops.graph.select_all(action='DESELECT')
@@ -167,7 +172,6 @@ def key_clipboard(self, type=None):
 
     elif (type=="delete"):
         try:
-            bpy.ops.graph.reveal()
             curves = get_visible_fcurves()
             curves_are_active = False
             if curves:
@@ -192,3 +196,36 @@ def get_selected_bones():
         return len(bpy.context.selected_pose_bones)
     else:
         return 0
+
+def is_addon_enabled(name):
+    """Returns bool. Checks if addon "name" is installed and enabled. Used for third-party functions."""
+    try:
+        if bpy.context.preferences.addons[name]:
+            return True
+        else:
+            return False
+    except KeyError:
+        return False
+
+def use_oss():
+    """Returns [bool, bool]. Runs through all time-based areas in the active screen and look for OSS. If it's off, immediately break and return false to use for key management."""
+    use_selected = True
+    reveal_curves = False
+    for area in bpy.context.screen.areas:
+        if area.type == 'GRAPH_EDITOR':
+            for space in area.spaces:
+                if space.type == "GRAPH_EDITOR":
+                    print("Detected graph editor with: "+ str(space.dopesheet.show_only_selected))
+                    if space.dopesheet.show_only_selected == False:
+                        use_selected = False
+                        break
+        elif area.type == 'DOPESHEET_EDITOR':
+            for space in area.spaces:
+                if space.type == "DOPESHEET_EDITOR":
+                    print("Detected dope sheet with: "+ str(space.dopesheet.show_only_selected))
+                    if space.dopesheet.show_only_selected == False:
+                        reveal_curves = True
+                        use_selected = False
+                        break
+
+    return [use_selected, reveal_curves]

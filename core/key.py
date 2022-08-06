@@ -68,6 +68,53 @@ class ABRA_OT_key_delete(bpy.types.Operator):
         api.key_clipboard(self, type="delete")
         return {"FINISHED"}
 
+class ABRA_OT_key_timing(bpy.types.Operator):
+    bl_idname = "screen.at_copy_key_timing"
+    bl_label = "Copy Key Timing *"
+    bl_description = "* 'Copy Timing and Ease' addon required. Select two bones, where the active bone will share the key timing of the other"
+    bl_options = {"REGISTER", "UNDO"}
+
+    def execute(self, context):
+        if api.is_addon_enabled("Copy_Timing_and_Ease"):
+            bones = bpy.context.selected_pose_bones
+            if len(bones) == 2:
+                area = bpy.context.area
+                old_type = area.type
+                area.type = 'GRAPH_EDITOR'
+                obj = bpy.context.object
+                action = obj.animation_data.action
+
+                for bone in bones:
+                    if bone != bpy.context.active_pose_bone:
+                        print("selected bone")
+                        boneAction = action.groups.get(bone.name)
+                        for i in boneAction.channels:
+                            i.select = True
+                            for x in i.keyframe_points:
+                                if x.co[0] > bpy.context.scene.frame_start and x.co[0] < bpy.context.scene.frame_end:
+                                    x.select_control_point=True
+                                else:
+                                    x.select_control_point=False
+                                
+                        bpy.ops.graph.copy_timing_and_ease()
+                        bpy.ops.graph.select_all(action='DESELECT')
+                        bpy.context.active_object.data.bones[bone.name].select = False
+                        
+                for bone in bones:
+                    if bone == bpy.context.active_pose_bone:
+                        print("active bone to apply")
+                        boneAction = action.groups.get(bone.name)
+                        for i in boneAction.channels:
+                            i.select = True
+                            bpy.ops.graph.paste_timing()
+                
+                area.type = old_type
+            else:
+                self.report({"INFO"}, "Select exactly two bones")
+        else:
+            self.report({"INFO"}, "Required addon is not installed")
+        return {"FINISHED"}
+
 #########################
 
 class ABRA_OT_key_shapekeys(bpy.types.Operator):
@@ -111,6 +158,38 @@ class ABRA_OT_key_armature(bpy.types.Operator):
                 for area in window.screen.areas:
                     area.tag_redraw()
                 
+        return {"FINISHED"}
+
+class ABRA_OT_select_children(bpy.types.Operator):
+    bl_idname = "screen.at_select_children"
+    bl_label = "Select Children"
+    bl_description = "Selects the children from all selected bones"
+    bl_options = {"REGISTER", "UNDO"}
+
+    def execute(self, context):
+        if bpy.context.mode == "POSE":
+            selectedBones = bpy.context.selected_pose_bones
+            if selectedBones:
+                for bone in selectedBones:
+                    children = bone.children
+                    if children:
+                        for child in children:
+                            child.bone.select = True
+        return {"FINISHED"}
+
+class ABRA_OT_select_parent(bpy.types.Operator):
+    bl_idname = "screen.at_select_parent"
+    bl_label = "Select Parent"
+    bl_description = "Selects the parent from all selected bones"
+    bl_options = {"REGISTER", "UNDO"}
+
+    def execute(self, context):
+        if bpy.context.mode == "POSE":
+            selectedBones = bpy.context.selected_pose_bones
+            if selectedBones:
+                for bone in selectedBones:
+                    if bone.parent:
+                            bone.parent.bone.select = True
         return {"FINISHED"}
 
 class ABRA_OT_tangent_keypath(bpy.types.Operator):
@@ -279,4 +358,4 @@ class ABRA_OT_tangent_autoclamp(bpy.types.Operator):
         api.set_tangent("AUTO_CLAMPED")
         return {"FINISHED"}
         
-cls = (ABRA_OT_key_selected,ABRA_OT_key_visible,ABRA_OT_key_copy,ABRA_OT_key_paste,ABRA_OT_key_delete,ABRA_OT_key_shapekeys,ABRA_OT_key_armature,ABRA_OT_tangent_keypath,ABRA_OT_tangent_keypathclear,ABRA_OT_range_to_selection,ABRA_OT_tangent_free,ABRA_OT_tangent_aligned,ABRA_OT_tangent_vector,ABRA_OT_tangent_auto,ABRA_OT_tangent_autoclamp)
+cls = (ABRA_OT_key_selected,ABRA_OT_key_visible,ABRA_OT_key_copy,ABRA_OT_key_paste,ABRA_OT_key_delete,ABRA_OT_key_timing,ABRA_OT_key_shapekeys,ABRA_OT_key_armature,ABRA_OT_select_children,ABRA_OT_select_parent,ABRA_OT_tangent_keypath,ABRA_OT_tangent_keypathclear,ABRA_OT_range_to_selection,ABRA_OT_tangent_free,ABRA_OT_tangent_aligned,ABRA_OT_tangent_vector,ABRA_OT_tangent_auto,ABRA_OT_tangent_autoclamp)

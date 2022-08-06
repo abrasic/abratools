@@ -2,11 +2,12 @@ bl_info = {
     'name': 'AbraTools',
     'author': 'Abrasic',
     'version': (1, 0, 0),
-    'blender': (2, 80, 0),
+    'blender': (3, 0, 0),
     'description': 'Blender Animator toolkit',
     'location' : 'Preferences > Header > aT',
     'category': 'Animation',
-    'warning': 'This is an alpha version of AbraTools',
+    'warning': 'alpha6 | This is an alpha version of AbraTools',
+    "doc_url": "https://docs.abx.gg/support/download-and-setup",
     'tracker_url': 'https://github.com/abrasic/abratools',
 }
 

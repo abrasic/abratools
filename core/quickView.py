@@ -21,7 +21,7 @@ class ABRA_OT_isolate_func(bpy.types.Operator):
             return {'CANCELLED'}                
 class ABRA_OT_isolate_curves(bpy.types.Operator):
     bl_idname = "screen.at_isolate_curves"
-    bl_label = "Isolate Curves [BETA]"
+    bl_label = "Isolate Curves"
     bl_description = "While enabled, AbraTools will automatically hide F-Curve channels that aren't selected. This is a beta feature"
     bl_options = {"REGISTER"}
 

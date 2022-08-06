@@ -1,7 +1,7 @@
 from linecache import lazycache
 import bpy 
 
-from ..core import key, quickView
+from ..core import api, key, quickView
 from .icons import icons_coll
 
 prefsHeaderOld = None
@@ -14,6 +14,7 @@ ic_logo = ic["logo"]
 
 ic_auto_overlay = ic["auto_overlay"]
 ic_copy_keys = ic["copy_keys"]
+ic_key_timing = ic["copy_key_timing"]
 ic_create_path = ic["create_path"]
 ic_delete_keys = ic["delete_keys"]
 ic_delete_path = ic["delete_path"]
@@ -24,6 +25,8 @@ ic_key_visible = ic["key_visible"]
 ic_key_whole_armature = ic["key_whole_armature"]
 ic_paste_keys = ic["paste_keys"]
 ic_range_to_selection = ic["range_to_selection"]
+ic_select_children = ic["select_children"]
+ic_select_parent = ic["select_parent"]
 ic_view_const = ic["view_const"]
 ic_view_loc = ic["view_loc"]
 ic_view_props = ic["view_props"]
@@ -155,6 +158,8 @@ def prefsHeaderWrite(self, context):
         layout.operator(key.ABRA_OT_key_paste.bl_idname, text='', icon_value=ic_paste_keys.icon_id)
     if (prefs.vis_keydelete): 
         layout.operator(key.ABRA_OT_key_delete.bl_idname, text='', icon_value=ic_delete_keys.icon_id)
+    if (prefs.vis_keytiming): 
+        layout.operator(key.ABRA_OT_key_timing.bl_idname, text='', icon_value=ic_key_timing.icon_id)
     if (prefs.vis_keyshape): 
         layout.operator(key.ABRA_OT_key_shapekeys.bl_idname, text='', icon_value=ic_key_all_shapes.icon_id)
     if (prefs.vis_keyarmature): 
@@ -171,6 +176,12 @@ def prefsHeaderWrite(self, context):
         layout.operator(key.ABRA_OT_tangent_auto.bl_idname, text='', icon="HANDLE_AUTO")
     if (prefs.vis_tanautoclamp): 
         layout.operator(key.ABRA_OT_tangent_autoclamp.bl_idname, text='', icon="HANDLE_AUTOCLAMPED")
+
+    ## SELECTION ##
+    if (prefs.vis_selchild): 
+            layout.operator(key.ABRA_OT_select_children.bl_idname, text='', icon_value=ic_select_children.icon_id)
+    if (prefs.vis_selparent): 
+            layout.operator(key.ABRA_OT_select_parent.bl_idname, text='', icon_value=ic_select_parent.icon_id)
 
     ## OTHER ##
     if (prefs.vis_rangesel): 
@@ -195,7 +206,7 @@ def prefsBodyWrite(self, context):
     layout = self.layout
     prefs = bpy.context.preferences.addons["abTools"].preferences
     row = layout.box()
-    fill = row.split(factor=0.33)
+    fill = row.split(factor=0.75)
     col = fill.column()
     if (prefs.toolshelf_pages == "home"):
         col.label(text="Welcome to the AbraTools Toolshelf!")
@@ -221,6 +232,7 @@ def prefsBodyWrite(self, context):
         col.prop(prefs, "vis_keycopy", icon_value=ic_copy_keys.icon_id)
         col.prop(prefs, "vis_keypaste", icon_value=ic_paste_keys.icon_id)
         col.prop(prefs, "vis_keydelete", icon_value=ic_delete_keys.icon_id)
+        col.prop(prefs, "vis_keytiming", icon_value=ic_key_timing.icon_id)
         col.prop(prefs, "vis_keyshape", icon_value=ic_key_all_shapes.icon_id)
         col.prop(prefs, "vis_keyarmature", icon_value=ic_key_whole_armature.icon_id)
     if (prefs.toolshelf_pages == "tangents"):
@@ -229,14 +241,28 @@ def prefsBodyWrite(self, context):
         col.prop(prefs, "vis_tanvector", icon="HANDLE_VECTOR")
         col.prop(prefs, "vis_tanauto", icon="HANDLE_AUTO")
         col.prop(prefs, "vis_tanautoclamp", icon="HANDLE_AUTOCLAMPED")
+    if (prefs.toolshelf_pages == "selection"):
+        col.prop(prefs, "vis_selchild", icon_value=ic_select_children.icon_id)
+        col.prop(prefs, "vis_selparent", icon_value=ic_select_parent.icon_id)
     if (prefs.toolshelf_pages == "other"):
         col.prop(prefs, "vis_rangesel", icon_value=ic_range_to_selection.icon_id)
         col.prop(prefs, "vis_keypath", icon_value=ic_create_path.icon_id)
     if (prefs.toolshelf_pages == "settings"):
         col.prop(prefs, "header_col")
         col.prop(prefs, "button_width")
+        col.separator()
+        col.label(text="Third-party Addons:")
+        if api.is_addon_enabled("Copy_Timing_and_Ease"):
+            col.label(text="Copy Timing and Ease (INSTALLED)", icon="CHECKBOX_HLT")
+        else:
+            col.label(text="Copy Timing and Ease", icon="CHECKBOX_DEHLT")
+        col.operator("wm.url_open", text="By Blastframe | Click to Buy", icon="URL").url = "https://blendermarket.com/products/copy-timing-and-ease"
+        col.separator()
+        col.label(text="Some tools require third-party addons in order to use", icon="INFO")
+        col.label(text="We are not affiliated nor endorsed by these addons", icon="INFO")
 
-    layout.label(text="aT | alpha5")
+
+    layout.label(text="aT | alpha6")
 
     return 
     

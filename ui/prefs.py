@@ -15,9 +15,10 @@ class AbraToolsPrefs(AddonPreferences):
             ('quickview', 'Quick View', '', '', 1),
             ('fastkey', 'Keying', '', '', 2),
             ('tangents', 'Tangents', '', '', 3),
-            ('other', 'Other', '', '', 4),
+            ('selection', 'Selection', '', '', 4),
+            ('other', 'Other', '', '', 5),
             None,
-            ('settings', 'Settings', '', '', 5),
+            ('settings', 'Settings', '', '', 6),
 
         ],
         default='home'
@@ -122,6 +123,12 @@ class AbraToolsPrefs(AddonPreferences):
         description = key.ABRA_OT_key_delete.bl_description,
         default = True
     )
+
+    vis_keytiming: BoolProperty(
+        name = key.ABRA_OT_key_timing.bl_label,
+        description = key.ABRA_OT_key_timing.bl_description,
+        default = True
+    )
     
     vis_keyshape: BoolProperty(
         name = key.ABRA_OT_key_shapekeys.bl_label,
@@ -145,6 +152,20 @@ class AbraToolsPrefs(AddonPreferences):
         name = key.ABRA_OT_range_to_selection.bl_label,
         description = key.ABRA_OT_range_to_selection.bl_description,
         default = True
+    )
+
+    ##################
+
+    vis_selchild: BoolProperty(
+        name = key.ABRA_OT_select_children.bl_label,
+        description = key.ABRA_OT_select_children.bl_description,
+        default = False
+    )
+
+    vis_selparent: BoolProperty(
+        name = key.ABRA_OT_select_parent.bl_label,
+        description = key.ABRA_OT_select_parent.bl_description,
+        default = False
     )
 
     ##################
@@ -229,6 +250,7 @@ class AbraToolsPrefs(AddonPreferences):
     def draw(self, context):
         prefs = bpy.context.preferences.addons["abTools"].preferences
         layout = self.layout
-        layout.label(text="AbraTools works using a customized preferences page. For the best experience, add a Preferences menu into your workspace and press the 'aT' icon at the top right of the menu.")
+        layout.label(text="Thank you for using AbraTools!")
+        layout.label(text="If you're new, please consider reading the documentation")
 
 cls = (AbraToolsPrefs,)
