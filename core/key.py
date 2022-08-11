@@ -238,7 +238,7 @@ class ABRA_OT_tangent_keypath(bpy.types.Operator):
                     active = bpy.context.active_object
                     if active:
                         if bpy.context.mode == "POSE" and active.pose:
-                            bpy.ops.pose.paths_calculate()
+                            bpy.ops.pose.paths_calculate(display_type=bpy.context.active_object.animation_visualization.motion_path.type, range=bpy.context.active_object.animation_visualization.motion_path.range, bake_location=prefs.path_loc)
                         elif bpy.context.mode == "OBJECT" and active:
                             bpy.ops.object.paths_calculate()
 
