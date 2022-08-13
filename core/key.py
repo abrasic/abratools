@@ -1,6 +1,15 @@
 import bpy
 from . import api
 
+# $$\   $$\ $$$$$$$$\ $$\     $$\ $$$$$$\ $$\   $$\  $$$$$$\  
+# $$ | $$  |$$  _____|\$$\   $$  |\_$$  _|$$$\  $$ |$$  __$$\ 
+# $$ |$$  / $$ |       \$$\ $$  /   $$ |  $$$$\ $$ |$$ /  \__|
+# $$$$$  /  $$$$$\      \$$$$  /    $$ |  $$ $$\$$ |$$ |$$$$\ 
+# $$  $$<   $$  __|      \$$  /     $$ |  $$ \$$$$ |$$ |\_$$ |
+# $$ |\$$\  $$ |          $$ |      $$ |  $$ |\$$$ |$$ |  $$ |
+# $$ | \$$\ $$$$$$$$\     $$ |    $$$$$$\ $$ | \$$ |\$$$$$$  |
+# \__|  \__|\________|    \__|    \______|\__|  \__| \______/ 
+
 class ABRA_OT_key_selected(bpy.types.Operator):
     bl_idname = "screen.at_quick_insert"
     bl_label = "Key Selected Curves"
@@ -35,8 +44,6 @@ class ABRA_OT_key_visible(bpy.types.Operator):
         area.type = old
         return {"FINISHED"}
 
-#########################
-
 class ABRA_OT_key_copy(bpy.types.Operator):
     bl_idname = "screen.at_copy_keys"
     bl_label = "Copy Keys"
@@ -46,7 +53,6 @@ class ABRA_OT_key_copy(bpy.types.Operator):
     def execute(self, context):
         api.key_clipboard(self, type="copy")
         return {"FINISHED"}
-           
 
 class ABRA_OT_key_paste(bpy.types.Operator):
     bl_idname = "screen.at_paste_keys"
@@ -86,7 +92,6 @@ class ABRA_OT_key_timing(bpy.types.Operator):
 
                 for bone in bones:
                     if bone != bpy.context.active_pose_bone:
-                        print("selected bone")
                         boneAction = action.groups.get(bone.name)
                         for i in boneAction.channels:
                             i.select = True
@@ -114,8 +119,6 @@ class ABRA_OT_key_timing(bpy.types.Operator):
         else:
             self.report({"INFO"}, "Required addon is not installed")
         return {"FINISHED"}
-
-#########################
 
 class ABRA_OT_key_shapekeys(bpy.types.Operator):
     bl_idname = "screen.at_key_shapes_all"
@@ -160,37 +163,128 @@ class ABRA_OT_key_armature(bpy.types.Operator):
                 
         return {"FINISHED"}
 
+#  $$$$$$\  $$$$$$$$\ $$\       $$$$$$$$\  $$$$$$\ $$$$$$$$\ $$$$$$\  $$$$$$\  $$\   $$\ 
+# $$  __$$\ $$  _____|$$ |      $$  _____|$$  __$$\\__$$  __|\_$$  _|$$  __$$\ $$$\  $$ |
+# $$ /  \__|$$ |      $$ |      $$ |      $$ /  \__|  $$ |     $$ |  $$ /  $$ |$$$$\ $$ |
+# \$$$$$$\  $$$$$\    $$ |      $$$$$\    $$ |        $$ |     $$ |  $$ |  $$ |$$ $$\$$ |
+#  \____$$\ $$  __|   $$ |      $$  __|   $$ |        $$ |     $$ |  $$ |  $$ |$$ \$$$$ |
+# $$\   $$ |$$ |      $$ |      $$ |      $$ |  $$\   $$ |     $$ |  $$ |  $$ |$$ |\$$$ |
+# \$$$$$$  |$$$$$$$$\ $$$$$$$$\ $$$$$$$$\ \$$$$$$  |  $$ |   $$$$$$\  $$$$$$  |$$ | \$$ |
+#  \______/ \________|\________|\________| \______/   \__|   \______| \______/ \__|  \__|                                                                    
+
 class ABRA_OT_select_children(bpy.types.Operator):
     bl_idname = "screen.at_select_children"
     bl_label = "Select Children"
-    bl_description = "Selects the children from all selected bones"
+    bl_description = "Selects the children from all selected bones. Hold SHIFT to add bones to selection instead of replace"
     bl_options = {"REGISTER", "UNDO"}
 
-    def execute(self, context):
+    def invoke(self, context, event):
         if bpy.context.mode == "POSE":
             selectedBones = bpy.context.selected_pose_bones
             if selectedBones:
                 for bone in selectedBones:
+                    if not event.shift:    # Remove bone from selection if shift is not held
+                        bone.bone.select = False
                     children = bone.children
                     if children:
                         for child in children:
                             child.bone.select = True
+        else:
+            self.report({"INFO"}, "Currently only supports Pose Mode")
+        return {"FINISHED"}
+
+class ABRA_OT_select_siblings(bpy.types.Operator):
+    bl_idname = "screen.at_select_siblings"
+    bl_label = "Select Siblings"
+    bl_description = "Selects all other children related to selected bones"
+    bl_options = {"REGISTER", "UNDO"}
+
+    def invoke(self, context, event):
+        if bpy.context.mode == "POSE":
+            selectedBones = bpy.context.selected_pose_bones
+            if selectedBones:
+                for bone in selectedBones:
+                    parent = bone.parent
+                    for child in parent.children:
+                        child.bone.select = True
+        else:
+            self.report({"INFO"}, "Currently only supports Pose Mode")
         return {"FINISHED"}
 
 class ABRA_OT_select_parent(bpy.types.Operator):
     bl_idname = "screen.at_select_parent"
     bl_label = "Select Parent"
-    bl_description = "Selects the parent from all selected bones"
+    bl_description = "Selects the parent from all selected bones. Hold SHIFT to add bones to selection instead of replace"
     bl_options = {"REGISTER", "UNDO"}
 
-    def execute(self, context):
+    def invoke(self, context, event):
         if bpy.context.mode == "POSE":
             selectedBones = bpy.context.selected_pose_bones
             if selectedBones:
                 for bone in selectedBones:
+                    if not event.shift:    # Remove bone from selection if shift is not held
+                        bone.bone.select = False
                     if bone.parent:
                             bone.parent.bone.select = True
+        else:
+            self.report({"INFO"}, "Currently only supports Pose Mode")
         return {"FINISHED"}
+
+class ABRA_OT_select_mirror(bpy.types.Operator):
+    bl_idname = "screen.at_select_mirror"
+    bl_label = "Select Mirror"
+    bl_description = "Selects the opposite bone, if applicable. For this to work, adjacent bones must have the same name with a prefix/suffix denoting their position (some examples of detectable bones include: 'LeftShoulder'/'RightShoulder', 'Pinky1_l'/'Pinky1_r', 'Clavicle.Left'/'Clavicle.Right' or 'l_arm_ik'/'r_arm_ik')"
+    bl_options = {"REGISTER", "UNDO"}
+
+    def invoke(self, context, event):
+        if bpy.context.mode == "POSE":
+            if event.shift:
+                bpy.ops.pose.select_mirror(extend=True)
+            else:
+                bpy.ops.pose.select_mirror()
+        else:
+            self.report({"INFO"}, "Currently only supports Pose Mode")
+        return {"FINISHED"}
+
+class ABRA_OT_cursor_to_selected(bpy.types.Operator):
+    bl_idname = "screen.at_cursor_to_selected"
+    bl_label = "Cursor to Selected"
+    bl_description = "Native Blender function that moves the 3D cursor to selected objects"
+    bl_options = {"REGISTER", "UNDO"}
+
+    def invoke(self, context, event):
+        area = bpy.context.area
+        old_type = area.type
+        area.type = 'VIEW_3D'
+
+        bpy.ops.view3d.snap_cursor_to_selected()
+
+        area.type = old_type
+        return {"FINISHED"}
+
+class ABRA_OT_toggle_cursor_pivot(bpy.types.Operator):
+    bl_idname = "screen.at_toggle_cursor_pivot"
+    bl_label = "Toggle Cursor Pivot"
+    bl_description = "Quickly changes between 3D Cursor and Individual Origins pivot types"
+    bl_options = {"REGISTER", "UNDO"}
+
+    def invoke(self, context, event):
+        if bpy.context.scene.tool_settings.transform_pivot_point == "CURSOR":
+            bpy.context.scene.tool_settings.transform_pivot_point = "INDIVIDUAL_ORIGINS"
+        else:
+            bpy.context.scene.tool_settings.transform_pivot_point = "CURSOR"
+
+        return {"FINISHED"}
+
+
+#  $$$$$$\ $$$$$$$$\ $$\   $$\ $$$$$$$$\ $$$$$$$\  
+# $$  __$$\\__$$  __|$$ |  $$ |$$  _____|$$  __$$\ 
+# $$ /  $$ |  $$ |   $$ |  $$ |$$ |      $$ |  $$ |
+# $$ |  $$ |  $$ |   $$$$$$$$ |$$$$$\    $$$$$$$  |
+# $$ |  $$ |  $$ |   $$  __$$ |$$  __|   $$  __$$< 
+# $$ |  $$ |  $$ |   $$ |  $$ |$$ |      $$ |  $$ |
+#  $$$$$$  |  $$ |   $$ |  $$ |$$$$$$$$\ $$ |  $$ |
+#  \______/   \__|   \__|  \__|\________|\__|  \__|
 
 class ABRA_OT_tangent_keypath(bpy.types.Operator):
     bl_idname = "screen.at_key_path"
@@ -306,7 +400,14 @@ class ABRA_OT_range_to_selection(bpy.types.Operator):
         area.type = old_type
         return {"FINISHED"}
 
-#########################
+#  /$$$$$$$$ /$$$$$$  /$$   /$$  /$$$$$$  /$$$$$$$$ /$$   /$$ /$$$$$$$$ /$$$$$$ 
+# |__  $$__//$$__  $$| $$$ | $$ /$$__  $$| $$_____/| $$$ | $$|__  $$__//$$__  $$
+#    | $$  | $$  \ $$| $$$$| $$| $$  \__/| $$      | $$$$| $$   | $$  | $$  \__/
+#    | $$  | $$$$$$$$| $$ $$ $$| $$ /$$$$| $$$$$   | $$ $$ $$   | $$  |  $$$$$$ 
+#    | $$  | $$__  $$| $$  $$$$| $$|_  $$| $$__/   | $$  $$$$   | $$   \____  $$
+#    | $$  | $$  | $$| $$\  $$$| $$  \ $$| $$      | $$\  $$$   | $$   /$$  \ $$
+#    | $$  | $$  | $$| $$ \  $$|  $$$$$$/| $$$$$$$$| $$ \  $$   | $$  |  $$$$$$/
+#    |__/  |__/  |__/|__/  \__/ \______/ |________/|__/  \__/   |__/   \______/                                                                    
 
 class ABRA_OT_tangent_free(bpy.types.Operator):
     bl_idname = "screen.at_tangent_free"
@@ -358,4 +459,27 @@ class ABRA_OT_tangent_autoclamp(bpy.types.Operator):
         api.set_tangent("AUTO_CLAMPED")
         return {"FINISHED"}
         
-cls = (ABRA_OT_key_selected,ABRA_OT_key_visible,ABRA_OT_key_copy,ABRA_OT_key_paste,ABRA_OT_key_delete,ABRA_OT_key_timing,ABRA_OT_key_shapekeys,ABRA_OT_key_armature,ABRA_OT_select_children,ABRA_OT_select_parent,ABRA_OT_tangent_keypath,ABRA_OT_tangent_keypathclear,ABRA_OT_range_to_selection,ABRA_OT_tangent_free,ABRA_OT_tangent_aligned,ABRA_OT_tangent_vector,ABRA_OT_tangent_auto,ABRA_OT_tangent_autoclamp)
+############################################
+
+cls = (ABRA_OT_key_selected,
+ABRA_OT_key_visible,
+ABRA_OT_key_copy,
+ABRA_OT_key_paste,
+ABRA_OT_key_delete,
+ABRA_OT_key_timing,
+ABRA_OT_key_shapekeys,
+ABRA_OT_key_armature,
+ABRA_OT_select_children,
+ABRA_OT_select_siblings,
+ABRA_OT_select_parent,
+ABRA_OT_select_mirror,
+ABRA_OT_cursor_to_selected,
+ABRA_OT_toggle_cursor_pivot,
+ABRA_OT_tangent_keypath,
+ABRA_OT_tangent_keypathclear,
+ABRA_OT_range_to_selection,
+ABRA_OT_tangent_free,
+ABRA_OT_tangent_aligned,
+ABRA_OT_tangent_vector,
+ABRA_OT_tangent_auto,
+ABRA_OT_tangent_autoclamp)

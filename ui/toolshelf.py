@@ -16,6 +16,7 @@ ic_auto_overlay = ic["auto_overlay"]
 ic_copy_keys = ic["copy_keys"]
 ic_key_timing = ic["copy_key_timing"]
 ic_create_path = ic["create_path"]
+ic_cursor_to_selected = ic["cursor_to_selected"]
 ic_delete_keys = ic["delete_keys"]
 ic_delete_path = ic["delete_path"]
 ic_isolate_curves = ic["isolate_curves"]
@@ -26,7 +27,10 @@ ic_key_whole_armature = ic["key_whole_armature"]
 ic_paste_keys = ic["paste_keys"]
 ic_range_to_selection = ic["range_to_selection"]
 ic_select_children = ic["select_children"]
+ic_select_mirror = ic["select_mirror"]
 ic_select_parent = ic["select_parent"]
+ic_select_siblings = ic["select_siblings"]
+ic_toggle_cursor_pivot = ic["toggle_cursor_pivot"]
 ic_view_const = ic["view_const"]
 ic_view_loc = ic["view_loc"]
 ic_view_props = ic["view_props"]
@@ -178,10 +182,20 @@ def prefsHeaderWrite(self, context):
         layout.operator(key.ABRA_OT_tangent_autoclamp.bl_idname, text='', icon="HANDLE_AUTOCLAMPED")
 
     ## SELECTION ##
+    layout.operator_context = "INVOKE_DEFAULT"
     if (prefs.vis_selchild): 
             layout.operator(key.ABRA_OT_select_children.bl_idname, text='', icon_value=ic_select_children.icon_id)
     if (prefs.vis_selparent): 
             layout.operator(key.ABRA_OT_select_parent.bl_idname, text='', icon_value=ic_select_parent.icon_id)
+    if (prefs.vis_selsiblings): 
+            layout.operator(key.ABRA_OT_select_siblings.bl_idname, text='', icon_value=ic_select_siblings.icon_id)
+    if (prefs.vis_selmirror): 
+            layout.operator(key.ABRA_OT_select_mirror.bl_idname, text='', icon_value=ic_select_mirror.icon_id)
+    if (prefs.vis_cursortosel): 
+        layout.operator(key.ABRA_OT_cursor_to_selected.bl_idname, text='', icon_value=ic_cursor_to_selected.icon_id)
+    if (prefs.vis_toggle_cursor): 
+        layout.operator(key.ABRA_OT_toggle_cursor_pivot.bl_idname, text='', icon_value=ic_toggle_cursor_pivot.icon_id)
+    layout.operator_context = "EXEC_DEFAULT"
 
     ## OTHER ##
     if (prefs.vis_rangesel): 
@@ -244,6 +258,10 @@ def prefsBodyWrite(self, context):
     if (prefs.toolshelf_pages == "selection"):
         col.prop(prefs, "vis_selchild", icon_value=ic_select_children.icon_id)
         col.prop(prefs, "vis_selparent", icon_value=ic_select_parent.icon_id)
+        col.prop(prefs, "vis_selsiblings", icon_value=ic_select_siblings.icon_id)
+        col.prop(prefs, "vis_selmirror", icon_value=ic_select_parent.icon_id)
+        col.prop(prefs, "vis_cursortosel", icon_value=ic_cursor_to_selected.icon_id)
+        col.prop(prefs, "vis_toggle_cursor", icon_value=ic_toggle_cursor_pivot.icon_id)
     if (prefs.toolshelf_pages == "other"):
         col.prop(prefs, "vis_rangesel", icon_value=ic_range_to_selection.icon_id)
         col.prop(prefs, "vis_keypath", icon_value=ic_create_path.icon_id)

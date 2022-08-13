@@ -104,8 +104,6 @@ class AbraToolsPrefs(AddonPreferences):
         default = True
     )
 
-    ##################
-
     vis_keycopy: BoolProperty(
         name = key.ABRA_OT_key_copy.bl_label,
         description = key.ABRA_OT_key_copy.bl_description,
@@ -165,6 +163,30 @@ class AbraToolsPrefs(AddonPreferences):
     vis_selparent: BoolProperty(
         name = key.ABRA_OT_select_parent.bl_label,
         description = key.ABRA_OT_select_parent.bl_description,
+        default = False
+    )
+
+    vis_selmirror: BoolProperty(
+        name = key.ABRA_OT_select_mirror.bl_label,
+        description = key.ABRA_OT_select_mirror.bl_description,
+        default = False
+    )
+
+    vis_selsiblings: BoolProperty(
+        name = key.ABRA_OT_select_siblings.bl_label,
+        description = key.ABRA_OT_select_siblings.bl_description,
+        default = False
+    )
+
+    vis_cursortosel: BoolProperty(
+        name = key.ABRA_OT_cursor_to_selected.bl_label,
+        description = key.ABRA_OT_cursor_to_selected.bl_description,
+        default = False
+    )
+
+    vis_toggle_cursor: BoolProperty(
+        name = key.ABRA_OT_toggle_cursor_pivot.bl_label,
+        description = key.ABRA_OT_toggle_cursor_pivot.bl_description,
         default = False
     )
 
