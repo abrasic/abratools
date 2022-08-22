@@ -190,6 +190,12 @@ class AbraToolsPrefs(AddonPreferences):
         default = False
     )
 
+    vis_selsets: BoolProperty(
+        name = key.ABRA_OT_selection_sets.bl_label,
+        description = key.ABRA_OT_selection_sets.bl_description,
+        default = False
+    )
+
     ##################
 
     vis_tanfree: BoolProperty(

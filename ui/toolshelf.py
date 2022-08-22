@@ -30,6 +30,7 @@ ic_select_children = ic["select_children"]
 ic_select_mirror = ic["select_mirror"]
 ic_select_parent = ic["select_parent"]
 ic_select_siblings = ic["select_siblings"]
+ic_selection_sets = ic["selection_sets"]
 ic_toggle_cursor_pivot = ic["toggle_cursor_pivot"]
 ic_view_const = ic["view_const"]
 ic_view_loc = ic["view_loc"]
@@ -184,17 +185,19 @@ def prefsHeaderWrite(self, context):
     ## SELECTION ##
     layout.operator_context = "INVOKE_DEFAULT"
     if (prefs.vis_selchild): 
-            layout.operator(key.ABRA_OT_select_children.bl_idname, text='', icon_value=ic_select_children.icon_id)
+        layout.operator(key.ABRA_OT_select_children.bl_idname, text='', icon_value=ic_select_children.icon_id)
     if (prefs.vis_selparent): 
-            layout.operator(key.ABRA_OT_select_parent.bl_idname, text='', icon_value=ic_select_parent.icon_id)
+        layout.operator(key.ABRA_OT_select_parent.bl_idname, text='', icon_value=ic_select_parent.icon_id)
     if (prefs.vis_selsiblings): 
-            layout.operator(key.ABRA_OT_select_siblings.bl_idname, text='', icon_value=ic_select_siblings.icon_id)
+        layout.operator(key.ABRA_OT_select_siblings.bl_idname, text='', icon_value=ic_select_siblings.icon_id)
     if (prefs.vis_selmirror): 
-            layout.operator(key.ABRA_OT_select_mirror.bl_idname, text='', icon_value=ic_select_mirror.icon_id)
+        layout.operator(key.ABRA_OT_select_mirror.bl_idname, text='', icon_value=ic_select_mirror.icon_id)
     if (prefs.vis_cursortosel): 
         layout.operator(key.ABRA_OT_cursor_to_selected.bl_idname, text='', icon_value=ic_cursor_to_selected.icon_id)
     if (prefs.vis_toggle_cursor): 
         layout.operator(key.ABRA_OT_toggle_cursor_pivot.bl_idname, text='', icon_value=ic_toggle_cursor_pivot.icon_id)
+    if (prefs.vis_selsets): 
+        layout.operator(key.ABRA_OT_selection_sets.bl_idname, text='', icon_value=ic_selection_sets.icon_id)
     layout.operator_context = "EXEC_DEFAULT"
 
     ## OTHER ##
@@ -262,6 +265,7 @@ def prefsBodyWrite(self, context):
         col.prop(prefs, "vis_selmirror", icon_value=ic_select_parent.icon_id)
         col.prop(prefs, "vis_cursortosel", icon_value=ic_cursor_to_selected.icon_id)
         col.prop(prefs, "vis_toggle_cursor", icon_value=ic_toggle_cursor_pivot.icon_id)
+        col.prop(prefs, "vis_selsets", icon_value=ic_selection_sets.icon_id)
     if (prefs.toolshelf_pages == "other"):
         col.prop(prefs, "vis_rangesel", icon_value=ic_range_to_selection.icon_id)
         col.prop(prefs, "vis_keypath", icon_value=ic_create_path.icon_id)
@@ -270,11 +274,27 @@ def prefsBodyWrite(self, context):
         col.prop(prefs, "button_width")
         col.separator()
         col.label(text="Third-party Addons:")
+        addon = col.grid_flow(columns=2)
         if api.is_addon_enabled("Copy_Timing_and_Ease"):
-            col.label(text="Copy Timing and Ease (INSTALLED)", icon="CHECKBOX_HLT")
+            addon.label(text="Copy Timing and Ease (INSTALLED)", icon="CHECKBOX_HLT")
         else:
-            col.label(text="Copy Timing and Ease", icon="CHECKBOX_DEHLT")
-        col.operator("wm.url_open", text="By Blastframe | Click to Buy", icon="URL").url = "https://blendermarket.com/products/copy-timing-and-ease"
+            addon.label(text="Copy Timing and Ease", icon="CHECKBOX_DEHLT")
+        addon.operator("wm.url_open", text="By Blastframe | Click to Buy", icon="URL").url = "https://blendermarket.com/products/copy-timing-and-ease"
+
+        addon = col.grid_flow(columns=2)
+        if api.is_addon_enabled("copy_global_transform"):
+            addon.label(text="Copy Global Transform (INSTALLED)", icon="CHECKBOX_HLT")
+        else:
+            addon.label(text="Copy Global Transform", icon="CHECKBOX_DEHLT")
+        addon.label(text="Native Add-on")
+
+        addon = col.grid_flow(columns=2)
+        if api.is_addon_enabled("bone_selection_sets"):
+            addon.label(text="Bone Selection Sets (INSTALLED)", icon="CHECKBOX_HLT")
+        else:
+            addon.label(text="Bone Selection Sets", icon="CHECKBOX_DEHLT")
+        addon.label(text="Native Add-on")
+
         col.separator()
         col.label(text="Some tools require third-party addons in order to use", icon="INFO")
         col.label(text="We are not affiliated nor endorsed by these addons", icon="INFO")

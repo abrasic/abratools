@@ -81,7 +81,7 @@ class ABRA_OT_key_timing(bpy.types.Operator):
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
-        if api.is_addon_enabled("Copy_Timing_and_Ease"):
+        if api.is_addon_enabled("Copy_Timing_and_Ease") and bpy.context.mode == "POSE":
             bones = bpy.context.selected_pose_bones
             if len(bones) == 2:
                 area = bpy.context.area
@@ -276,6 +276,16 @@ class ABRA_OT_toggle_cursor_pivot(bpy.types.Operator):
 
         return {"FINISHED"}
 
+class ABRA_OT_selection_sets(bpy.types.Operator):
+    bl_idname = "screen.at_selection_sets"
+    bl_label = "View Selection Sets *"
+    bl_description = "* 'Selection Sets' addon required. Manage and assign bones to selection sets for easier access"
+    bl_options = {"REGISTER", "UNDO"}
+
+    def invoke(self, context, event):
+        bpy.ops.message.selsetspanel("INVOKE_DEFAULT")
+        return {"FINISHED"}
+
 
 #  $$$$$$\ $$$$$$$$\ $$\   $$\ $$$$$$$$\ $$$$$$$\  
 # $$  __$$\\__$$  __|$$ |  $$ |$$  _____|$$  __$$\ 
@@ -371,31 +381,11 @@ class ABRA_OT_range_to_selection(bpy.types.Operator):
         old_type = area.type
         area.type = 'GRAPH_EDITOR'
     
-        curves = api.get_selected_fcurves()
-        if curves:
-            minimum = None
-            maximum = None
-            for curve in curves:
-                keys = api.get_selected_keys(curve)
-                if keys:
-                    firstKey = api.get_key_coords(curve, keys[0])[0]
-                    lastKey = api.get_key_coords(curve, keys[-1])[0]
-                    if not minimum or firstKey < minimum:
-                        minimum = firstKey
-                    if not maximum or lastKey > maximum:
-                        maximum = lastKey
-                        
-            if minimum > maximum:
-                omax = minimum
-                minimum = maximum
-                maximum = omax
+        range = api.get_range_from_selected_keys()
 
-            if minimum != maximum:
-                bpy.context.scene.frame_start = int(minimum)
-                bpy.context.scene.frame_end = int(maximum)
-        else:
-            area.type = old_type
-            return {"CANCELLED"}
+        if range[0] != range[1]:
+            bpy.context.scene.frame_start = int(range[0])
+            bpy.context.scene.frame_end = int(range[1])
             
         area.type = old_type
         return {"FINISHED"}
@@ -473,6 +463,7 @@ ABRA_OT_select_children,
 ABRA_OT_select_siblings,
 ABRA_OT_select_parent,
 ABRA_OT_select_mirror,
+ABRA_OT_selection_sets,
 ABRA_OT_cursor_to_selected,
 ABRA_OT_toggle_cursor_pivot,
 ABRA_OT_tangent_keypath,

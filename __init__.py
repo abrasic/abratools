@@ -29,6 +29,8 @@ def register():
     bpy.types.USERPREF_HT_header.append(toolshelf.drawToggle)
     bpy.app.handlers.frame_change_pre.append(quickView.overlay_func)
 
+    bpy.types.Scene.set_selection = bpy.props.PointerProperty(type=panels.Set_Selector_Vars)
+
     wm = bpy.context.window_manager
     kc = wm.keyconfigs.addon
 
@@ -47,6 +49,8 @@ def unregister():
     bpy.context.preferences.themes[0].preferences.space.header = toolshelf.prefsOldHeaderCol
     bpy.types.USERPREF_HT_header.remove(toolshelf.drawToggle)
     bpy.app.handlers.frame_change_pre.remove(quickView.overlay_func)
+
+    del bpy.types.Scene.set_selection
     
     for cls in classes:
         bpy.utils.unregister_class(cls)

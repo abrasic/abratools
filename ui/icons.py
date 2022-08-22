@@ -25,6 +25,7 @@ icons.load("select_children", os.path.join(icons_dir, "select_children.png"), 'I
 icons.load("select_mirror", os.path.join(icons_dir, "select_mirror.png"), 'IMAGE')
 icons.load("select_parent", os.path.join(icons_dir, "select_parent.png"), 'IMAGE')
 icons.load("select_siblings", os.path.join(icons_dir, "select_siblings.png"), 'IMAGE')
+icons.load("selection_sets", os.path.join(icons_dir, "selection_sets.png"), 'IMAGE')
 icons.load("toggle_cursor_pivot", os.path.join(icons_dir, "toggle_cursor_pivot.png"), 'IMAGE')
 icons.load("view_const", os.path.join(icons_dir, "view_const.png"), 'IMAGE')
 icons.load("view_loc", os.path.join(icons_dir, "view_loc.png"), 'IMAGE')

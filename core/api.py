@@ -1,4 +1,4 @@
-import bpy, math
+import bpy, addon_utils, math
 
 def get_frame_range():
     return [bpy.context.scene.frame_start, bpy.context.scene.frame_end]
@@ -37,6 +37,29 @@ def get_selected_keys(curve):
             keysIndex.append(i)
 
     return keysIndex if keysIndex else None
+
+def get_range_from_selected_keys():
+    """Returns [min, max] of frame range of leftmost and rightmost selected keys"""
+    curves = get_selected_fcurves()
+    minimum = None
+    maximum = None
+    if curves:
+        for curve in curves:
+            keys = get_selected_keys(curve)
+            if keys:
+                firstKey = get_key_coords(curve, keys[0])[0]
+                lastKey = get_key_coords(curve, keys[-1])[0]
+                if not minimum or firstKey < minimum:
+                    minimum = firstKey
+                if not maximum or lastKey > maximum:
+                    maximum = lastKey
+                    
+        if minimum > maximum:
+            omax = minimum
+            minimum = maximum
+            maximum = omax
+
+    return [minimum, maximum]
 
 def get_key_coords(curve, key):
     """Returns [x,y] coordinates of key from specified curve"""
@@ -119,6 +142,31 @@ def get_key_right_neighbour(curve, key):
     except IndexError:
         return None
 
+def select_bones_from_set(int):
+    """Selects bones from selection set of active object."""
+    bpy.context.object.active_selection_set = int
+    bpy.ops.pose.selection_set_select()
+
+
+def rename_active_selection_set(str):
+    active = bpy.context.active_object
+    active.selection_sets[active.active_selection_set].name = str
+
+def add_set_from_selected_bones():
+    """Creates a new selection set and assign selected bones to it"""
+    active = bpy.context.active_object
+
+    if active.type == "ARMATURE" and bpy.context.mode == "POSE":
+        bpy.ops.pose.selection_set_add()
+        bpy.ops.pose.selection_set_assign()
+        rename_active_selection_set("New Set " + str(active.active_selection_set))
+
+def delete_active_selection_set():
+    active = bpy.context.active_object
+
+    if active.type == "ARMATURE" and bpy.context.mode == "POSE":
+        bpy.ops.pose.selection_set_remove()
+
     
 def insert_key(keys, x, y, select=False):
     """Inserts a key on specified key array"""
@@ -152,12 +200,13 @@ def key_clipboard(self, type=None):
     area.spaces[0].dopesheet.show_only_selected = only_show_selected[0]
 
     if only_show_selected[1]:
-        bpy.ops.graph.reveal() # Dopesheet elemtsn cannot be hidden; this is so you expect all visible keys to be removed
+        bpy.ops.graph.reveal() # Dopesheet elements cannot be hidden; this is so you expect all visible keys to be removed
 
     if (type=="copy"):
         if get_visible_fcurves():
-            bpy.ops.graph.select_all(action='DESELECT')
-            bpy.ops.graph.select_column(mode='CFRA')
+            if not get_selected_keys: # If no keys are selected, select what's on the playhead and copy that, if anything
+                bpy.ops.graph.select_all(action='DESELECT')
+                bpy.ops.graph.select_column(mode='CFRA')
             try:
                 bpy.ops.graph.copy()
             except RuntimeError:
@@ -206,6 +255,12 @@ def is_addon_enabled(name):
             return False
     except KeyError:
         return False
+
+def enable_addon(self, name):
+    try:
+        addon_utils.enable(name, default_set=True)
+    except ModuleNotFoundError:
+        self.report({"INFO"}, "Module not found")
 
 def use_oss():
     """Returns [bool, bool]. Runs through all time-based areas in the active screen and look for OSS. If it's off, immediately break and return false to use for key management."""
