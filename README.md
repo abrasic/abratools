@@ -24,6 +24,10 @@ The best way to use the Toolshelf is by dragging out a new area (by clicking and
 You can shrink the panel so only the buttons in the header are shown (as shown in the gif above). If you ever want to make changes to your toolshelf, you can do so by expanding it again and you can access the Toolshelf settings.
 
 # TOOLS
+## Customization
+Control how you want your toolshelf to look and hide tools you dont want to see. Everything is hotkeyable, too!
+<img src='https://user-images.githubusercontent.com/43157991/186026209-27349ba2-0c03-470c-8eb3-bd804ccf043f.gif' height='225'>
+
 ## Isolate Curves
 Automatically hide F-Curves that aren't selected. Bye-bye, `Shift+H`!
 <img src='https://1352856054-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FVEvUhh6zNMLIFbTZCBjF%2Fuploads%2FB98EYtCW0t2zu5VVcmc5%2Fisolate_curves.gif?alt=media&token=666c8e89-8091-45f0-a795-c76f662997e2' height='325'>
@@ -48,6 +52,17 @@ Quickly block out your shapes. Avoid constant [I] key spam.
 Gone are the days of [A] + [I] keypresses while blocking.
 
 <img src='https://files.gitbook.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FVEvUhh6zNMLIFbTZCBjF%2Fuploads%2FE1UnPXeSTYNLz69Jk1iJ%2Fkeyarmature.gif?alt=media&token=d0d768c4-8ed4-4fea-a66d-701bccc3f8a6' height='325'>
+
+## Selection Sets+
+Access and manage your selection sets quicker.
+
+<img src='https://user-images.githubusercontent.com/43157991/186025824-a90eef9a-f857-4663-9958-14a4a4791b10.gif' height='325'>
+
+## Quick Pivot
+Quickly change your pivot point using the 3D cursor.
+
+<img src='https://user-images.githubusercontent.com/43157991/186027819-cf7afa6d-655d-4f82-8001-c08864ac87d5.gif'>
+
 
 ## Quick Copy/Paste
 
