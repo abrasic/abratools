@@ -204,7 +204,7 @@ def key_clipboard(self, type=None):
 
     if (type=="copy"):
         if get_visible_fcurves():
-            if not get_selected_keys: # If no keys are selected, select what's on the playhead and copy that, if anything
+            if not get_selected_fcurves():
                 bpy.ops.graph.select_all(action='DESELECT')
                 bpy.ops.graph.select_column(mode='CFRA')
             try:

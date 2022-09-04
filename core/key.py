@@ -84,29 +84,31 @@ class ABRA_OT_key_timing(bpy.types.Operator):
         if api.is_addon_enabled("Copy_Timing_and_Ease") and bpy.context.mode == "POSE":
             bones = bpy.context.selected_pose_bones
             if len(bones) == 2:
-                area = bpy.context.area
+                area = context.area
                 old_type = area.type
                 area.type = 'GRAPH_EDITOR'
-                obj = bpy.context.object
+                obj = context.object
                 action = obj.animation_data.action
 
+                # Copy Timing from non-active object
                 for bone in bones:
-                    if bone != bpy.context.active_pose_bone:
+                    if bone != context.active_pose_bone:
                         boneAction = action.groups.get(bone.name)
                         for i in boneAction.channels:
                             i.select = True
                             for x in i.keyframe_points:
-                                if x.co[0] > bpy.context.scene.frame_start and x.co[0] < bpy.context.scene.frame_end:
+                                if x.co[0] > context.scene.frame_start and x.co[0] < context.scene.frame_end:
                                     x.select_control_point=True
                                 else:
                                     x.select_control_point=False
                                 
                         bpy.ops.graph.copy_timing_and_ease()
                         bpy.ops.graph.select_all(action='DESELECT')
-                        bpy.context.active_object.data.bones[bone.name].select = False
-                        
+                        context.active_object.data.bones[bone.name].select = False
+
+                # Paste timing from active object
                 for bone in bones:
-                    if bone == bpy.context.active_pose_bone:
+                    if bone == context.active_pose_bone:
                         print("active bone to apply")
                         boneAction = action.groups.get(bone.name)
                         for i in boneAction.channels:
