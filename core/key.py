@@ -235,7 +235,7 @@ class ABRA_OT_select_parent(bpy.types.Operator):
 class ABRA_OT_select_mirror(bpy.types.Operator):
     bl_idname = "screen.at_select_mirror"
     bl_label = "Select Mirror"
-    bl_description = "Selects the opposite bone, if applicable. For this to work, adjacent bones must have the same name with a prefix/suffix denoting their position (some examples of detectable bones include: 'LeftShoulder'/'RightShoulder', 'Pinky1_l'/'Pinky1_r', 'Clavicle.Left'/'Clavicle.Right' or 'l_arm_ik'/'r_arm_ik')"
+    bl_description = "Selects the opposite bone. For this to work, adjacent bones must have the same name with a prefix/suffix denoting their position (ex: 'LeftShoulder'/'RightShoulder', 'Pinky1_l'/'Pinky1_r', 'Clavicle.Left'/'Clavicle.Right' or 'l_arm_ik'/'r_arm_ik')"
     bl_options = {"REGISTER", "UNDO"}
 
     def invoke(self, context, event):
