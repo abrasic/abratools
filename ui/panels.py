@@ -30,16 +30,16 @@ class ABRA_OT_mpathpanel(bpy.types.Operator):
             if mode == "POSE":
                 if active:
                     if active.pose:
-                        layout.prop(active.animation_visualization.motion_path, "type")
+                        layout.prop(active.pose.animation_visualization.motion_path, "type")
                         if active.pose.animation_visualization.motion_path.type == "RANGE":
-                            layout.prop(active.animation_visualization.motion_path, "frame_start")
-                            layout.prop(active.animation_visualization.motion_path, "frame_end")
+                            layout.prop(active.pose.animation_visualization.motion_path, "frame_start")
+                            layout.prop(active.pose.animation_visualization.motion_path, "frame_end")
                         if active.pose.animation_visualization.motion_path.type == "CURRENT_FRAME": 
-                            layout.prop(active.animation_visualization.motion_path, "frame_before")
-                            layout.prop(active.animation_visualization.motion_path, "frame_after")
+                            layout.prop(active.pose.animation_visualization.motion_path, "frame_before")
+                            layout.prop(active.pose.animation_visualization.motion_path, "frame_after")
                         layout.separator()
-                        layout.prop(active.animation_visualization.motion_path, "frame_step")
-                        layout.prop(active.animation_visualization.motion_path, "range")
+                        layout.prop(active.pose.animation_visualization.motion_path, "frame_step")
+                        layout.prop(active.pose.animation_visualization.motion_path, "range")
                         layout.prop(prefs, "path_loc")
                     else:
                         layout.label(text="Active object does not support motion paths.")
@@ -51,8 +51,8 @@ class ABRA_OT_mpathpanel(bpy.types.Operator):
                     if active.animation_visualization.motion_path.type == "RANGE":
                         layout.prop(active.animation_visualization.motion_path, "frame_start")
                         layout.prop(active.animation_visualization.motion_path, "frame_end")
-                        layout.prop(active.animation_visualization.motion_path, "frame_before")
                     if active.animation_visualization.motion_path.type == "CURRENT_FRAME": 
+                        layout.prop(active.animation_visualization.motion_path, "frame_before")
                         layout.prop(active.animation_visualization.motion_path, "frame_after")
                     layout.prop(active.animation_visualization.motion_path, "frame_step")
                     
