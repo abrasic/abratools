@@ -1,20 +1,16 @@
-## **At this time it's advised that you download from [RELEASES](https://github.com/abrasic/abratools/releases) instead of directly from the REPOSITRORY.**
-
-## **We currently give support for Blender 3.0 and higher.**
-
-
-
-
-
-
 # AbraTools Alpha
-### IMPORTANT: **Code is a mess. Be careful using it in production. Bug reports, feature requests and PRs are appreciated.**
 
 AbraTools is an **unfinished animation toolset** for Blender 3. It utilizes the Preferences header so you're able to move the panel where you desire. It comes with some basic tools to help make certian animation tasks a bit less tedious:
 
 * **Download** AbraTools [here](https://github.com/abrasic/abratools/releases). 
 * **Installation instructions** [here](https://docs.abx.gg/support/download-and-setup). 
-* **Read the docs** [here](https://docs.abx.gg).
+* **Read the docs** [here](https://docs.abx.gg) (incomplete).
+
+### IMPORTANT: **Code is a mess. Be careful using it in production. Bug reports, feature requests and PRs are appreciated.**
+
+## **At this time it's advised that you download from [RELEASES](https://github.com/abrasic/abratools/releases) instead of directly from the REPOSITRORY.**
+
+## **We currently give support for [releases](https://github.com/abrasic/abratools/releases) in Blender 3.0 and higher.** We will not provide support for the repository version.
 
 # SETUP
 <img src='https://1352856054-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FVEvUhh6zNMLIFbTZCBjF%2Fuploads%2F6Dt25W2vwT9be0SgVuJg%2Fworkspace_setup.gif?alt=media&token=74f79393-b2c3-4d40-ace5-460f3f7753a4' height='325'>
