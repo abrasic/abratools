@@ -146,6 +146,13 @@ class AbraToolsPrefs(AddonPreferences):
         default = True
     )
 
+    vis_keyretime: BoolProperty(
+        name = key.ABRA_OT_key_retime.bl_label,
+        description = key.ABRA_OT_key_retime.bl_description,
+        default = True
+    )
+
+
     vis_rangesel: BoolProperty(
         name = key.ABRA_OT_range_to_selection.bl_label,
         description = key.ABRA_OT_range_to_selection.bl_description,
@@ -273,6 +280,38 @@ class AbraToolsPrefs(AddonPreferences):
         default = 1.0,
         description = "Sets the width of buttons in the toolshelf"
     )
+
+    ######## RETIME PANEL #########
+    retime_framestart: IntProperty(
+        name = "Frame Start",
+        description = "The frame that will retime all keys to the right of it",
+        default = 0
+    )
+
+    retime_frameoffset: IntProperty(
+        name = "Frame Offset",
+        description = "The amount of frames the keys will be moved by",
+        default = 0
+    )
+
+    retime_onlyvisible: BoolProperty(
+        name = "Retime Selected",
+        description = "Retimes keys of selected objects only. When disabled, it will retime all keys instead",
+        default = False
+    )
+
+    retime_hiddenobjects: BoolProperty(
+        name = "Retime Hidden Objects",
+        description = "Retime hidden objects",
+        default = True
+    )
+
+    retime_markers: BoolProperty(
+        name = "Retime Markers",
+        description = "Retime timeline markers",
+        default = True
+    )
+
 
     ###############################
     def draw(self, context):

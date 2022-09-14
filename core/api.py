@@ -238,6 +238,32 @@ def key_clipboard(self, type=None):
 
             
     area.type = old_type
+
+def retime_keys():
+    area = bpy.context.area
+    old_type = area.type
+    old_mode = bpy.context.mode
+    area.type = 'DOPESHEET_EDITOR'
+    prefs = bpy.context.preferences.addons["abTools"].preferences
+
+    bpy.ops.object.mode_set(mode='OBJECT')
+
+    area.spaces[0].dopesheet.show_only_selected = prefs.retime_onlyvisible
+    area.spaces[0].dopesheet.show_hidden = prefs.retime_hiddenobjects
+
+    # Transform all selected keys
+    bpy.ops.action.select_leftright(mode='RIGHT')
+    bpy.ops.transform.transform(mode='TIME_TRANSLATE', value=(prefs.retime_frameoffset, 0, 0, 0), orient_axis='X', orient_type='GLOBAL', orient_matrix=((1, 0, 0), (0, 1, 0), (0, 0, 1)), orient_matrix_type='GLOBAL', constraint_axis=(True, False, False))
+
+    # Select and transform markers
+    if prefs.retime_markers and len(bpy.context.scene.timeline_markers):
+        bpy.ops.marker.select_leftright(mode='RIGHT')
+        bpy.ops.marker.move(frames=prefs.retime_frameoffset)
+
+    bpy.ops.action.select_all(action='DESELECT')
+    bpy.ops.object.mode_set(mode=old_mode)
+    area.type = old_type
+    return True
  
 def get_selected_bones():
     """Returns int of total bones selected. If user is not in pose mode, 0 is returned"""

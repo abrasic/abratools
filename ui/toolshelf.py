@@ -26,6 +26,7 @@ ic_key_visible = ic["key_visible"]
 ic_key_whole_armature = ic["key_whole_armature"]
 ic_paste_keys = ic["paste_keys"]
 ic_range_to_selection = ic["range_to_selection"]
+ic_retime_scene = ic["retime_scene"]
 ic_select_children = ic["select_children"]
 ic_select_mirror = ic["select_mirror"]
 ic_select_parent = ic["select_parent"]
@@ -169,6 +170,8 @@ def prefsHeaderWrite(self, context):
         layout.operator(key.ABRA_OT_key_shapekeys.bl_idname, text='', icon_value=ic_key_all_shapes.icon_id)
     if (prefs.vis_keyarmature): 
         layout.operator(key.ABRA_OT_key_armature.bl_idname, text='', icon_value=ic_key_whole_armature.icon_id)
+    if (prefs.vis_keyretime): 
+        layout.operator(key.ABRA_OT_key_retime.bl_idname, text='', icon_value=ic_retime_scene.icon_id)
 
     ## TANGENTS ## 
     if (prefs.vis_tanfree): 
@@ -252,6 +255,7 @@ def prefsBodyWrite(self, context):
         col.prop(prefs, "vis_keytiming", icon_value=ic_key_timing.icon_id)
         col.prop(prefs, "vis_keyshape", icon_value=ic_key_all_shapes.icon_id)
         col.prop(prefs, "vis_keyarmature", icon_value=ic_key_whole_armature.icon_id)
+        col.prop(prefs, "vis_keyretime", icon_value=ic_retime_scene.icon_id)
     if (prefs.toolshelf_pages == "tangents"):
         col.prop(prefs, "vis_tanfree", icon="HANDLE_FREE")
         col.prop(prefs, "vis_tanaligned", icon="HANDLE_ALIGNED")

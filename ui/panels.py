@@ -65,6 +65,29 @@ class ABRA_OT_mpathpanel(bpy.types.Operator):
                 layout.label(text="Unsupported object")
                 layout.label(text="Try selecting something in object/pose mode")
 
+class ABRA_OT_retimepanel(bpy.types.Operator):
+    bl_label = "Retime"
+    bl_idname = "message.retimepanel"
+    bl_options = {"REGISTER", "UNDO"}
+ 
+    def execute(self, context):
+        api.retime_keys()
+        self.report({'INFO'}, "Retimed keys")
+        return {'FINISHED'}
+ 
+    def invoke(self, context, event):
+        return context.window_manager.invoke_props_dialog(self, width = 350)
+ 
+    def draw(self, context):
+        prefs = bpy.context.preferences.addons["abTools"].preferences
+        layout = self.layout
+        layout.prop(prefs, "retime_framestart")
+        layout.prop(prefs, "retime_frameoffset")
+        layout.separator()
+        layout.prop(prefs,"retime_onlyvisible")
+        layout.prop(prefs,"retime_hiddenobjects")
+        layout.prop(prefs,"retime_markers")
+
 class Set_Selector_Vars(bpy.types.PropertyGroup):
     renaming: bpy.props.BoolProperty(name="renaming", description="", default=False)
 class Set_Selector(bpy.types.Operator):
@@ -227,4 +250,4 @@ class ABRA_OT_selsetspanel(bpy.types.Operator):
         else:
             layout.label(text="Required addon is not installed")
 
-cls = (ABRA_OT_mpathpanel,ABRA_OT_selsetspanel,Set_Selector,Set_Selector_Vars,Rename_Set,Create_Set,Delete_Set,Assign_Bones,Remove_Bones)
+cls = (ABRA_OT_mpathpanel,ABRA_OT_selsetspanel,ABRA_OT_retimepanel,Set_Selector,Set_Selector_Vars,Rename_Set,Create_Set,Delete_Set,Assign_Bones,Remove_Bones)

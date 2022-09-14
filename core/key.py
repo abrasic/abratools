@@ -165,6 +165,18 @@ class ABRA_OT_key_armature(bpy.types.Operator):
                 
         return {"FINISHED"}
 
+class ABRA_OT_key_retime(bpy.types.Operator):
+    bl_idname = "screen.at_key_retime"
+    bl_label = "Retime Scene"
+    bl_description = "Adds a specified amount of space between keys by translating keys and markers automatically"
+    bl_options = {"REGISTER", "UNDO"}
+
+    def execute(self, context):
+        prefs = bpy.context.preferences.addons["abTools"].preferences
+        prefs.retime_framestart = context.scene.frame_current
+        bpy.ops.message.retimepanel("INVOKE_DEFAULT")
+        return {"FINISHED"}
+
 #  $$$$$$\  $$$$$$$$\ $$\       $$$$$$$$\  $$$$$$\ $$$$$$$$\ $$$$$$\  $$$$$$\  $$\   $$\ 
 # $$  __$$\ $$  _____|$$ |      $$  _____|$$  __$$\\__$$  __|\_$$  _|$$  __$$\ $$$\  $$ |
 # $$ /  \__|$$ |      $$ |      $$ |      $$ /  \__|  $$ |     $$ |  $$ /  $$ |$$$$\ $$ |
@@ -461,6 +473,7 @@ ABRA_OT_key_delete,
 ABRA_OT_key_timing,
 ABRA_OT_key_shapekeys,
 ABRA_OT_key_armature,
+ABRA_OT_key_retime,
 ABRA_OT_select_children,
 ABRA_OT_select_siblings,
 ABRA_OT_select_parent,
