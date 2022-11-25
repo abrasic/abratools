@@ -130,7 +130,7 @@ class Rename_Set(bpy.types.Operator):
         return {'FINISHED'}
 
 class Create_Set(bpy.types.Operator):
-    """Create a selection set"""
+    """Create a selection set for the current selected bones"""
     bl_idname = "armature.create_set"
     bl_label = "Create Set"
     bl_options = {"REGISTER", "UNDO"}
@@ -158,6 +158,40 @@ class Delete_Set(bpy.types.Operator):
 
     def invoke(self, context, event):
         api.delete_active_selection_set()
+        return {'FINISHED'}
+
+    def execute(self, context):
+        return {'FINISHED'}
+
+class Move_Up(bpy.types.Operator):
+    """Moves up the active set in the list"""
+    bl_idname = "armature.move_up"
+    bl_label = "Move Up"
+    bl_options = {"REGISTER", "UNDO"}
+
+    @classmethod
+    def poll(cls, context):
+        return context.active_object is not None
+
+    def invoke(self, context, event):
+        bpy.ops.pose.selection_set_move(direction='UP')
+        return {'FINISHED'}
+
+    def execute(self, context):
+        return {'FINISHED'}
+
+class Move_Down(bpy.types.Operator):
+    """Moves down the active set in the list"""
+    bl_idname = "armature.move_down"
+    bl_label = "Move Down"
+    bl_options = {"REGISTER", "UNDO"}
+
+    @classmethod
+    def poll(cls, context):
+        return context.active_object is not None
+
+    def invoke(self, context, event):
+        bpy.ops.pose.selection_set_move(direction='DOWN')
         return {'FINISHED'}
 
     def execute(self, context):
@@ -225,14 +259,13 @@ class ABRA_OT_selsetspanel(bpy.types.Operator):
                     colRight.operator('armature.delete_set', icon="REMOVE", text="")
                     colRight.operator('armature.rename_set', icon="OUTLINER_DATA_GP_LAYER", text="", depress=context.scene.set_selection.renaming)
                     colRight.separator()
+                    colRight.operator('armature.move_up', icon="TRIA_UP", text="")
+                    colRight.operator('armature.move_down', icon="TRIA_DOWN", text="")
+                    colRight.separator()
                     colRight.operator('armature.assign_bones', icon="PINNED", text="")
                     colRight.operator('armature.remove_bones', icon="UNPINNED", text="")
                     for i, set in enumerate(active.selection_sets):
                         activeSet = active.selection_sets[active.active_selection_set]
-                        print("--------------------")
-                        print(context.scene.set_selection.renaming)
-                        print(set.name)
-                        print(activeSet.name)
                         if set.name == activeSet.name:
                             if context.scene.set_selection.renaming:
                                 colLeft.prop(activeSet, "name", icon_only=True)
@@ -250,4 +283,4 @@ class ABRA_OT_selsetspanel(bpy.types.Operator):
         else:
             layout.label(text="Required addon is not installed")
 
-cls = (ABRA_OT_mpathpanel,ABRA_OT_selsetspanel,ABRA_OT_retimepanel,Set_Selector,Set_Selector_Vars,Rename_Set,Create_Set,Delete_Set,Assign_Bones,Remove_Bones)
+cls = (ABRA_OT_mpathpanel,ABRA_OT_selsetspanel,ABRA_OT_retimepanel,Set_Selector,Set_Selector_Vars,Rename_Set,Create_Set,Delete_Set,Move_Up,Move_Down,Assign_Bones,Remove_Bones)

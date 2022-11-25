@@ -109,7 +109,6 @@ class ABRA_OT_key_timing(bpy.types.Operator):
                 # Paste timing from active object
                 for bone in bones:
                     if bone == context.active_pose_bone:
-                        print("active bone to apply")
                         boneAction = action.groups.get(bone.name)
                         for i in boneAction.channels:
                             i.select = True

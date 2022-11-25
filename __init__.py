@@ -28,7 +28,6 @@ def register():
 
     bpy.types.USERPREF_HT_header.append(toolshelf.drawToggle)
     bpy.app.handlers.frame_change_pre.append(quickView.overlay_func)
-
     bpy.types.Scene.set_selection = bpy.props.PointerProperty(type=panels.Set_Selector_Vars)
 
     wm = bpy.context.window_manager
@@ -42,6 +41,8 @@ def register():
         km = kc.keymaps.new(name='Animation Channels', space_type='EMPTY')
         kmi = km.keymap_items.new(quickView.ABRA_OT_isolate_func.bl_idname, 'LEFTMOUSE', 'RELEASE', shift=True)
         addon_keymaps.append((km, kmi))
+
+    print("[aT] AbraTools is now running")
         
 
 def unregister():
@@ -59,6 +60,8 @@ def unregister():
         km.keymap_items.remove(kmi)
         
     addon_keymaps.clear()
+
+    print("[aT] AbraTools is no longer running")
 
 if __name__ == "__main__":
     register()
