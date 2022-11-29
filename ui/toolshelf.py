@@ -32,6 +32,7 @@ ic_select_mirror = ic["select_mirror"]
 ic_select_parent = ic["select_parent"]
 ic_select_siblings = ic["select_siblings"]
 ic_selection_sets = ic["selection_sets"]
+ic_swap_rig_mode = ic["swap_rig_mode"]
 ic_toggle_cursor_pivot = ic["toggle_cursor_pivot"]
 ic_view_const = ic["view_const"]
 ic_view_loc = ic["view_loc"]
@@ -201,6 +202,8 @@ def prefsHeaderWrite(self, context):
         layout.operator(key.ABRA_OT_toggle_cursor_pivot.bl_idname, text='', icon_value=ic_toggle_cursor_pivot.icon_id)
     if (prefs.vis_selsets): 
         layout.operator(key.ABRA_OT_selection_sets.bl_idname, text='', icon_value=ic_selection_sets.icon_id)
+    if (prefs.vis_selswaprigmode): 
+        layout.operator(key.ABRA_OT_swap_rig_mode.bl_idname, text='', icon_value=ic_swap_rig_mode.icon_id)
     layout.operator_context = "EXEC_DEFAULT"
 
     ## OTHER ##
@@ -270,6 +273,7 @@ def prefsBodyWrite(self, context):
         col.prop(prefs, "vis_cursortosel", icon_value=ic_cursor_to_selected.icon_id)
         col.prop(prefs, "vis_toggle_cursor", icon_value=ic_toggle_cursor_pivot.icon_id)
         col.prop(prefs, "vis_selsets", icon_value=ic_selection_sets.icon_id)
+        col.prop(prefs, "vis_selswaprigmode", icon_value=ic_swap_rig_mode.icon_id)
     if (prefs.toolshelf_pages == "other"):
         col.prop(prefs, "vis_rangesel", icon_value=ic_range_to_selection.icon_id)
         col.prop(prefs, "vis_keypath", icon_value=ic_create_path.icon_id)

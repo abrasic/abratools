@@ -203,6 +203,12 @@ class AbraToolsPrefs(AddonPreferences):
         default = False
     )
 
+    vis_selswaprigmode: BoolProperty(
+        name = key.ABRA_OT_swap_rig_mode.bl_label,
+        description = key.ABRA_OT_swap_rig_mode.bl_description,
+        default = False
+    )
+
     ##################
 
     vis_tanfree: BoolProperty(

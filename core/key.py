@@ -299,6 +299,67 @@ class ABRA_OT_selection_sets(bpy.types.Operator):
         bpy.ops.message.selsetspanel("INVOKE_DEFAULT")
         return {"FINISHED"}
 
+class ABRA_OT_swap_rig_mode(bpy.types.Operator):
+    bl_idname = "screen.at_swap_rig_mode"
+    bl_label = "Swap Rig Mode"
+    bl_description = "Swaps between Pose/Object Mode and selects the associated armature or armature meshes. Useful when working with rig shape keys outside of Pose Mode and want to access the mesh faster, and vice versa"
+    bl_options = {"REGISTER", "UNDO"}
+
+    def invoke(self, context, event):
+        if bpy.context.mode == "POSE":
+            if bpy.context.active_object.type == "ARMATURE":
+                armature = bpy.context.active_object
+
+            objects = []
+            if armature:
+                for obj in bpy.data.objects:
+                    if obj.type == 'MESH': 
+                        for modifier in obj.modifiers:
+                            if (modifier.type == 'ARMATURE'): 
+                                if modifier.object == armature:
+                                    objects.append(obj)
+                                    
+                if objects:
+                    print(objects)
+                    bpy.ops.object.mode_set(mode='OBJECT')
+                    bpy.ops.object.select_all(action='DESELECT')
+                    bpy.context.view_layer.objects.active = None
+                    for i, o in enumerate(objects):
+                        if i == 0:
+                            bpy.context.view_layer.objects.active = o
+
+                        o.select_set(True)
+                else:
+                    self.report({"INFO"}, "No meshes associated with armature")
+                    return {"CANCELLED"}
+                    
+        elif bpy.context.mode == "OBJECT":
+            armature = None
+            if bpy.context.active_object.type == "MESH":
+                obj = bpy.context.active_object
+                if obj.modifiers:
+                    for modifier in obj.modifiers:
+                        if modifier.type == 'ARMATURE':
+                            if modifier.object:
+                                armature = modifier.object
+                            else:
+                                self.report({"INFO"}, "Mesh has no Armature modifier")
+                                return {"CANCELLED"}
+                else:
+                    self.report({"INFO"}, "Mesh has no Armature modifier")
+                    return {"CANCELLED"}
+            else:
+                self.report({"INFO"}, "Select mesh with Armature modifier")
+                return {"CANCELLED"}
+                            
+            if armature:
+                print(armature)
+                bpy.ops.object.select_all(action='DESELECT')
+                bpy.context.view_layer.objects.active = armature
+                bpy.ops.object.mode_set(mode='POSE')
+        
+        return {"FINISHED"}
+
 
 #  $$$$$$\ $$$$$$$$\ $$\   $$\ $$$$$$$$\ $$$$$$$\  
 # $$  __$$\\__$$  __|$$ |  $$ |$$  _____|$$  __$$\ 
@@ -478,6 +539,7 @@ ABRA_OT_select_siblings,
 ABRA_OT_select_parent,
 ABRA_OT_select_mirror,
 ABRA_OT_selection_sets,
+ABRA_OT_swap_rig_mode,
 ABRA_OT_cursor_to_selected,
 ABRA_OT_toggle_cursor_pivot,
 ABRA_OT_tangent_keypath,
