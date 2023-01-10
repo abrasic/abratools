@@ -260,7 +260,12 @@ def retime_keys():
         bpy.ops.marker.select_leftright(mode='RIGHT')
         bpy.ops.marker.move(frames=prefs.retime_frameoffset)
 
+    # Add to end frame range
+    bpy.context.scene.frame_end += int(prefs.retime_frameoffset)
+
+    # Cleanup
     bpy.ops.action.select_all(action='DESELECT')
+    bpy.ops.marker.select_all(action='DESELECT')
     bpy.ops.object.mode_set(mode=old_mode)
     area.type = old_type
     return True
