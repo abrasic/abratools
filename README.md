@@ -44,10 +44,14 @@ Quickly block out your shapes. Avoid constant [I] key spam.
 <img src='https://files.gitbook.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FVEvUhh6zNMLIFbTZCBjF%2Fuploads%2F3rp1IS8hBvS8cJotKr2Z%2Fkeyallshapes.gif?alt=media&token=00bc591e-4632-4c11-8537-35650599bfbf' height='325'>
 
 ## Key Whole Armature
-
 Gone are the days of [A] + [I] keypresses while blocking.
 
 <img src='https://files.gitbook.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FVEvUhh6zNMLIFbTZCBjF%2Fuploads%2FE1UnPXeSTYNLz69Jk1iJ%2Fkeyarmature.gif?alt=media&token=d0d768c4-8ed4-4fea-a66d-701bccc3f8a6' height='325'>
+
+## Retime Scene
+Need more space in a moving hold without the fear of screwing up your timing in other shots? We got you covered. Our retime feature moves camera markers and all other keyframes in your scene automatically.
+
+![retime](https://user-images.githubusercontent.com/43157991/209421291-2373a142-1e5c-42a4-a923-b7ea82f20967.gif)
 
 ## Selection Sets+
 Access and manage your selection sets quicker.
