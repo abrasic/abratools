@@ -1,5 +1,4 @@
 import bpy, addon_utils, math
-from .. import prefs
 
 def dprint(text, col=None):
     color = '\x1b[1;30;40m'
