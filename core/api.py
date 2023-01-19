@@ -1,5 +1,29 @@
 import bpy, addon_utils, math
+from .. import prefs
 
+def dprint(text, col=None):
+    if prefs.dev_debug == True:
+        color = '\x1b[1;30;40m'
+        match col:
+            case 'red':
+                color = '\x1b[7;31;40m'
+            case 'yellow':
+                color = '\x1b[7;33;40m'
+            case 'green':
+                color = '\x1b[7;32;40m'
+            case 'blue':
+                color = '\x1b[7;34;40m'
+            case 'cyan':
+                color = '\x1b[7;36;40m'
+            case 'purple':
+                color = '\x1b[7;35;40m'
+            case 'white':
+                color = '\x1b[7;37;40m'
+            case _:
+                color = '\x1b[1;30;40m'
+
+        print(color + 'ABRATOOLS DEBUG:' + '\x1b[0m ' + text)
+        
 def get_frame_range():
     return [bpy.context.scene.frame_start, bpy.context.scene.frame_end]
 

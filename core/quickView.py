@@ -44,7 +44,6 @@ class ABRA_OT_auto_overlay(bpy.types.Operator):
 @persistent
 def overlay_func(self, context):
     prefs = bpy.context.preferences.addons["abTools"].preferences
-    print(prefs.auto_overlay)
     if prefs.auto_overlay:
         isPlaying = bpy.context.screen.is_animation_playing
         for area in bpy.context.screen.areas:

@@ -320,7 +320,6 @@ class ABRA_OT_swap_rig_mode(bpy.types.Operator):
                                     objects.append(obj)
                                     
                 if objects:
-                    print(objects)
                     bpy.ops.object.mode_set(mode='OBJECT')
                     bpy.ops.object.select_all(action='DESELECT')
                     bpy.context.view_layer.objects.active = None
@@ -353,7 +352,6 @@ class ABRA_OT_swap_rig_mode(bpy.types.Operator):
                 return {"CANCELLED"}
                             
             if armature:
-                print(armature)
                 bpy.ops.object.select_all(action='DESELECT')
                 bpy.context.view_layer.objects.active = armature
                 bpy.ops.object.mode_set(mode='POSE')

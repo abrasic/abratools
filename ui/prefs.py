@@ -287,6 +287,12 @@ class AbraToolsPrefs(AddonPreferences):
         description = "Sets the width of buttons in the toolshelf"
     )
 
+    dev_debug: bpy.props.BoolProperty(
+        name = "Debug Mode",
+        default = False,
+        description = "Developer use only. Prints additional content to the Blender console"
+    )
+
     ######## RETIME PANEL #########
     retime_framestart: IntProperty(
         name = "Frame Start",
