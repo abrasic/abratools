@@ -179,7 +179,7 @@ class ABRA_OT_key_retime(bpy.types.Operator):
 class ABRA_OT_bake_keys(bpy.types.Operator):
     bl_idname = "screen.at_bake_keys"
     bl_label = "Bake Keys"
-    bl_description = "Adds and replaces keys for all visible F-Curves for every nth frame across specified frame range. Shift + Click this tool to modify frame step."
+    bl_description = "Adds and replaces keys for all selected objects' F-Curves for every nth frame, inside of the specified frame range. Shift + Click this tool to modify frame step."
     bl_options = {"REGISTER", "UNDO"}
 
     def invoke(self, context, event):
