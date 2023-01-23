@@ -334,7 +334,7 @@ class AbraToolsPrefs(AddonPreferences):
 
     bake_framestep: IntProperty(
         name = "Frame Step",
-        description = "How many frames ahead until another key is baked.",
+        description = "How many frames ahead until another key is baked",
         default = 2,
         min = 1
     )
