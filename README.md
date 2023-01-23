@@ -57,6 +57,11 @@ Need more space in a moving hold without the fear of screwing up your timing in 
 
 ![retime](https://user-images.githubusercontent.com/43157991/209421291-2373a142-1e5c-42a4-a923-b7ea82f20967.gif)
 
+## Bake Keys
+Bake some keys on ones, twos, or whatever interval you prefer.
+![bake](https://user-images.githubusercontent.com/43157991/213976577-f5155bcc-649b-49da-ad10-76bc8f29e542.gif)
+
+
 ## Selection Sets+
 Access and manage your selection sets quicker.
 
