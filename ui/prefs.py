@@ -122,6 +122,12 @@ class AbraToolsPrefs(AddonPreferences):
         default = True
     )
 
+    vis_keybake: BoolProperty(
+        name = key.ABRA_OT_bake_keys.bl_label,
+        description = key.ABRA_OT_bake_keys.bl_description,
+        default = True,
+    )
+
     vis_keytiming: BoolProperty(
         name = key.ABRA_OT_key_timing.bl_label,
         description = key.ABRA_OT_key_timing.bl_description,
@@ -324,6 +330,14 @@ class AbraToolsPrefs(AddonPreferences):
         default = True
     )
 
+    ######## BAKING PANEL ########
+
+    bake_framestep: IntProperty(
+        name = "Frame Step",
+        description = "How many frames ahead until another key is baked.",
+        default = 2,
+        min = 1
+    )
 
     ###############################
     def draw(self, context):

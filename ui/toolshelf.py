@@ -13,6 +13,7 @@ ic = icons_coll["icons"]
 ic_logo = ic["logo"]
 
 ic_auto_overlay = ic["auto_overlay"]
+ic_bake_on_nths = ic["bake_on_nths"]
 ic_copy_keys = ic["copy_keys"]
 ic_key_timing = ic["copy_key_timing"]
 ic_create_path = ic["create_path"]
@@ -165,6 +166,10 @@ def prefsHeaderWrite(self, context):
         layout.operator(key.ABRA_OT_key_paste.bl_idname, text='', icon_value=ic_paste_keys.icon_id)
     if (prefs.vis_keydelete): 
         layout.operator(key.ABRA_OT_key_delete.bl_idname, text='', icon_value=ic_delete_keys.icon_id)
+    if (prefs.vis_keybake): 
+        layout.operator_context = "INVOKE_DEFAULT"
+        layout.operator(key.ABRA_OT_bake_keys.bl_idname, text='', icon_value=ic_bake_on_nths.icon_id)
+        layout.operator_context = "EXEC_DEFAULT"
     if (prefs.vis_keytiming): 
         layout.operator(key.ABRA_OT_key_timing.bl_idname, text='', icon_value=ic_key_timing.icon_id)
     if (prefs.vis_keyshape): 
@@ -255,6 +260,7 @@ def prefsBodyWrite(self, context):
         col.prop(prefs, "vis_keycopy", icon_value=ic_copy_keys.icon_id)
         col.prop(prefs, "vis_keypaste", icon_value=ic_paste_keys.icon_id)
         col.prop(prefs, "vis_keydelete", icon_value=ic_delete_keys.icon_id)
+        col.prop(prefs, "vis_keybake", icon_value=ic_bake_on_nths.icon_id)
         col.prop(prefs, "vis_keytiming", icon_value=ic_key_timing.icon_id)
         col.prop(prefs, "vis_keyshape", icon_value=ic_key_all_shapes.icon_id)
         col.prop(prefs, "vis_keyarmature", icon_value=ic_key_whole_armature.icon_id)
@@ -307,6 +313,8 @@ def prefsBodyWrite(self, context):
         col.label(text="Some tools require third-party addons in order to use", icon="INFO")
         col.label(text="We are not affiliated nor endorsed by these addons", icon="INFO")
 
+        col.separator()
+        col.prop(prefs, "dev_debug")
 
     layout.label(text="aT | alpha6")
 

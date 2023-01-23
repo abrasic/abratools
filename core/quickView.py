@@ -13,6 +13,7 @@ class ABRA_OT_isolate_func(bpy.types.Operator):
         wm = context.window_manager
         if(context.area.type == "GRAPH_EDITOR"):
             if prefs.isolate_curves:
+                api.dprint("Isolate Curves Execute", col="white")
                 bpy.ops.graph.hide(unselected=True)
                 return {"FINISHED"}
             else:

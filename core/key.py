@@ -176,6 +176,69 @@ class ABRA_OT_key_retime(bpy.types.Operator):
         bpy.ops.message.retimepanel("INVOKE_DEFAULT")
         return {"FINISHED"}
 
+class ABRA_OT_bake_keys(bpy.types.Operator):
+    bl_idname = "screen.at_bake_keys"
+    bl_label = "Bake Keys"
+    bl_description = "Adds and replaces keys for all visible F-Curves for every nth frame across specified frame range. Shift + Click this tool to modify frame step."
+    bl_options = {"REGISTER", "UNDO"}
+
+    def invoke(self, context, event):
+        if event.shift:
+            bpy.ops.message.bakepanel("INVOKE_DEFAULT")
+            return {"FINISHED"}
+        else:
+            # Set to GE
+            area = bpy.context.area
+            old_type = area.type
+            area.type = 'GRAPH_EDITOR'
+
+            # Get data ready for bake
+            prefs = bpy.context.preferences.addons["abTools"].preferences
+            range = api.get_frame_range()
+            frame_const = bpy.context.scene.frame_current
+            step = prefs.bake_framestep
+
+            # Basic checks
+            if api.get_visible_fcurves() is None:
+                self.report({"INFO"}, "At least one F-Curve/channel needs be visible")
+                area.type = old_type
+                return {"CANCELLED"}
+
+            if bpy.context.mode == "POSE" or bpy.context.mode == "OBJECT":
+                pass
+            else:
+                self.report({"INFO"}, "Unsupported mode. You must be in either Object or Pose mode.")
+                area.type = old_type
+                return {"CANCELLED"}
+
+            # Begin inserting keyframes by moving playhead on every nth frame until playhead reaches end of range.
+            api.dprint("BAKING RANGE ("+str(range[0])+"-"+str(range[1])+")", col="red")
+            bpy.ops.nla.bake(frame_start=range[0], frame_end=range[1], bake_types={bpy.context.mode}, use_current_action = True)
+            bpy.ops.graph.select_all(action='DESELECT')
+
+            api.dprint("Initial bake complete. Moving to range start")
+            bpy.context.scene.frame_current = range[0]
+            ref = bpy.context.scene.frame_current
+            while bpy.context.scene.frame_current < range[1]:
+                s = 0
+                bpy.ops.screen.keyframe_jump()
+                s += bpy.context.scene.frame_current - ref
+                if s == 0:
+                    api.dprint("There are no more keyframes left to bake", col="yellow")
+                    break
+                api.dprint("Playhead jumped to frame " + str(bpy.context.scene.frame_current) + " with a total offset of "+ str(s))
+                if s % step == 0:
+                    api.dprint("Current frame is divisible. Skipping...")
+                else:
+                    api.dprint("Current frame is NOT divisible. Deleting keys on "+str(bpy.context.scene.frame_current)+")", col="yellow")
+                    bpy.ops.graph.select_column(mode='CFRA')
+                    bpy.ops.graph.delete(confirm=False)
+
+            bpy.context.scene.frame_current = frame_const
+            area.type = old_type
+            api.dprint("Bake should be complete", col="green")
+            return {"FINISHED"}
+
 #  $$$$$$\  $$$$$$$$\ $$\       $$$$$$$$\  $$$$$$\ $$$$$$$$\ $$$$$$\  $$$$$$\  $$\   $$\ 
 # $$  __$$\ $$  _____|$$ |      $$  _____|$$  __$$\\__$$  __|\_$$  _|$$  __$$\ $$$\  $$ |
 # $$ /  \__|$$ |      $$ |      $$ |      $$ /  \__|  $$ |     $$ |  $$ /  $$ |$$$$\ $$ |
@@ -532,6 +595,7 @@ ABRA_OT_key_timing,
 ABRA_OT_key_shapekeys,
 ABRA_OT_key_armature,
 ABRA_OT_key_retime,
+ABRA_OT_bake_keys,
 ABRA_OT_select_children,
 ABRA_OT_select_siblings,
 ABRA_OT_select_parent,

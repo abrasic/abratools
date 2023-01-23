@@ -1,27 +1,29 @@
 import bpy, addon_utils, math
 
 def dprint(text, col=None):
-    color = '\x1b[1;30;40m'
-    match col:
-        case 'red':
-            color = '\x1b[7;31;40m'
-        case 'yellow':
-            color = '\x1b[7;33;40m'
-        case 'green':
-            color = '\x1b[7;32;40m'
-        case 'blue':
-            color = '\x1b[7;34;40m'
-        case 'cyan':
-            color = '\x1b[7;36;40m'
-        case 'purple':
-            color = '\x1b[7;35;40m'
-        case 'white':
-            color = '\x1b[7;37;40m'
-        case _:
-            color = '\x1b[1;30;40m'
+    prefs = bpy.context.preferences.addons["abTools"].preferences
+    if prefs.dev_debug:
+        color = '\x1b[1;30;40m'
+        match col:
+            case 'red':
+                color = '\x1b[7;31;40m'
+            case 'yellow':
+                color = '\x1b[7;33;40m'
+            case 'green':
+                color = '\x1b[7;32;40m'
+            case 'blue':
+                color = '\x1b[7;34;40m'
+            case 'cyan':
+                color = '\x1b[7;36;40m'
+            case 'purple':
+                color = '\x1b[7;35;40m'
+            case 'white':
+                color = '\x1b[7;37;40m'
+            case _:
+                color = '\x1b[1;30;40m'
 
-    print(color + 'ABRATOOLS DEBUG:' + '\x1b[0m ' + text)
-        
+        print(color + 'ABRATOOLS DEBUG:' + '\x1b[0m ' + text)
+
 def get_frame_range():
     return [bpy.context.scene.frame_start, bpy.context.scene.frame_end]
 
@@ -145,7 +147,6 @@ def get_selection_right_neighbour(curve, keys):
     except IndexError:
         return None
 
-
 def get_key_left_neighbour(curve, key):
     """Returns the left neighbour of a key."""
     keyBefore = curve.keyframe_points[key]
@@ -168,7 +169,6 @@ def select_bones_from_set(int):
     """Selects bones from selection set of active object."""
     bpy.context.object.active_selection_set = int
     bpy.ops.pose.selection_set_select()
-
 
 def rename_active_selection_set(str):
     active = bpy.context.active_object
@@ -262,11 +262,11 @@ def key_clipboard(self, type=None):
     area.type = old_type
 
 def retime_keys():
+    prefs = bpy.context.preferences.addons["abTools"].preferences
     area = bpy.context.area
     old_type = area.type
     old_mode = bpy.context.mode
     area.type = 'DOPESHEET_EDITOR'
-    prefs = bpy.context.preferences.addons["abTools"].preferences
 
     bpy.ops.object.mode_set(mode='OBJECT')
 
