@@ -276,7 +276,7 @@ def prefsBodyWrite(self, context):
         col.prop(prefs, "vis_selchild", icon_value=ic_select_children.icon_id)
         col.prop(prefs, "vis_selparent", icon_value=ic_select_parent.icon_id)
         col.prop(prefs, "vis_selsiblings", icon_value=ic_select_siblings.icon_id)
-        col.prop(prefs, "vis_selmirror", icon_value=ic_select_parent.icon_id)
+        col.prop(prefs, "vis_selmirror", icon_value=ic_select_mirror.icon_id)
         col.prop(prefs, "vis_cursortosel", icon_value=ic_cursor_to_selected.icon_id)
         col.prop(prefs, "vis_toggle_cursor", icon_value=ic_toggle_cursor_pivot.icon_id)
         col.prop(prefs, "vis_selsets", icon_value=ic_selection_sets.icon_id)
