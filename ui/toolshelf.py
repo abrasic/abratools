@@ -203,8 +203,9 @@ def prefsHeaderWrite(self, context):
         layout.operator(key.ABRA_OT_select_mirror.bl_idname, text='', icon_value=ic_select_mirror.icon_id)
     if (prefs.vis_cursortosel): 
         layout.operator(key.ABRA_OT_cursor_to_selected.bl_idname, text='', icon_value=ic_cursor_to_selected.icon_id)
-    if (prefs.vis_toggle_cursor): 
-        layout.operator(key.ABRA_OT_toggle_cursor_pivot.bl_idname, text='', icon_value=ic_toggle_cursor_pivot.icon_id)
+    if (prefs.vis_toggle_cursor):
+        cursor_mode = bpy.context.scene.tool_settings.transform_pivot_point == "CURSOR"
+        layout.operator(key.ABRA_OT_toggle_cursor_pivot.bl_idname, text='', depress=cursor_mode, icon_value=ic_toggle_cursor_pivot.icon_id)
     if (prefs.vis_selsets): 
         layout.operator(key.ABRA_OT_selection_sets.bl_idname, text='', icon_value=ic_selection_sets.icon_id)
     if (prefs.vis_selswaprigmode): 
