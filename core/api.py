@@ -1,4 +1,9 @@
 import bpy, addon_utils, math
+from ..ui import draw
+
+def draw_message(str):
+    drawc = draw.AT_Draw()
+    drawc.label(str)
 
 def dprint(text, col=None):
     prefs = bpy.context.preferences.addons["abTools"].preferences
@@ -232,14 +237,14 @@ def key_clipboard(self, type=None):
             try:
                 bpy.ops.graph.copy()
             except RuntimeError:
-                self.report({"INFO"}, "No keys on playhead")
+                draw_message("No keys on playhead")
             bpy.ops.graph.select_all(action='DESELECT')
     
     elif (type=="paste"):
         try:
             bpy.ops.graph.paste()
         except RuntimeError:
-            self.report({"INFO"}, "No keys to paste")
+            draw_message("No keys in clipboard")
 
     elif (type=="delete"):
         try:
@@ -256,7 +261,7 @@ def key_clipboard(self, type=None):
                 bpy.ops.graph.select_column(mode='CFRA')
                 bpy.ops.graph.delete()
         except RuntimeError:
-            self.report({"INFO"}, "No keys to delete")
+            draw_message("Select keys or place on playhead")
 
             
     area.type = old_type
@@ -313,7 +318,7 @@ def enable_addon(self, name):
     try:
         addon_utils.enable(name, default_set=True)
     except ModuleNotFoundError:
-        self.report({"INFO"}, "Module not found")
+        draw_message("Module not found")
 
 def use_oss():
     """Returns [bool, bool]. Runs through all time-based areas in the active screen and look for OSS. If it's off, immediately break and return false to use for key management."""

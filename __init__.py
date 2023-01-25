@@ -13,7 +13,7 @@ bl_info = {
 
 import bpy, os
 from .core import key, quickView
-from .ui import prefs, panels, toolshelf
+from .ui import prefs, panels, toolshelf, draw
 ################################
 
 classes = quickView.cls + key.cls + prefs.cls + panels.cls + toolshelf.cls
@@ -29,6 +29,7 @@ def register():
     bpy.types.USERPREF_HT_header.append(toolshelf.drawToggle)
     bpy.app.handlers.frame_change_pre.append(quickView.overlay_func)
     bpy.types.Scene.set_selection = bpy.props.PointerProperty(type=panels.Set_Selector_Vars)
+    bpy.app.timers.register(draw.AT_Draw.notif_fade_out, first_interval=0.1)
 
     wm = bpy.context.window_manager
     kc = wm.keyconfigs.addon
@@ -50,6 +51,7 @@ def unregister():
     bpy.context.preferences.themes[0].preferences.space.header = toolshelf.prefsOldHeaderCol
     bpy.types.USERPREF_HT_header.remove(toolshelf.drawToggle)
     bpy.app.handlers.frame_change_pre.remove(quickView.overlay_func)
+    bpy.app.timers.unregister(draw.AT_Draw.notif_fade_out)
 
     del bpy.types.Scene.set_selection
     

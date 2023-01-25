@@ -116,9 +116,9 @@ class ABRA_OT_key_timing(bpy.types.Operator):
                 
                 area.type = old_type
             else:
-                self.report({"INFO"}, "Select exactly two bones")
+                api.draw_message("Select exactly two bones")
         else:
-            self.report({"INFO"}, "Required addon is not installed")
+            api.draw_message("Required add-on is not installed")
         return {"FINISHED"}
 
 class ABRA_OT_key_shapekeys(bpy.types.Operator):
@@ -200,14 +200,14 @@ class ABRA_OT_bake_keys(bpy.types.Operator):
 
             # Basic checks
             if api.get_visible_fcurves() is None:
-                self.report({"INFO"}, "At least one F-Curve/channel needs be visible")
+                api.draw_message("No F-Curves are visible")
                 area.type = old_type
                 return {"CANCELLED"}
 
             if bpy.context.mode == "POSE" or bpy.context.mode == "OBJECT":
                 pass
             else:
-                self.report({"INFO"}, "Unsupported mode. You must be in either Object or Pose mode.")
+                api.draw_message("Object or Pose Mode only")
                 area.type = old_type
                 return {"CANCELLED"}
 
@@ -266,7 +266,7 @@ class ABRA_OT_select_children(bpy.types.Operator):
                         for child in children:
                             child.bone.select = True
         else:
-            self.report({"INFO"}, "Currently only supports Pose Mode")
+            api.draw_message("Currently only supports Pose Mode")
         return {"FINISHED"}
 
 class ABRA_OT_select_siblings(bpy.types.Operator):
@@ -284,7 +284,7 @@ class ABRA_OT_select_siblings(bpy.types.Operator):
                     for child in parent.children:
                         child.bone.select = True
         else:
-            self.report({"INFO"}, "Currently only supports Pose Mode")
+            api.draw_message("Currently only supports Pose Mode")
         return {"FINISHED"}
 
 class ABRA_OT_select_parent(bpy.types.Operator):
@@ -303,7 +303,7 @@ class ABRA_OT_select_parent(bpy.types.Operator):
                     if bone.parent:
                             bone.parent.bone.select = True
         else:
-            self.report({"INFO"}, "Currently only supports Pose Mode")
+            api.draw_message("Currently only supports Pose Mode")
         return {"FINISHED"}
 
 class ABRA_OT_select_mirror(bpy.types.Operator):
@@ -319,7 +319,7 @@ class ABRA_OT_select_mirror(bpy.types.Operator):
             else:
                 bpy.ops.pose.select_mirror()
         else:
-            self.report({"INFO"}, "Currently only supports Pose Mode")
+            api.draw_message("Currently only supports Pose Mode")
         return {"FINISHED"}
 
 class ABRA_OT_cursor_to_selected(bpy.types.Operator):
@@ -346,8 +346,10 @@ class ABRA_OT_toggle_cursor_pivot(bpy.types.Operator):
 
     def invoke(self, context, event):
         if bpy.context.scene.tool_settings.transform_pivot_point == "CURSOR":
+            api.draw_message("Individual Origins")
             bpy.context.scene.tool_settings.transform_pivot_point = "INDIVIDUAL_ORIGINS"
         else:
+            api.draw_message("Cursor")
             bpy.context.scene.tool_settings.transform_pivot_point = "CURSOR"
 
         return {"FINISHED"}
@@ -392,7 +394,7 @@ class ABRA_OT_swap_rig_mode(bpy.types.Operator):
 
                         o.select_set(True)
                 else:
-                    self.report({"INFO"}, "No meshes associated with armature")
+                    api.draw_message("No meshes associated with Armature")
                     return {"CANCELLED"}
                     
         elif bpy.context.mode == "OBJECT":
@@ -405,13 +407,13 @@ class ABRA_OT_swap_rig_mode(bpy.types.Operator):
                             if modifier.object:
                                 armature = modifier.object
                             else:
-                                self.report({"INFO"}, "Mesh has no Armature modifier")
+                                api.draw_message("Mesh has no Armature modifier")
                                 return {"CANCELLED"}
                 else:
-                    self.report({"INFO"}, "Mesh has no Armature modifier")
+                    api.draw_message("Mesh has no Armature modifier")
                     return {"CANCELLED"}
             else:
-                self.report({"INFO"}, "Select mesh with Armature modifier")
+                api.draw_message("Select mesh with Armature modifier")
                 return {"CANCELLED"}
                             
             if armature:
@@ -446,7 +448,7 @@ class ABRA_OT_tangent_keypath(bpy.types.Operator):
                 self.report({"WARNING"}, "Preventing overload: Max 5 bones")
                 return {"CANCELLED"}
             opcode = None
-            if bpy.context.mode == "OBJECT":
+            if bpy.context.mode == "OBJECT" and len(context.selected_objects)>0:
                 opcode = bpy.ops.object
                 opcode.paths_clear(only_selected=True)
             if bpy.context.mode == "POSE":
@@ -503,6 +505,7 @@ class ABRA_OT_tangent_keypathclear(bpy.types.Operator):
                 opcode.paths_clear(only_selected=True)
             else:
                 opcode.paths_clear()
+                
         return {"FINISHED"}
 
 class ABRA_OT_range_to_selection(bpy.types.Operator):

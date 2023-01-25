@@ -8,7 +8,7 @@ class ABRA_OT_mpathpanel(bpy.types.Operator):
     bl_idname = "message.mpathpanel"
  
     def execute(self, context):
-        self.report({'INFO'}, "Changes saved")
+        api.draw_message("Changes saved")
         return {'FINISHED'}
  
     def invoke(self, context, event):
@@ -72,7 +72,7 @@ class ABRA_OT_retimepanel(bpy.types.Operator):
  
     def execute(self, context):
         api.retime_keys()
-        self.report({'INFO'}, "Retimed keys")
+        api.draw_message("Retimed keys")
         return {'FINISHED'}
  
     def invoke(self, context, event):
@@ -94,7 +94,7 @@ class ABRA_OT_bakepanel(bpy.types.Operator):
     bl_options = {"REGISTER", "UNDO"}
  
     def execute(self, context):
-        self.report({'INFO'}, "Changes saved")
+        api.draw_message("Changes saved")
         return {'FINISHED'}
  
     def invoke(self, context, event):
