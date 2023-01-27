@@ -41,6 +41,18 @@ class AbraToolsPrefs(AddonPreferences):
         description = "For internal use. Checks if user enabled Isolate Curves",
         default = False
     )
+    
+    vis_auto_frame: BoolProperty(
+        name = quickView.ABRA_OT_auto_frame.bl_label,
+        description = quickView.ABRA_OT_auto_frame.bl_description,
+        default = True
+    )
+
+    auto_frame: BoolProperty(
+        name = "Auto Frame Enabled",
+        description = "For internal use. Checks if user enabled Auto Frame",
+        default = False
+    )
 
     vis_overlay: BoolProperty(
         name = quickView.ABRA_OT_auto_overlay.bl_label,

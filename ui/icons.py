@@ -7,6 +7,7 @@ icons_dir = os.path.join(os.path.dirname(__file__), "icons")
 icons.load("logo", os.path.join(icons_dir, "logo.png"), 'IMAGE')
 
 icons.load("auto_overlay", os.path.join(icons_dir, "auto_overlay.png"), 'IMAGE')
+icons.load("auto_frame", os.path.join(icons_dir, "auto_frame.png"), 'IMAGE')
 icons.load("bake_on_nths", os.path.join(icons_dir, "bake_on_nths.png"), 'IMAGE')
 icons.load("copy_keys", os.path.join(icons_dir, "copy_keys.png"), 'IMAGE')
 icons.load("copy_key_timing", os.path.join(icons_dir, "copy_key_timing.png"), 'IMAGE')

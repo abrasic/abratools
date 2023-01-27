@@ -13,6 +13,7 @@ ic = icons_coll["icons"]
 ic_logo = ic["logo"]
 
 ic_auto_overlay = ic["auto_overlay"]
+ic_auto_frame = ic["auto_frame"]
 ic_bake_on_nths = ic["bake_on_nths"]
 ic_copy_keys = ic["copy_keys"]
 ic_key_timing = ic["copy_key_timing"]
@@ -138,6 +139,8 @@ def prefsHeaderWrite(self, context):
     ## QUICK VIEW ##
     if (prefs.vis_isolate):
         layout.operator(quickView.ABRA_OT_isolate_curves.bl_idname, text='', depress=prefs.isolate_curves, icon_value=ic_isolate_curves.icon_id)
+    if (prefs.vis_auto_frame):
+        layout.operator(quickView.ABRA_OT_auto_frame.bl_idname, text='', depress=prefs.auto_frame, icon_value=ic_auto_frame.icon_id)
     if (prefs.vis_overlay):
         layout.operator(quickView.ABRA_OT_auto_overlay.bl_idname, text='', depress=prefs.auto_overlay, icon_value=ic_auto_overlay.icon_id)
     if (prefs.vis_viewloc):
@@ -248,6 +251,7 @@ def prefsBodyWrite(self, context):
         col.operator("wm.url_open", text="GitHub").url = "https://github.com/abrasic/abratools"
     if (prefs.toolshelf_pages == "quickview"):
         col.prop(prefs, "vis_isolate", icon_value=ic_isolate_curves.icon_id)
+        col.prop(prefs, "vis_auto_frame", icon_value=ic_auto_frame.icon_id)
         col.prop(prefs, "vis_overlay", icon_value=ic_auto_overlay.icon_id)
         col.prop(prefs, "vis_viewloc", icon_value=ic_view_loc.icon_id)
         col.prop(prefs, "vis_viewrot", icon_value=ic_view_rot.icon_id)
@@ -317,7 +321,7 @@ def prefsBodyWrite(self, context):
         col.separator()
         col.prop(prefs, "dev_debug")
 
-    layout.label(text="aT | alpha6")
+    layout.label(text="aT | beta1")
 
     return 
     
