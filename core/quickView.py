@@ -40,7 +40,7 @@ class ABRA_OT_isolate_func(bpy.types.Operator):
 
                     # Deselect markers and keys for good measure
                     api.dprint("Deselecting keys and markers")
-                    bpy.ops.graph.select_all(action='DESELECT')
+                    #bpy.ops.graph.select_all(action='DESELECT')
                     for marker in bpy.context.scene.timeline_markers:
                         if marker.select:
                             marker.select = False
@@ -61,7 +61,11 @@ class ABRA_OT_isolate_func(bpy.types.Operator):
 
                     # Deselect again
                     api.dprint("Deselecting keys")
-                    bpy.ops.graph.select_all(action='DESELECT')
+                    #bpy.ops.graph.select_all(action='DESELECT')
+
+                    # select_all removes selection of the channel, which will cause it to hide the next time isolate curves is enabled.
+                    # The workaround I've found is to make a giant selection box to substract all keyframes but keep the channels themselves selected
+                    bpy.ops.graph.select_box(mode="SUB",xmin=-2**30,xmax=2**30,ymin=-2**30,ymax=2**30)
                     bpy.ops.marker.select_all(action='DESELECT')
 
                     # Delete markers
@@ -130,10 +134,17 @@ class ABRA_OT_visible_loc(bpy.types.Operator):
         area.type = 'GRAPH_EDITOR'
 
         bpy.ops.graph.reveal()
+
         for curve in bpy.context.editable_fcurves:
             match = re.search("location$", curve.data_path)
-            curve.hide = False if match else True
-            curve.select = False
+            if match:
+                curve.hide = False
+                curve.select = True
+            else:
+                curve.hide = True
+                curve.select = False
+
+        bpy.ops.screen.at_isolate_function()
 
         area.type = old
                 
@@ -156,8 +167,14 @@ class ABRA_OT_visible_rot(bpy.types.Operator):
                 match = re.search("rotation_quaternion$", curve.data_path)
             else:
                 match = re.search("rotation_euler$", curve.data_path)
-            curve.hide = False if match else True
-            curve.select = False
+            if match:
+                curve.hide = False
+                curve.select = True
+            else:
+                curve.hide = True
+                curve.select = False
+
+        bpy.ops.screen.at_isolate_function()
         
         area.type = old
         return {"FINISHED"}
@@ -176,8 +193,14 @@ class ABRA_OT_visible_scl(bpy.types.Operator):
         bpy.ops.graph.reveal()
         for curve in bpy.context.editable_fcurves:
             match = re.search("scale$", curve.data_path)
-            curve.hide = False if match else True
-            curve.select = False
+            if match:
+                curve.hide = False
+                curve.select = True
+            else:
+                curve.hide = True
+                curve.select = False
+
+        bpy.ops.screen.at_isolate_function()
                 
         area.type = old
         return {"FINISHED"}
@@ -196,8 +219,14 @@ class ABRA_OT_visible_keys(bpy.types.Operator):
         bpy.ops.graph.reveal()
         for curve in bpy.context.editable_fcurves:
             match = re.search("^key_blocks\[", curve.data_path)
-            curve.hide = False if match else True
-            curve.select = False
+            if match:
+                curve.hide = False
+                curve.select = True
+            else:
+                curve.hide = True
+                curve.select = False
+
+        bpy.ops.screen.at_isolate_function()
                 
         area.type = old
         return {"FINISHED"}
@@ -216,8 +245,14 @@ class ABRA_OT_visible_props(bpy.types.Operator):
         bpy.ops.graph.reveal()
         for curve in bpy.context.editable_fcurves:
             match = re.search('\[\"(.*?)\"\]$', curve.data_path)
-            curve.hide = False if match else True
-            curve.select = False
+            if match:
+                curve.hide = False
+                curve.select = True
+            else:
+                curve.hide = True
+                curve.select = False
+
+        bpy.ops.screen.at_isolate_function()
                 
         area.type = old
         return {"FINISHED"}
@@ -236,8 +271,14 @@ class ABRA_OT_visible_const(bpy.types.Operator):
         bpy.ops.graph.reveal()
         for curve in bpy.context.editable_fcurves:
             match = re.search('influence$', curve.data_path)
-            curve.hide = False if match else True
-            curve.select = False
+            if match:
+                curve.hide = False
+                curve.select = True
+            else:
+                curve.hide = True
+                curve.select = False
+
+        bpy.ops.screen.at_isolate_function()
                 
         area.type = old
         return {"FINISHED"}
