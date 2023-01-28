@@ -32,6 +32,10 @@ Control how you want your toolshelf to look and hide tools you dont want to see.
 Automatically hide F-Curves that aren't selected. Bye-bye, `Shift+H`!
 <img src='https://1352856054-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FVEvUhh6zNMLIFbTZCBjF%2Fuploads%2FB98EYtCW0t2zu5VVcmc5%2Fisolate_curves.gif?alt=media&token=666c8e89-8091-45f0-a795-c76f662997e2' height='325'>
 
+## Auto Frame
+Quit panning around the graph editor as much to find your F-Curves. AbraTools will automatically frame F-Curves into view for your current frame range.
+![auto_frame](https://user-images.githubusercontent.com/43157991/215243104-d9e246fd-d26c-42b6-af0a-a6b37a1a45da.gif)
+
 ## Quick Motion Path Setup
 Avoid the tedious work of setting up motion paths. One click and you're ready to rock.
 
