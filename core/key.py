@@ -81,27 +81,39 @@ class ABRA_OT_key_timing(bpy.types.Operator):
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
-        if api.is_addon_enabled("Copy_Timing_and_Ease") and bpy.context.mode == "POSE":
+        if api.is_addon_enabled("AnimCopy") and bpy.context.mode == "POSE":
+            api.dprint("Addon detected", col="green")
             bones = bpy.context.selected_pose_bones
+            api.dprint("Selected bones: "+str(len(bones)))
             if len(bones) == 2:
+                api.dprint("Two bones selected. Starting copier...", col="green")
                 area = context.area
                 old_type = area.type
                 area.type = 'GRAPH_EDITOR'
                 obj = context.object
                 action = obj.animation_data.action
+                bpy.ops.graph.select_all(action='DESELECT')
 
                 # Copy Timing from non-active object
+                api.dprint("Copying timing from non-active")
+                frameKeys = []
                 for bone in bones:
                     if bone != context.active_pose_bone:
+                        api.dprint("Copying frames from bone: "+str(bone.name))
                         boneAction = action.groups.get(bone.name)
                         for i in boneAction.channels:
+                            api.dprint("=== ITERATING CHANNEL: "+i.data_path)
                             i.select = True
                             for x in i.keyframe_points:
                                 if x.co[0] > context.scene.frame_start and x.co[0] < context.scene.frame_end:
                                     x.select_control_point=True
+                                    if x.co[0] not in frameKeys:
+                                        frameKeys.append(x.co[0])
                                 else:
                                     x.select_control_point=False
-                                
+                        api.dprint("FINAL FRAMES TO COPY:", col="blue")
+                        api.dprint(str(frameKeys), col="blue")
+
                         bpy.ops.graph.copy_timing_and_ease()
                         bpy.ops.graph.select_all(action='DESELECT')
                         context.active_object.data.bones[bone.name].select = False

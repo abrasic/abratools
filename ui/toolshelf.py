@@ -294,7 +294,7 @@ def prefsBodyWrite(self, context):
         col.separator()
         col.label(text="Third-party Addons:")
         addon = col.grid_flow(columns=2)
-        if api.is_addon_enabled("Copy_Timing_and_Ease"):
+        if api.is_addon_enabled("AnimCopy"):
             addon.label(text="Animcopy (INSTALLED)", icon="CHECKBOX_HLT")
         else:
             addon.label(text="Animcopy", icon="CHECKBOX_DEHLT")

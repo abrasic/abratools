@@ -92,7 +92,7 @@ class ABRA_OT_isolate_curves(bpy.types.Operator):
 class ABRA_OT_auto_frame(bpy.types.Operator):
     bl_idname = "screen.at_auto_frame"
     bl_label = "Auto Frame"
-    bl_description = "While enabled, AbraTools will automatically frame keyframes into view within the frame range. This is a beta feature"
+    bl_description = "While enabled, AbraTools will automatically frame F-Curves into view within the frame range. Works best alongside Isolate Curves. This is a beta feature"
     bl_options = {"REGISTER"}
 
     def execute(self, context):
