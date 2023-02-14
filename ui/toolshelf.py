@@ -295,10 +295,10 @@ def prefsBodyWrite(self, context):
         col.label(text="Third-party Addons:")
         addon = col.grid_flow(columns=2)
         if api.is_addon_enabled("Copy_Timing_and_Ease"):
-            addon.label(text="Copy Timing and Ease (INSTALLED)", icon="CHECKBOX_HLT")
+            addon.label(text="Animcopy (INSTALLED)", icon="CHECKBOX_HLT")
         else:
-            addon.label(text="Copy Timing and Ease", icon="CHECKBOX_DEHLT")
-        addon.operator("wm.url_open", text="By Blastframe | Click to Buy", icon="URL").url = "https://blendermarket.com/products/copy-timing-and-ease"
+            addon.label(text="Animcopy", icon="CHECKBOX_DEHLT")
+        addon.operator("wm.url_open", text="By Blastframe | Click to Buy", icon="URL").url = "https://blendermarket.com/products/animcopy"
 
         addon = col.grid_flow(columns=2)
         if api.is_addon_enabled("copy_global_transform"):
