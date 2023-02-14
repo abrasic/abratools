@@ -270,14 +270,14 @@ def retime_keys():
 
     bpy.ops.object.mode_set(mode='OBJECT')
 
-    dprint("Only show selected is set to "+ str(prefs.retime_onlyvisible))
+    dprint("Only show selected is "+ str(prefs.retime_onlyvisible))
     area.spaces[0].dopesheet.show_only_selected = prefs.retime_onlyvisible
-    dprint("Show hidden objects "+ str(prefs.retime_onlyvisible))
+    dprint("Show hidden objects is "+ str(prefs.retime_onlyvisible))
     area.spaces[0].dopesheet.show_hidden = prefs.retime_hiddenobjects
 
     # Transform all selected keys
     bpy.ops.action.select_leftright(mode='RIGHT')
-    dprint("Transforming keys "+ str(prefs.retime_frameoffset)+ "frames ahead")
+    dprint("Transforming keys "+ str(prefs.retime_frameoffset)+ " frames ahead")
     bpy.ops.transform.transform(mode='TIME_TRANSLATE', value=(prefs.retime_frameoffset, 0, 0, 0), orient_axis='X', orient_type='GLOBAL', orient_matrix=((1, 0, 0), (0, 1, 0), (0, 0, 1)), orient_matrix_type='GLOBAL', constraint_axis=(True, False, False))
 
     # Select and transform markers

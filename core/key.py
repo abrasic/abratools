@@ -77,7 +77,7 @@ class ABRA_OT_key_delete(bpy.types.Operator):
 class ABRA_OT_key_timing(bpy.types.Operator):
     bl_idname = "screen.at_copy_key_timing"
     bl_label = "Copy Key Timing *"
-    bl_description = "* 'Copy Timing and Ease' addon required. Select two bones, where the active bone will share the key timing of the other"
+    bl_description = "* 'Animcopy' addon required. Select two bones, where the active bone will share the key timing of the other"
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
