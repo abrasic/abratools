@@ -170,14 +170,7 @@ class AbraToolsPrefs(AddonPreferences):
         default = True
     )
 
-
-    vis_rangesel: BoolProperty(
-        name = key.ABRA_OT_range_to_selection.bl_label,
-        description = key.ABRA_OT_range_to_selection.bl_description,
-        default = True
-    )
-
-    ##################
+    ####### SELECTION #######
 
     vis_selchild: BoolProperty(
         name = key.ABRA_OT_select_children.bl_label,
@@ -227,7 +220,7 @@ class AbraToolsPrefs(AddonPreferences):
         default = False
     )
 
-    ##################
+    ####### TANGENTS #######
 
     vis_tanfree: BoolProperty(
         name = key.ABRA_OT_tangent_free.bl_label,
@@ -259,6 +252,20 @@ class AbraToolsPrefs(AddonPreferences):
         default = True
     )
 
+    ####### OTHER #########
+
+    vis_rangesel: BoolProperty(
+        name = key.ABRA_OT_range_to_selection.bl_label,
+        description = key.ABRA_OT_range_to_selection.bl_description,
+        default = True
+    )
+
+    vis_rangemarkers: BoolProperty(
+        name = key.ABRA_OT_range_to_markers.bl_label,
+        description = key.ABRA_OT_range_to_markers.bl_description,
+        default = True
+    )
+
     ####### MOTION PATH #########
 
     path_calc: bpy.props.EnumProperty(
@@ -287,7 +294,7 @@ class AbraToolsPrefs(AddonPreferences):
         default = "TAILS",
     )
 
-    ###############################
+    ####### SETTINGS #######
 
     header_col: bpy.props.FloatVectorProperty(  
         name = "Header Color",

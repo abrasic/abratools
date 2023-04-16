@@ -28,6 +28,7 @@ ic_key_visible = ic["key_visible"]
 ic_key_whole_armature = ic["key_whole_armature"]
 ic_paste_keys = ic["paste_keys"]
 ic_range_to_selection = ic["range_to_selection"]
+ic_range_to_markers = ic["range_to_markers"]
 ic_retime_scene = ic["retime_scene"]
 ic_select_children = ic["select_children"]
 ic_select_mirror = ic["select_mirror"]
@@ -218,6 +219,8 @@ def prefsHeaderWrite(self, context):
     ## OTHER ##
     if (prefs.vis_rangesel): 
         layout.operator(key.ABRA_OT_range_to_selection.bl_idname, text='', icon_value=ic_range_to_selection.icon_id)
+    if (prefs.vis_rangemarkers): 
+        layout.operator(key.ABRA_OT_range_to_markers.bl_idname, text='', icon_value=ic_range_to_markers.icon_id)
     if (prefs.vis_keypath): 
         layout.operator_context = "INVOKE_DEFAULT"
         layout.operator(key.ABRA_OT_tangent_keypath.bl_idname, text='', icon_value=ic_create_path.icon_id)
@@ -294,6 +297,7 @@ def prefsBodyWrite(self, context):
         col.label(text="Other useful tools")
         col.prop(prefs, "vis_rangesel", icon_value=ic_range_to_selection.icon_id)
         col.prop(prefs, "vis_keypath", icon_value=ic_create_path.icon_id)
+        col.prop(prefs, "vis_rangemarkers", icon_value=ic_range_to_markers.icon_id)
     if (prefs.toolshelf_pages == "settings"):
         col.prop(prefs, "header_col")
         col.prop(prefs, "button_width")

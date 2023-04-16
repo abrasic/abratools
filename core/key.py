@@ -580,6 +580,45 @@ class ABRA_OT_range_to_selection(bpy.types.Operator):
             
         area.type = old_type
         return {"FINISHED"}
+    
+class ABRA_OT_range_to_markers(bpy.types.Operator):
+    bl_idname = "screen.at_range_to_markers"
+    bl_label = "Frame Range to Markers"
+    bl_description = "Sets the frame range to the markers that are nearest to the current frame. Useful if you're working on individual camera shots in a single scene file"
+    bl_options = {"REGISTER", "UNDO"}
+
+    def execute(self, context):
+        area = bpy.context.area
+        old_type = area.type
+        area.type = 'DOPESHEET_EDITOR'
+
+        current_frame = context.scene.frame_current
+        markers = context.scene.timeline_markers
+        frame_range = [0,1048574] # Frame range can never be less than zero
+        marker_check = [False, False]
+
+        if markers:
+            for marker in markers:
+                if marker.frame >= current_frame: # Marker is to the right of playhead
+                    if marker.frame < frame_range[1]: 
+                        frame_range[1] = marker.frame
+                        marker_check[1] = True
+                elif marker.frame <= current_frame: # Marker is to the left of playhead
+                    if marker.frame > frame_range[0]: 
+                        frame_range[0] = marker.frame
+                        marker_check[0] = True
+
+            # Check if markers were ever to the left or right of playhead. In either case, set frame range to itself instead.
+            if not marker_check[1]:
+                frame_range[1] = current_frame
+            if not marker_check[0]:
+                frame_range[0] = current_frame
+                
+            context.scene.frame_start = frame_range[0]
+            context.scene.frame_end = frame_range[1]
+            
+        area.type = old_type
+        return {"FINISHED"}
 
 
 #  /$$$$$$$$ /$$$$$$  /$$   /$$  /$$$$$$  /$$$$$$$$ /$$   /$$ /$$$$$$$$ /$$$$$$ 
@@ -664,6 +703,7 @@ ABRA_OT_toggle_cursor_pivot,
 ABRA_OT_tangent_keypath,
 ABRA_OT_tangent_keypathclear,
 ABRA_OT_range_to_selection,
+ABRA_OT_range_to_markers,
 ABRA_OT_tangent_free,
 ABRA_OT_tangent_aligned,
 ABRA_OT_tangent_vector,
