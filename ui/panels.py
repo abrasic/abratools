@@ -293,10 +293,10 @@ class ABRA_OT_selsetspanel(bpy.types.Operator):
                             colLeft.operator_context = 'INVOKE_DEFAULT'
                             colLeft.operator('armature.set_selector', text=set.name).set_index = i
                 else:
-                    row.label(text="You have no selection sets for this Armature!")
-                    row.operator('armature.create_set', icon="ADD", text="Create set from current selection")
+                    row.label(text="No selection sets exist for this armature.")
+                    row.operator('armature.create_set', icon="ADD", text="Create a set from current selection")
             else:
-                layout.label(text="This tool only works in Pose Mode!")
+                layout.label(text="This tool only works in Pose Mode.")
         else:
             layout.label(text="Required addon is not installed")
 

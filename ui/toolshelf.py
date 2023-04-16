@@ -243,7 +243,7 @@ def prefsBodyWrite(self, context):
     if (prefs.toolshelf_pages == "home"):
         col.label(text="AbraTools Settings Panel")
         col.label(text="Here, you can modify the appearance and tool visibility for the header.")
-        col.label(text="Once you're done, you can shrink thew settings panel so you can only see the header.")
+        col.label(text="Once you're done, you can shrink the settings panel so you can only see the header.")
         col.label(text="Thank you for using AbraTools.")
 
         col.separator()
