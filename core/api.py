@@ -344,3 +344,11 @@ def use_oss():
                         break
 
     return [use_selected, reveal_curves]
+
+def is_bone_visible(bone, layers):
+    """Returns Bool. Determines if the bone is visible via active bone layers."""
+    for layer in layers:
+        if bone.layers[layer]:
+            return True
+        else:
+            return False

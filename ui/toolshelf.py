@@ -241,15 +241,17 @@ def prefsBodyWrite(self, context):
     fill = row.split(factor=0.75)
     col = fill.column()
     if (prefs.toolshelf_pages == "home"):
-        col.label(text="Welcome to the AbraTools Toolshelf!")
-        col.label(text="Here you can access header tools and change how the header looks!")
-        col.label(text="To utilize AbraTools, shrink this panel so you only see the header!")
+        col.label(text="AbraTools Settings Panel")
+        col.label(text="Here, you can modify the appearance and tool visibility for the header.")
+        col.label(text="Once you're done, you can shrink thew settings panel so you can only see the header.")
+        col.label(text="Thank you for using AbraTools.")
 
         col.separator()
 
         col.operator("wm.url_open", text="Documentation").url = "https://docs.abx.gg"
         col.operator("wm.url_open", text="GitHub").url = "https://github.com/abrasic/abratools"
     if (prefs.toolshelf_pages == "quickview"):
+        col.label(text="Tools that modify the visibility of elements in the Graph Editor")
         col.prop(prefs, "vis_isolate", icon_value=ic_isolate_curves.icon_id)
         col.prop(prefs, "vis_auto_frame", icon_value=ic_auto_frame.icon_id)
         col.prop(prefs, "vis_overlay", icon_value=ic_auto_overlay.icon_id)
@@ -260,6 +262,7 @@ def prefsBodyWrite(self, context):
         col.prop(prefs, "vis_viewprops", icon_value=ic_view_props.icon_id)
         col.prop(prefs, "vis_viewinfl", icon_value=ic_view_const.icon_id)
     if (prefs.toolshelf_pages == "fastkey"):
+        col.label(text="Tools that modify and manage keyframes")
         col.prop(prefs, "vis_keysel", icon_value=ic_key_selected.icon_id)
         col.prop(prefs, "vis_keyvis", icon_value=ic_key_visible.icon_id)
         col.prop(prefs, "vis_keycopy", icon_value=ic_copy_keys.icon_id)
@@ -271,12 +274,14 @@ def prefsBodyWrite(self, context):
         col.prop(prefs, "vis_keyarmature", icon_value=ic_key_whole_armature.icon_id)
         col.prop(prefs, "vis_keyretime", icon_value=ic_retime_scene.icon_id)
     if (prefs.toolshelf_pages == "tangents"):
+        col.label(text="Tools that modify tangents of keyframes")
         col.prop(prefs, "vis_tanfree", icon="HANDLE_FREE")
         col.prop(prefs, "vis_tanaligned", icon="HANDLE_ALIGNED")
         col.prop(prefs, "vis_tanvector", icon="HANDLE_VECTOR")
         col.prop(prefs, "vis_tanauto", icon="HANDLE_AUTO")
         col.prop(prefs, "vis_tanautoclamp", icon="HANDLE_AUTOCLAMPED")
     if (prefs.toolshelf_pages == "selection"):
+        col.label(text="Tools that modify the selection of objects")
         col.prop(prefs, "vis_selchild", icon_value=ic_select_children.icon_id)
         col.prop(prefs, "vis_selparent", icon_value=ic_select_parent.icon_id)
         col.prop(prefs, "vis_selsiblings", icon_value=ic_select_siblings.icon_id)
@@ -286,6 +291,7 @@ def prefsBodyWrite(self, context):
         col.prop(prefs, "vis_selsets", icon_value=ic_selection_sets.icon_id)
         col.prop(prefs, "vis_selswaprigmode", icon_value=ic_swap_rig_mode.icon_id)
     if (prefs.toolshelf_pages == "other"):
+        col.label(text="Other useful tools")
         col.prop(prefs, "vis_rangesel", icon_value=ic_range_to_selection.icon_id)
         col.prop(prefs, "vis_keypath", icon_value=ic_create_path.icon_id)
     if (prefs.toolshelf_pages == "settings"):

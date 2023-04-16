@@ -212,7 +212,7 @@ class ABRA_OT_bake_keys(bpy.types.Operator):
 
             # Basic checks
             if api.get_visible_fcurves() is None:
-                self.report({"INFO"}, "At least one F-Curve/channel needs be visible")
+                self.report({"INFO"}, "At least one F-Curve needs to be visible")
                 area.type = old_type
                 return {"CANCELLED"}
 
@@ -271,12 +271,35 @@ class ABRA_OT_select_children(bpy.types.Operator):
             selectedBones = bpy.context.selected_pose_bones
             if selectedBones:
                 for bone in selectedBones:
+                    armature = bone.id_data.data
+                    layers = armature.layers # Get currently visible bone layers
+                    active_layers = []
+                    i = 0
+                    for layer in layers:
+                        if layer == True:
+                            active_layers.append(i) # Make a list of bone layers in use by armature
+                        i+=i
                     if not event.shift:    # Remove bone from selection if shift is not held
                         bone.bone.select = False
-                    children = bone.children
+                    children = bone.children # Get children from iterating bone
                     if children:
-                        for child in children:
-                            child.bone.select = True
+                        for child in children: # Loop thru child bones and check if they are visible. If not, skip them and use next visible child
+                            if api.is_bone_visible(child.bone, active_layers):
+                                child.bone.select = True
+                                continue
+                            else:
+                                c_iter = False
+                                while c_iter == False:
+                                    children = child.children
+                                    if children:
+                                        for child in children: # Loop thru child bones and check if they are visible. If not, skip them and use next visible child
+                                            print(child)
+                                            if api.is_bone_visible(child.bone, active_layers):
+                                                print("child bone is finally visible. show this one")
+                                                child.bone.select = True
+                                                c_iter = True
+                                    else:
+                                        break
         else:
             self.report({"INFO"}, "Currently only supports Pose Mode")
         return {"FINISHED"}
@@ -310,10 +333,31 @@ class ABRA_OT_select_parent(bpy.types.Operator):
             selectedBones = bpy.context.selected_pose_bones
             if selectedBones:
                 for bone in selectedBones:
-                    if not event.shift:    # Remove bone from selection if shift is not held
+                    armature = bone.id_data.data
+                    layers = armature.layers # Get currently visible bone layers
+                    active_layers = []
+                    i = 0
+                    for layer in layers:
+                        if layer == True:
+                            active_layers.append(i) # Make a list of bone layers in use by armature
+                        i+=i
+                    if not event.shift:
                         bone.bone.select = False
-                    if bone.parent:
-                            bone.parent.bone.select = True
+                    parent = bone.parent
+                    if parent:
+                        if api.is_bone_visible(parent.bone, active_layers):
+                            parent.bone.select = True
+                        else:  
+                            p_iter = False
+                            while p_iter == False:
+                                parent = parent.parent
+                                print(parent)
+                                if parent:
+                                    if api.is_bone_visible(parent.bone, active_layers):
+                                        parent.bone.select = True
+                                        p_iter = True
+                                else:
+                                    break
         else:
             self.report({"INFO"}, "Currently only supports Pose Mode")
         return {"FINISHED"}
@@ -536,6 +580,7 @@ class ABRA_OT_range_to_selection(bpy.types.Operator):
             
         area.type = old_type
         return {"FINISHED"}
+
 
 #  /$$$$$$$$ /$$$$$$  /$$   /$$  /$$$$$$  /$$$$$$$$ /$$   /$$ /$$$$$$$$ /$$$$$$ 
 # |__  $$__//$$__  $$| $$$ | $$ /$$__  $$| $$_____/| $$$ | $$|__  $$__//$$__  $$
