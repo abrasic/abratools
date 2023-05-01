@@ -615,7 +615,7 @@ class ABRA_OT_range_to_markers(bpy.types.Operator):
                 frame_range[0] = current_frame
                 
             context.scene.frame_start = frame_range[0]
-            context.scene.frame_end = frame_range[1]
+            context.scene.frame_end = frame_range[1] - 1
             
         area.type = old_type
         return {"FINISHED"}

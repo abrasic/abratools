@@ -58,6 +58,36 @@ class ABRA_OT_togglePrefs(bpy.types.Operator):
             restorePrefs()
 
         return {'FINISHED'}
+    
+class ABRA_OT_viewportTogglePrefs(bpy.types.Operator):
+    bl_idname      = "at.vptoggleprefs"
+    bl_label       = "Open Toolshelf"
+    bl_description = "Opens an abraTools toolshelf below this editor"
+
+    def execute(self, context):
+        abraOn = bpy.context.preferences.addons["abTools"].preferences.abraon
+        last_area = bpy.context.screen.areas[-1]
+        if last_area.type != "PREFERENCES":
+            bpy.ops.screen.area_split(direction='HORIZONTAL', factor=-0.999)
+            area = bpy.context.screen.areas[-1]
+            area.type = "PREFERENCES"
+            writeOnPrefs()
+        else:
+            restorePrefs()
+            cl = context.copy() 
+            area = [area for area in context.screen.areas if area.type == "PREFERENCES"][-1]
+            cl['window'] = context.window
+            cl['screen'] = context.screen
+            cl['area'] = area
+            cl['region'] = area.regions[-1]
+            cl['scene'] = context.scene
+
+            areas = [area for area in context.screen.areas if area.type == "PREFERENCES"]
+
+            for area in areas:
+                bpy.ops.screen.area_close(cl)
+
+        return {'FINISHED'}
 
 def writeOnPrefs():
     """Overrides preferences header for AbraTools usage."""
@@ -96,6 +126,9 @@ def writeOnPrefs():
 def drawToggle(self, context):
     bpy.context.preferences.addons["abTools"].preferences.abraon = False
     self.layout.operator("at.toggleprefs",text="",icon_value=ic_logo.icon_id)
+
+def vpToggleBtn(self, context):
+    self.layout.operator("at.vptoggleprefs",text="",icon_value=ic_logo.icon_id)
 
 def updateHeader(self, context):
     bpy.context.preferences.themes[0].preferences.space.header = self.header_col
@@ -351,4 +384,4 @@ def prefsSidebarWrite(self, context):
     tabs.prop(prefs, "toolshelf_pages", expand=True)
     return 
     
-cls = (ABRA_OT_togglePrefs,)
+cls = (ABRA_OT_togglePrefs,ABRA_OT_viewportTogglePrefs)
