@@ -1,6 +1,5 @@
-# AbraTools Alpha
-> AbraTools contains a list of QoL Graph Editor tools and functions for Blender 3. It's made by animators, for animators.
-
+# AbraTools Beta
+### *AbraTools contains a list of many quality-of-life animation tools for Blender 3. It's made by animators, for animators.*
 
 **Code is a mess. Be careful using it in production. Bug reports, feature requests and PRs are appreciated.**
 
@@ -15,14 +14,11 @@ It's advised that you download from [RELEASES](https://github.com/abrasic/abrato
     * An example of a correct filepath is  `C:\Users\You\AppData\Roaming\Blender Foundation\Blender\3.x\scripts\addons\abTools`
 * I test all new code on professional animation workspaces. Most testing is extensive, but that doesn't mean new code and tools are prone to errors.
 * I give no support for any revision of abraTools that you download directly from the repository (ex. using the "Code > Download ZIP" button).
-* We are not responsible for any disruptions, crashes, data loss, and all other undetermined actions caused by cutting-edge versions of abraTools. It is your responsibility to create back-up files. You should however, [report these indicents](https://github.com/abrasic/abratools/issues/new) whenever they happen.
-
+* **We are not responsible for any disruptions, crashes, data loss, and all other undetermined actions caused by cutting-edge versions of abraTools. It is your responsibility to create back-up files. You should however, [report these indicents](https://github.com/abrasic/abratools/issues/new) whenever they happen.**
 # SETUP
-<img src='https://1352856054-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FVEvUhh6zNMLIFbTZCBjF%2Fuploads%2F6Dt25W2vwT9be0SgVuJg%2Fworkspace_setup.gif?alt=media&token=74f79393-b2c3-4d40-ace5-460f3f7753a4' height='325'>
+![openshelf](https://user-images.githubusercontent.com/43157991/235394650-f7f58f6c-11dc-4121-bfa9-5841d166756c.gif)
 
-The best way to use the Toolshelf is by dragging out a new area (by clicking and dragging up on a corner of an existing area) and switch it to the Preferences window. From there, click on the 'aT' icon at the right side of the header and it's ready to go!
-
-You can shrink the panel so only the buttons in the header are shown (as shown in the gif above). If you ever want to make changes to your toolshelf, you can do so by expanding it again and you can access the Toolshelf settings.
+You can open the abraTools toolshelf by simply clicking the icon located in the header of the 3D viewport. If you ever want to make changes to how your toolshelf looks, you can expand it to access the visibility options.
 
 # TOOLS
 ## Customization
