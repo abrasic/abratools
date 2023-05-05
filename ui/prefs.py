@@ -128,6 +128,18 @@ class AbraToolsPrefs(AddonPreferences):
         default = True
     )
 
+    vis_keycopypose: BoolProperty(
+        name = key.ABRA_OT_key_copy_pose.bl_label,
+        description = key.ABRA_OT_key_copy_pose.bl_description,
+        default = True
+    )
+
+    vis_keypastepose: BoolProperty(
+        name = key.ABRA_OT_key_paste_pose.bl_label,
+        description = key.ABRA_OT_key_paste_pose.bl_description,
+        default = True
+    )
+
     vis_keydelete: BoolProperty(
         name = key.ABRA_OT_key_delete.bl_label,
         description = key.ABRA_OT_key_delete.bl_description,

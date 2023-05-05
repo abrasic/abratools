@@ -16,6 +16,7 @@ ic_auto_overlay = ic["auto_overlay"]
 ic_auto_frame = ic["auto_frame"]
 ic_bake_on_nths = ic["bake_on_nths"]
 ic_copy_keys = ic["copy_keys"]
+ic_copy_pose = ic["copy_pose"]
 ic_key_timing = ic["copy_key_timing"]
 ic_create_path = ic["create_path"]
 ic_cursor_to_selected = ic["cursor_to_selected"]
@@ -27,6 +28,7 @@ ic_key_selected = ic["key_selected"]
 ic_key_visible = ic["key_visible"]
 ic_key_whole_armature = ic["key_whole_armature"]
 ic_paste_keys = ic["paste_keys"]
+ic_paste_pose = ic["paste_pose"]
 ic_range_to_selection = ic["range_to_selection"]
 ic_range_to_markers = ic["range_to_markers"]
 ic_retime_scene = ic["retime_scene"]
@@ -201,6 +203,12 @@ def prefsHeaderWrite(self, context):
         layout.operator(key.ABRA_OT_key_copy.bl_idname, text='', icon_value=ic_copy_keys.icon_id)
     if (prefs.vis_keypaste): 
         layout.operator(key.ABRA_OT_key_paste.bl_idname, text='', icon_value=ic_paste_keys.icon_id)
+    layout.operator_context = "INVOKE_DEFAULT"
+    if (prefs.vis_keycopypose):
+        layout.operator(key.ABRA_OT_key_copy_pose.bl_idname, text='', icon_value=ic_copy_pose.icon_id)
+    if (prefs.vis_keypastepose):
+        layout.operator(key.ABRA_OT_key_paste_pose.bl_idname, text='', icon_value=ic_paste_pose.icon_id)
+    layout.operator_context = "EXEC_DEFAULT"
     if (prefs.vis_keydelete): 
         layout.operator(key.ABRA_OT_key_delete.bl_idname, text='', icon_value=ic_delete_keys.icon_id)
     if (prefs.vis_keybake): 
@@ -303,6 +311,8 @@ def prefsBodyWrite(self, context):
         col.prop(prefs, "vis_keyvis", icon_value=ic_key_visible.icon_id)
         col.prop(prefs, "vis_keycopy", icon_value=ic_copy_keys.icon_id)
         col.prop(prefs, "vis_keypaste", icon_value=ic_paste_keys.icon_id)
+        col.prop(prefs, "vis_keycopypose", icon_value=ic_copy_pose.icon_id)
+        col.prop(prefs, "vis_keypastepose", icon_value=ic_paste_pose.icon_id)
         col.prop(prefs, "vis_keydelete", icon_value=ic_delete_keys.icon_id)
         col.prop(prefs, "vis_keybake", icon_value=ic_bake_on_nths.icon_id)
         col.prop(prefs, "vis_keytiming", icon_value=ic_key_timing.icon_id)

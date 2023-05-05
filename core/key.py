@@ -63,6 +63,45 @@ class ABRA_OT_key_paste(bpy.types.Operator):
     def execute(self, context):
         api.key_clipboard(self, type="paste")
         return {"FINISHED"}
+    
+class ABRA_OT_key_copy_pose(bpy.types.Operator):
+    bl_idname = "screen.at_copy_pose"
+    bl_label = "Copy Pose"
+    bl_description = "Copies the pose of all visible bones"
+    bl_options = {"REGISTER", "UNDO"}
+
+    def execute(self, context):
+        if bpy.context.mode == "POSE":
+            # Store old selection
+            sel = bpy.context.selected_pose_bones
+
+            # Select all and copy pose from visible bones
+            bpy.ops.pose.select_all(action='SELECT')
+            bpy.ops.pose.copy()
+
+            # Retrieve old selection
+            bpy.ops.pose.select_all(action='DESELECT')
+            for bone in sel:
+                bone.bone.select = True
+
+            return {"FINISHED"} 
+        else:
+            self.report({"INFO"}, "This tool only works in Pose Mode.")
+            return {"CANCELLED"}
+        
+class ABRA_OT_key_paste_pose(bpy.types.Operator):
+    bl_idname = "screen.at_paste_pose"
+    bl_label = "Paste Pose"
+    bl_description = "Paste pose data from buffer, if any. This does the same as 'Pose > Paste Pose'. Shift + Click to paste flipped pose"
+    bl_options = {"REGISTER", "UNDO"}
+
+    def invoke(self, context, event):
+        if bpy.context.mode == "POSE":
+            bpy.ops.pose.paste(flipped=event.shift, selected_mask=True)
+            return {"FINISHED"}
+        else:
+            self.report({"INFO"}, "This tool only works in Pose Mode.")
+            return {"CANCELLED"}
 
 class ABRA_OT_key_delete(bpy.types.Operator):
     bl_idname = "screen.at_delete_keys"
@@ -686,6 +725,8 @@ cls = (ABRA_OT_key_selected,
 ABRA_OT_key_visible,
 ABRA_OT_key_copy,
 ABRA_OT_key_paste,
+ABRA_OT_key_copy_pose,
+ABRA_OT_key_paste_pose,
 ABRA_OT_key_delete,
 ABRA_OT_key_timing,
 ABRA_OT_key_shapekeys,
