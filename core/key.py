@@ -222,7 +222,7 @@ class ABRA_OT_key_retime(bpy.types.Operator):
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
-        prefs = bpy.context.preferences.addons["abTools"].preferences
+        prefs = api.get_preferences()
         prefs.retime_framestart = context.scene.frame_current
         bpy.ops.message.retimepanel("INVOKE_DEFAULT")
         return {"FINISHED"}
@@ -244,7 +244,7 @@ class ABRA_OT_bake_keys(bpy.types.Operator):
             area.type = 'GRAPH_EDITOR'
 
             # Get data ready for bake
-            prefs = bpy.context.preferences.addons["abTools"].preferences
+            prefs = api.get_preferences()
             range = api.get_frame_range()
             frame_const = bpy.context.scene.frame_current
             step = prefs.bake_framestep
@@ -549,7 +549,7 @@ class ABRA_OT_tangent_keypath(bpy.types.Operator):
                 opcode.paths_clear(only_selected=True)
 
             if opcode:
-                prefs = bpy.context.preferences.addons["abTools"].preferences
+                prefs = api.get_preferences()
                 range = api.get_frame_range()
                 currentFrame = api.get_current_frame()
                 if bpy.app.version < (3, 2, 0):

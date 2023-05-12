@@ -370,11 +370,4 @@ class AbraToolsPrefs(AddonPreferences):
         min = 1
     )
 
-    ###############################
-    def draw(self, context):
-        prefs = bpy.context.preferences.addons["abTools"].preferences
-        layout = self.layout
-        layout.label(text="Thank you for using AbraTools!")
-        layout.label(text="If you're new, please consider reading the documentation")
-
 cls = (AbraToolsPrefs,)

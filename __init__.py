@@ -3,11 +3,11 @@ bl_info = {
     'author': 'Abrasic',
     'version': (1, 0, 0),
     'blender': (3, 0, 0),
-    'description': 'Blender Animator toolkit',
-    'location' : 'Preferences > Header > aT',
+    'description': 'Blender animation toolkit',
+    'location' : '3D Viewport or Preferences > Header > aT',
     'category': 'Animation',
-    'warning': 'alpha6 | This is an alpha version of AbraTools',
-    "doc_url": "https://docs.abx.gg/support/download-and-setup",
+    'warning': 'beta1 | This is a beta version of AbraTools',
+    'doc_url': 'https://docs.abx.gg/support/download-and-setup',
     'tracker_url': 'https://github.com/abrasic/abratools',
 }
 
@@ -44,10 +44,8 @@ def register():
         addon_keymaps.append((km, kmi))
 
     print("[aT] AbraTools is now running")
-        
 
 def unregister():
-
     bpy.context.preferences.themes[0].preferences.space.header = toolshelf.prefsOldHeaderCol
     bpy.types.USERPREF_HT_header.remove(toolshelf.drawToggle)
     bpy.types.VIEW3D_MT_editor_menus.remove(toolshelf.vpToggleBtn)

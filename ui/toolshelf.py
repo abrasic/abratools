@@ -1,4 +1,3 @@
-from linecache import lazycache
 import bpy 
 
 from ..core import api, key, quickView
@@ -53,7 +52,7 @@ class ABRA_OT_togglePrefs(bpy.types.Operator):
     bl_description = "Toggles the AbraTools toolshelf"
 
     def execute(self, context):
-        abraOn = bpy.context.preferences.addons["abTools"].preferences.abraon
+        abraOn = api.get_preferences()
         if abraOn == False:
             writeOnPrefs()
         else:  
@@ -67,7 +66,7 @@ class ABRA_OT_viewportTogglePrefs(bpy.types.Operator):
     bl_description = "Opens an abraTools toolshelf below this editor"
 
     def execute(self, context):
-        abraOn = bpy.context.preferences.addons["abTools"].preferences.abraon
+        abraOn = api.get_preferences()
         last_area = bpy.context.screen.areas[-1]
         if last_area.type != "PREFERENCES":
             bpy.ops.screen.area_split(direction='HORIZONTAL', factor=-0.999)
@@ -94,7 +93,7 @@ class ABRA_OT_viewportTogglePrefs(bpy.types.Operator):
 def writeOnPrefs():
     """Overrides preferences header for AbraTools usage."""
     
-    prefs = bpy.context.preferences.addons["abTools"].preferences
+    prefs = api.get_preferences()
     
     if prefs.abraon == True:
         return None
@@ -126,7 +125,8 @@ def writeOnPrefs():
     return None
     
 def drawToggle(self, context):
-    bpy.context.preferences.addons["abTools"].preferences.abraon = False
+    prefs = api.get_preferences()
+    prefs.abraon = False
     self.layout.operator("at.toggleprefs",text="",icon_value=ic_logo.icon_id)
 
 def vpToggleBtn(self, context):
@@ -138,7 +138,7 @@ def updateHeader(self, context):
 def restorePrefs():
     """Restores original preferences window when AbraTools is toggled off."""
 
-    prefs = bpy.context.preferences.addons["abTools"].preferences
+    prefs = api.get_preferences()
     if prefs.abraon == False:
         return None
     
@@ -164,7 +164,7 @@ def restorePrefs():
 
 def prefsHeaderWrite(self, context):
     """Draw aT header and tools"""
-    prefs = bpy.context.preferences.addons["abTools"].preferences
+    prefs = api.get_preferences()
     layout = self.layout
 
     row = layout.row()
@@ -280,7 +280,7 @@ def prefsBodyWrite(self, context):
     """Draw aT body (visibility options and settings)"""
 
     layout = self.layout
-    prefs = bpy.context.preferences.addons["abTools"].preferences
+    prefs = api.get_preferences()
     row = layout.box()
     fill = row.split(factor=0.75)
     col = fill.column()
@@ -381,7 +381,7 @@ def prefsBodyWrite(self, context):
 def prefsSidebarWrite(self, context):
     """Draw sidebar tabs"""
     layout = self.layout
-    prefs = bpy.context.preferences.addons["abTools"].preferences
+    prefs = api.get_preferences()
 
     if not context.space_data.show_region_header:
         exit = layout.column()

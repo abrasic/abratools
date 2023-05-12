@@ -9,7 +9,7 @@ class ABRA_OT_isolate_func(bpy.types.Operator):
     bl_options = {"REGISTER"}
 
     def execute(self, context):
-        prefs = bpy.context.preferences.addons["abTools"].preferences
+        prefs = api.get_preferences()
         wm = context.window_manager
         if(context.area.type == "GRAPH_EDITOR"):
             if prefs.isolate_curves:
@@ -85,7 +85,7 @@ class ABRA_OT_isolate_curves(bpy.types.Operator):
     bl_options = {"REGISTER"}
 
     def execute(self, context):
-        prefs = bpy.context.preferences.addons["abTools"].preferences
+        prefs = api.get_preferences()
         prefs.isolate_curves = not prefs.isolate_curves
         return {"FINISHED"}
 
@@ -96,7 +96,7 @@ class ABRA_OT_auto_frame(bpy.types.Operator):
     bl_options = {"REGISTER"}
 
     def execute(self, context):
-        prefs = bpy.context.preferences.addons["abTools"].preferences
+        prefs = api.get_preferences()
         prefs.auto_frame = not prefs.auto_frame
         return {"FINISHED"}
 
@@ -107,13 +107,13 @@ class ABRA_OT_auto_overlay(bpy.types.Operator):
     bl_options = {"REGISTER"}
 
     def execute(self, context):
-        prefs = bpy.context.preferences.addons["abTools"].preferences
+        prefs = api.get_preferences()
         prefs.auto_overlay = not prefs.auto_overlay
         return {"FINISHED"}
 
 @persistent
 def overlay_func(self, context):
-    prefs = bpy.context.preferences.addons["abTools"].preferences
+    prefs = api.get_preferences()
     if prefs.auto_overlay:
         isPlaying = bpy.context.screen.is_animation_playing
         for area in bpy.context.screen.areas:

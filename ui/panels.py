@@ -15,7 +15,7 @@ class ABRA_OT_mpathpanel(bpy.types.Operator):
         return context.window_manager.invoke_props_dialog(self, width = 350)
  
     def draw(self, context):
-        prefs = bpy.context.preferences.addons["abTools"].preferences
+        prefs = api.get_preferences()
         layout = self.layout
         if bpy.app.version < (3, 2, 0):
             layout.prop(prefs, "path_calc")
@@ -79,7 +79,7 @@ class ABRA_OT_retimepanel(bpy.types.Operator):
         return context.window_manager.invoke_props_dialog(self, width = 350)
  
     def draw(self, context):
-        prefs = bpy.context.preferences.addons["abTools"].preferences
+        prefs = api.get_preferences()
         layout = self.layout
         layout.prop(prefs, "retime_framestart")
         layout.prop(prefs, "retime_frameoffset")
@@ -101,7 +101,7 @@ class ABRA_OT_bakepanel(bpy.types.Operator):
         return context.window_manager.invoke_props_dialog(self, width = 150)
  
     def draw(self, context):
-        prefs = bpy.context.preferences.addons["abTools"].preferences
+        prefs = api.get_preferences()
         layout = self.layout
         layout.prop(prefs, "bake_framestep")
 

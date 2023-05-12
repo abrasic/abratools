@@ -1,7 +1,12 @@
 import bpy, addon_utils, math
 
+def get_preferences():
+    """Returns AddonPreferences type"""
+    name = __package__.split(".")[0]
+    return bpy.context.preferences.addons[name].preferences
+
 def dprint(text, col=None):
-    prefs = bpy.context.preferences.addons["abTools"].preferences
+    prefs = get_preferences()
     if prefs.dev_debug:
         color = '\x1b[1;30;40m'
         match col:
@@ -262,7 +267,7 @@ def key_clipboard(self, type=None):
     area.type = old_type
 
 def retime_keys():
-    prefs = bpy.context.preferences.addons["abTools"].preferences
+    prefs = get_preferences()
     area = bpy.context.area
     old_type = area.type
     old_mode = bpy.context.mode
