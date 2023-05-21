@@ -10,8 +10,6 @@
 ## ⚠️ IMPORTANT: If you're downloading from the repository directly, understand its consequences.
 It's advised that you download from [RELEASES](https://github.com/abrasic/abratools/releases) instead of the REPOSITRORY. If you so choose to receive the latest code changes to abraTools please understand the following:
 
-* YOU NEED TO RENAME THE FOLDER FROM `abratools-main` TO `abTools` IN THE BLENDER ADDONS FOLDER!!! Otherwise certain tools will NOT work.
-    * An example of a correct filepath is  `C:\Users\You\AppData\Roaming\Blender Foundation\Blender\3.x\scripts\addons\abTools`
 * I test all new code on professional animation workspaces. Most testing is extensive, but that doesn't mean new code and tools are prone to errors.
 * I give no support for any revision of abraTools that you download directly from the repository (ex. using the "Code > Download ZIP" button).
 * **We are not responsible for any disruptions, crashes, data loss, and all other undetermined actions caused by cutting-edge versions of abraTools. It is your responsibility to create back-up files. You should however, [report these indicents](https://github.com/abrasic/abratools/issues/new) whenever they happen.**

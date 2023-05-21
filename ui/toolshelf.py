@@ -52,7 +52,8 @@ class ABRA_OT_togglePrefs(bpy.types.Operator):
     bl_description = "Toggles the AbraTools toolshelf"
 
     def execute(self, context):
-        abraOn = api.get_preferences()
+        prefs = api.get_preferences()
+        abraOn = prefs.abraon
         if abraOn == False:
             writeOnPrefs()
         else:  
@@ -66,7 +67,6 @@ class ABRA_OT_viewportTogglePrefs(bpy.types.Operator):
     bl_description = "Opens an abraTools toolshelf below this editor"
 
     def execute(self, context):
-        abraOn = api.get_preferences()
         last_area = bpy.context.screen.areas[-1]
         if last_area.type != "PREFERENCES":
             bpy.ops.screen.area_split(direction='HORIZONTAL', factor=-0.999)
