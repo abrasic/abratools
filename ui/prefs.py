@@ -370,4 +370,28 @@ class AbraToolsPrefs(AddonPreferences):
         min = 1
     )
 
+    bake_type: EnumProperty(
+        name = "Interpolation",
+        description = "The type of interpolation that baked keys will use. In most cases, Bezier is recommended",
+        items = (
+            ("CONSTANT", "Constant", "Baked keys will be set with a stepped/constant interpolation"),
+            ("LINEAR", "Linear", "Baked keys will be set with a linear interpolation"),
+            ("BEZIER", "Bezier", "Baked keys will be set with a Bezier interpolation"),
+        ),
+        default = "BEZIER",
+    )
+
+    bake_handle: EnumProperty(
+        name = "Handle",
+        description = "The type of handles that baked keys will use. In most cases, Automatic is recommended",
+        items = (
+            ("FREE", "Free", "Free"),
+            ("ALIGNED", "Aligned", "Aligned"),
+            ("VECTOR", "Vector", "Vector"),
+            ("AUTO", "Automatic", "Automatic"),
+            ("AUTO_CLAMPED", "Auto Clamped", "Auto Clamped"),
+        ),
+        default = "AUTO",
+    )
+
 cls = (AbraToolsPrefs,)

@@ -98,12 +98,14 @@ class ABRA_OT_bakepanel(bpy.types.Operator):
         return {'FINISHED'}
  
     def invoke(self, context, event):
-        return context.window_manager.invoke_props_dialog(self, width = 150)
+        return context.window_manager.invoke_props_dialog(self, width = 250)
  
     def draw(self, context):
         prefs = api.get_preferences()
         layout = self.layout
         layout.prop(prefs, "bake_framestep")
+        layout.prop(prefs, "bake_type")
+        layout.prop(prefs, "bake_handle")
 
 class Set_Selector_Vars(bpy.types.PropertyGroup):
     renaming: bpy.props.BoolProperty(name="renaming", description="", default=False)

@@ -264,7 +264,18 @@ class ABRA_OT_bake_keys(bpy.types.Operator):
 
             # Begin inserting keyframes by moving playhead on every nth frame until playhead reaches end of range.
             api.dprint("BAKING RANGE ("+str(range[0])+"-"+str(range[1])+")", col="red")
+            # Deselect for interpolation change later
+            bpy.ops.graph.select_all(action='DESELECT')
+
+            # NLA Bake
+            bpy.ops.graph.reveal()
             bpy.ops.nla.bake(frame_start=range[0], frame_end=range[1], bake_types={bpy.context.mode}, use_current_action = True)
+
+            # Change interpolation type of new keys
+            bpy.ops.graph.interpolation_type(type=prefs.bake_type)
+            bpy.ops.graph.handle_type(type=prefs.bake_handle)
+
+            # Deselect everything one final time
             bpy.ops.graph.select_all(action='DESELECT')
 
             api.dprint("Initial bake complete. Moving to range start")
@@ -286,6 +297,12 @@ class ABRA_OT_bake_keys(bpy.types.Operator):
                     bpy.ops.graph.delete(confirm=False)
 
             bpy.context.scene.frame_current = frame_const
+
+            # Remove overalpping keys incase of a double bake (dumb workaround)
+            bpy.ops.graph.select_all(action='SELECT')
+            bpy.ops.graph.clean(threshold=0) 
+            bpy.ops.graph.select_all(action='DESELECT')
+
             area.type = old_type
             api.dprint("Bake should be complete", col="green")
             return {"FINISHED"}
