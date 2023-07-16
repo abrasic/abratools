@@ -22,7 +22,7 @@ class ABRA_OT_isolate_func(bpy.types.Operator):
                 for winman in bpy.data.window_managers:
                     for window in winman.windows:
                         for area in window.screen.areas:
-                            if area.type == 'GRAPH_EDITOR':
+                            if area.type == 'GRAPH_EDITOR' and area.ui_type != 'DRIVERS':
                                 api.dprint("GE found!")
                                 gre = area
                                 break
