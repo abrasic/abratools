@@ -203,6 +203,9 @@ def insert_key(keys, x, y, select=False):
     k.select_right_handle = select
     return k
 
+def select_keys_from_current(frames, range=False)
+    "Selects keys that are 'frames' away from the current frame"
+
 def set_area(area, type=None):
     area = bpy.context.area
     area.type = 'GRAPH_EDITOR'
@@ -237,11 +240,10 @@ def key_clipboard(self, type=None):
                 bpy.ops.graph.copy()
             except RuntimeError:
                 self.report({"INFO"}, "No keys on playhead")
-            bpy.ops.graph.select_all(action='DESELECT')
     
     elif (type=="paste"):
         try:
-            bpy.ops.graph.paste()
+            bpy.ops.graph.paste(merge='OVER_RANGE')
         except RuntimeError:
             self.report({"INFO"}, "No keys to paste")
 

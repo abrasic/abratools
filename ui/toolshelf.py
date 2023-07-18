@@ -294,6 +294,11 @@ def prefsBodyWrite(self, context):
 
         col.operator("wm.url_open", text="Documentation").url = "https://docs.abx.gg"
         col.operator("wm.url_open", text="GitHub").url = "https://github.com/abrasic/abratools"
+
+        col.separator(factor=3)
+        col.label(text="Developed with")
+        col.label(text="from Abrax Operations", icon="FUND")
+
     if (prefs.toolshelf_pages == "quickview"):
         col.label(text="Tools that modify the visibility of elements in the Graph Editor")
         col.prop(prefs, "vis_isolate", icon_value=ic_isolate_curves.icon_id)
@@ -375,6 +380,7 @@ def prefsBodyWrite(self, context):
         col.prop(prefs, "dev_debug")
 
     layout.label(text="aT | beta1")
+
 
     return 
     

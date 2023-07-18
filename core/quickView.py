@@ -17,7 +17,7 @@ class ABRA_OT_isolate_func(bpy.types.Operator):
                 bpy.ops.graph.hide(unselected=True)
 
             if prefs.auto_frame:
-                api.dprint("EXEC: Attempting to locate Graph Editor")
+                api.dprint("Auto-Frame Execute")
                 gre = None
                 for winman in bpy.data.window_managers:
                     for window in winman.windows:
