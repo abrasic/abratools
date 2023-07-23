@@ -3,6 +3,7 @@
 
 **Code is a mess. Be careful using it in production. Bug reports, feature requests and PRs are appreciated.**
 
+* Working as of Blender 3.5.1. 
 * **Download** AbraTools [here](https://github.com/abrasic/abratools/releases). 
 * **Installation instructions** [here](https://docs.abx.gg/support/download-and-setup). 
 * **Read the docs** [here](https://docs.abx.gg).
