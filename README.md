@@ -3,6 +3,7 @@
 
 **Code is a mess. Be careful using it in production. Bug reports, feature requests and PRs are appreciated.**
 
+* Working as of Blender 3.5.1. 
 * **Download** AbraTools [here](https://github.com/abrasic/abratools/releases). 
 * **Installation instructions** [here](https://docs.abx.gg/support/download-and-setup). 
 * **Read the docs** [here](https://docs.abx.gg).
@@ -31,6 +32,12 @@ You can open the abraTools toolshelf by simply clicking the icon located in the 
 > Quit panning around the graph editor as much to find your F-Curves. AbraTools will automatically frame F-Curves into view for your current frame range.
 
 ![auto_frame](https://user-images.githubusercontent.com/43157991/215243104-d9e246fd-d26c-42b6-af0a-a6b37a1a45da.gif)
+
+## Smart Keyframe Jumping
+> Navigate between keys faster with smart keyframe jumping and automatic selection
+
+![smartselect](https://github.com/abrasic/abratools/assets/43157991/8bb918fb-6a22-47c7-b121-30844906596e)
+
 
 ## Quick Motion Path Setup
 > Avoid the tedious work of setting up motion paths. One click and you're ready to rock.
