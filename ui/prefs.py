@@ -102,6 +102,18 @@ class AbraToolsPrefs(AddonPreferences):
         default = False
     )
 
+    vis_goto_left: BoolProperty(
+        name = quickView.ABRA_OT_goto_keyframe_left.bl_label,
+        description = quickView.ABRA_OT_goto_keyframe_left.bl_description,
+        default = True
+    )
+
+    vis_goto_right: BoolProperty(
+        name = quickView.ABRA_OT_goto_keyframe_right.bl_label,
+        description = quickView.ABRA_OT_goto_keyframe_right.bl_description,
+        default = False
+    )
+
     ##################
     
     vis_keysel: BoolProperty(
@@ -179,7 +191,7 @@ class AbraToolsPrefs(AddonPreferences):
     vis_keyretime: BoolProperty(
         name = key.ABRA_OT_key_retime.bl_label,
         description = key.ABRA_OT_key_retime.bl_description,
-        default = True
+        default = False
     )
 
     ####### SELECTION #######
@@ -187,19 +199,19 @@ class AbraToolsPrefs(AddonPreferences):
     vis_selchild: BoolProperty(
         name = key.ABRA_OT_select_children.bl_label,
         description = key.ABRA_OT_select_children.bl_description,
-        default = False
+        default = True
     )
 
     vis_selparent: BoolProperty(
         name = key.ABRA_OT_select_parent.bl_label,
         description = key.ABRA_OT_select_parent.bl_description,
-        default = False
+        default = True
     )
 
     vis_selmirror: BoolProperty(
         name = key.ABRA_OT_select_mirror.bl_label,
         description = key.ABRA_OT_select_mirror.bl_description,
-        default = False
+        default = True
     )
 
     vis_selsiblings: BoolProperty(
@@ -223,7 +235,7 @@ class AbraToolsPrefs(AddonPreferences):
     vis_selsets: BoolProperty(
         name = key.ABRA_OT_selection_sets.bl_label,
         description = key.ABRA_OT_selection_sets.bl_description,
-        default = False
+        default = True
     )
 
     vis_selswaprigmode: BoolProperty(

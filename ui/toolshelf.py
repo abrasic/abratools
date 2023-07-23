@@ -21,6 +21,8 @@ ic_create_path = ic["create_path"]
 ic_cursor_to_selected = ic["cursor_to_selected"]
 ic_delete_keys = ic["delete_keys"]
 ic_delete_path = ic["delete_path"]
+ic_goto_left = ic["goto_left"]
+ic_goto_right = ic["goto_right"]
 ic_isolate_curves = ic["isolate_curves"]
 ic_key_all_shapes = ic["key_all_shapes"]
 ic_key_selected = ic["key_selected"]
@@ -193,6 +195,10 @@ def prefsHeaderWrite(self, context):
         layout.operator(quickView.ABRA_OT_visible_props.bl_idname, text='', icon_value=ic_view_props.icon_id)
     if (prefs.vis_viewinfl):
         layout.operator(quickView.ABRA_OT_visible_const.bl_idname, text='', icon_value=ic_view_const.icon_id)
+    if (prefs.vis_goto_left):
+        layout.operator(quickView.ABRA_OT_goto_keyframe_left.bl_idname, text='', icon_value=ic_goto_left.icon_id)
+    if (prefs.vis_goto_right):
+        layout.operator(quickView.ABRA_OT_goto_keyframe_right.bl_idname, text='', icon_value=ic_goto_right.icon_id)
 
     ## KEYING ##
     if (prefs.vis_keysel):  
@@ -310,6 +316,8 @@ def prefsBodyWrite(self, context):
         col.prop(prefs, "vis_viewshkey", icon_value=ic_view_shapes.icon_id)
         col.prop(prefs, "vis_viewprops", icon_value=ic_view_props.icon_id)
         col.prop(prefs, "vis_viewinfl", icon_value=ic_view_const.icon_id)
+        col.prop(prefs, "vis_goto_left", icon_value=ic_goto_right.icon_id)
+        col.prop(prefs, "vis_goto_right", icon_value=ic_goto_right.icon_id)
     if (prefs.toolshelf_pages == "fastkey"):
         col.label(text="Tools that modify and manage keyframes")
         col.prop(prefs, "vis_keysel", icon_value=ic_key_selected.icon_id)

@@ -121,7 +121,210 @@ def overlay_func(self, context):
                 for space in area.spaces:
                     if space.type == 'VIEW_3D':
                         space.overlay.show_overlays = not isPlaying
-      
+
+class ABRA_OT_goto_keyframe_right(bpy.types.Operator):
+    bl_idname = "screen.at_goto_keyframe_right"
+    bl_label = "Go to Next Keyframe"
+    bl_description = "Smart playhead placement to next keyframe based on FCurve visibility and keyframe selection."
+    bl_options = {"REGISTER"}
+
+    def execute(self, context):
+        area = bpy.context.area
+        old = area.type
+        area.type = 'GRAPH_EDITOR'
+
+        current = bpy.context.scene.frame_current
+        curves = api.get_selected_fcurves()
+        current_frame_init = bpy.context.scene.frame_current
+
+        if not curves:
+            curves = api.get_visible_fcurves()
+
+        if curves:
+            # THIS CODE IS DISGUSTING
+            nearest = large_number = 2**30
+            ranged = False
+            move_range = [-2**30, 2**30]
+
+            api.dprint("GOTO RIGHT STARTED", col="green")
+            for curve in curves:
+                selected_keys = api.get_selected_keys(curve)
+                
+                # Atleast one key for each FCurve in the function needs to be selected otherwise the len() on the next if will break. It doesnt matter which one, it will get filtered out eventually
+                if selected_keys is None:
+                    api.dprint("A selected FCurve has no selected keys. Selecting one automatically...", col="yellow")
+                    curve.keyframe_points[0].select_control_point = True
+                    selected_keys = api.get_selected_keys(curve)
+                    bpy.context.scene.frame_current = current # If you comment this out the function is faster but is less accurate
+                
+                # Determine the key selection. If one (incl. for each curve) is selected, use standard jump-and-select.
+                # If two or more keys are selected for one FCurve, limit the jumping to that range and dont do any sort of selection.
+                if ranged or len(selected_keys) > 1:
+                    ranged = True
+                    api.dprint("More than one key is selected for this curve. Ranged movement will be enabled",col="blue")
+                    candidate_range = api.get_range_from_selected_keys()
+                    
+                    if move_range[0] < candidate_range[0]:
+                        move_range[0] = candidate_range[0]
+                    if move_range[1] > candidate_range[0]:
+                        move_range[1] = candidate_range[1]
+                    api.dprint(f"Range is {move_range[0]}, {move_range[1]}")
+                
+                # Put the playhead on a key to determine the next 
+                key_index = api.get_key_index_at_frame(curve, current_frame_init)
+                api.dprint(f"The current key index is {key_index}")
+                while key_index == -1:
+                    frame_before_jump = bpy.context.scene.frame_current
+                    bpy.ops.screen.keyframe_jump(next=False)
+                    frame_after_jump = bpy.context.scene.frame_current
+                    key_index = api.get_key_index_at_frame(curve, bpy.context.scene.frame_current)
+                    api.dprint(f"No key on this current frame. Jumping to frame {bpy.context.scene.frame_current} and the key index this time is {key_index}", col="yellow")
+                    
+                    if frame_before_jump == frame_after_jump: # No more keys to jump towards that direction
+                        api.dprint("No more keys in that direction anyways...")
+                        key_index = 0
+                        break
+                    
+                next_key_value = curve.keyframe_points[key_index].co[0]
+                if len(curve.keyframe_points) <= key_index + 1:
+                    if not ranged:
+                        api.dprint("End of FCurve detected. Selecting the last key instead...", col="yellow")
+                        next_key_value = curve.keyframe_points[key_index].co[0]
+                else:
+                    next_key_value = curve.keyframe_points[key_index + 1].co[0]
+                
+                # Determine if obtained value is nearest
+                if nearest > next_key_value and next_key_value > current_frame_init:
+                    api.dprint(f"NEW NEAREST VALUE CHANGED FROM {nearest} TO {next_key_value}")
+                    nearest = next_key_value
+                
+                api.dprint(f"Decided frame jump is at frame {int(nearest)}",col="purple")
+                    
+                bpy.context.scene.frame_current = current_frame_init
+
+            # Dont move playhead to large number if nearest value never changed (most likely happens if at the start/end of FCurve)
+            if large_number != nearest:
+                bpy.context.scene.frame_current = int(nearest)
+
+            # Override selection if range selection is out of start/end boundary
+            if ranged:
+                if nearest > move_range[1]:
+                    api.dprint(f"Overriding minimum range ({move_range[1]}) due to ranged selection", col="yellow")
+                    bpy.context.scene.frame_current = int(move_range[0])
+                elif nearest < move_range[0]:
+                    api.dprint(f"Overriding minimum range ({move_range[1]}) due to ranged selection", col="yellow")
+                    bpy.context.scene.frame_current = int(move_range[1])
+            if not ranged:
+                bpy.ops.graph.select_box(mode="SUB",axis_range=True, xmin=-2**30,xmax=2**30,ymin=-2**30,ymax=2**30, include_handles=False, wait_for_input=False)   
+                api.select_keys_on_column(selected_only=True)
+        else:
+            self.report({"INFO"}, "Unable to jump. Are FCurves visible? Is 'Only Show Selected' on?")
+
+        area.type = old
+                
+        return {"FINISHED"} 
+    
+class ABRA_OT_goto_keyframe_left(bpy.types.Operator):
+    bl_idname = "screen.at_goto_keyframe_left"
+    bl_label = "Go to Previous Keyframe"
+    bl_description = "Smart playhead placement to previous keyframe based on FCurve visibility and keyframe selection."
+    bl_options = {"REGISTER"}
+
+    def execute(self, context):
+        area = bpy.context.area
+        old = area.type
+        area.type = 'GRAPH_EDITOR'
+
+        current = bpy.context.scene.frame_current
+        curves = api.get_selected_fcurves()
+        current_frame_init = bpy.context.scene.frame_current
+
+        if not curves:
+            curves = api.get_visible_fcurves()
+
+        if curves:
+            # THIS CODE IS STILL DISGUSTING
+            nearest = large_number = -2**30
+            ranged = False
+            move_range = [-2**30, 2**30]
+
+            api.dprint("GOTO LEFT STARTED", col="green")
+            for curve in curves:
+                selected_keys = api.get_selected_keys(curve)
+                
+                # Atleast one key for each FCurve in the function needs to be selected otherwise the len() on the next if will break. It doesnt matter which one, it will get filtered out eventually
+                if selected_keys is None:
+                    api.dprint("A selected FCurve has no selected keys. Selecting one automatically...", col="yellow")
+                    curve.keyframe_points[len(curve.keyframe_points)-1].select_control_point = True
+                    selected_keys = api.get_selected_keys(curve)
+                    bpy.context.scene.frame_current = current # If you comment this out the function is faster but is less accurate
+                
+                # Determine the key selection. If one (incl. for each curve) is selected, use standard jump-and-select.
+                # If two or more keys are selected for one FCurve, limit the jumping to that range and dont do any sort of selection.
+                if ranged or len(selected_keys) > 1:
+                    ranged = True
+                    api.dprint("More than one key is selected for this curve. Ranged movement will be enabled",col="blue")
+                    candidate_range = api.get_range_from_selected_keys()
+                    
+                    if move_range[0] < candidate_range[0]:
+                        move_range[0] = candidate_range[0]
+                    if move_range[1] > candidate_range[0]:
+                        move_range[1] = candidate_range[1]
+                    api.dprint(f"Range is {move_range[0]}, {move_range[1]}")
+                
+                # Put the playhead on a key to determine the next 
+                key_index = api.get_key_index_at_frame(curve, current_frame_init)
+                api.dprint(f"The current key index is {key_index}")
+                while key_index == -1:
+                    frame_before_jump = bpy.context.scene.frame_current
+                    bpy.ops.screen.keyframe_jump(next=True)
+                    frame_after_jump = bpy.context.scene.frame_current
+                    key_index = api.get_key_index_at_frame(curve, bpy.context.scene.frame_current)
+                    api.dprint(f"No key on this current frame. Jumping to frame {bpy.context.scene.frame_current} and the key index this time is {key_index}", col="yellow")
+                    
+                    if frame_before_jump == frame_after_jump: # No more keys to jump towards that direction
+                        api.dprint("No more keys in that direction anyways...")
+                        key_index = 0
+                        break
+                    
+                next_key_value = curve.keyframe_points[key_index].co[0]
+                if key_index == 0:
+                    if not ranged:
+                        api.dprint("End of FCurve detected. Selecting the last key instead...", col="yellow")
+                        next_key_value = curve.keyframe_points[key_index].co[0]
+                else:
+                    next_key_value = curve.keyframe_points[key_index - 1].co[0]
+                
+                # Determine if obtained value is nearest
+                if nearest < next_key_value and next_key_value < current_frame_init:
+                    api.dprint(f"NEW NEAREST VALUE CHANGED FROM {nearest} TO {next_key_value}")
+                    nearest = next_key_value
+                
+                api.dprint(f"Decided frame jump is at frame {int(nearest)}",col="purple")
+                    
+                bpy.context.scene.frame_current = current_frame_init
+
+            # Dont move playhead to large number if nearest value never changed (most likely happens if at the start/end of FCurve)
+            if large_number != nearest:
+                bpy.context.scene.frame_current = int(nearest)
+
+            # Override selection if range selection is out of start/end boundary
+            if ranged:
+                if nearest > move_range[1]:
+                    api.dprint(f"Overriding minimum range ({move_range[1]}) due to ranged selection", col="yellow")
+                    bpy.context.scene.frame_current = int(move_range[0])
+                elif nearest < move_range[0]:
+                    api.dprint(f"Overriding minimum range ({move_range[1]}) due to ranged selection", col="yellow")
+                    bpy.context.scene.frame_current = int(move_range[1])
+            if not ranged:
+                bpy.ops.graph.select_box(mode="SUB",axis_range=True, xmin=-2**30,xmax=2**30,ymin=-2**30,ymax=2**30, include_handles=False, wait_for_input=False)   
+                api.select_keys_on_column(selected_only=True)
+        else:
+            self.report({"INFO"}, "Unable to jump. Are FCurves visible? Is 'Only Show Selected' on?")
+
+        area.type = old
+                
+        return {"FINISHED"} 
 class ABRA_OT_visible_loc(bpy.types.Operator):
     bl_idname = "screen.at_visible_loc"
     bl_label = "Quick View Location"
@@ -287,6 +490,8 @@ cls = (ABRA_OT_isolate_func,
 ABRA_OT_isolate_curves,
 ABRA_OT_auto_frame,
 ABRA_OT_auto_overlay,
+ABRA_OT_goto_keyframe_left,
+ABRA_OT_goto_keyframe_right,
 ABRA_OT_visible_loc,
 ABRA_OT_visible_rot,
 ABRA_OT_visible_scl,

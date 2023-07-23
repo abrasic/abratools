@@ -68,7 +68,7 @@ def get_selected_keys(curve):
 
 def get_range_from_selected_keys():
     """Returns [min, max] of frame range of leftmost and rightmost selected keys"""
-    curves = get_selected_fcurves()
+    curves = get_visible_fcurves()
     minimum = None
     maximum = None
     if curves:
@@ -124,6 +124,13 @@ def set_handle_angle(curve, key, angle, weight):
     curve.keyframe_points[key].handle_right_type = "FREE"
     curve.keyframe_points[key].handle_right = [keyCoords[0]+adjacent, keyCoords[1]+opposite]
 
+def get_key_index_at_frame(curve, frame):
+    """Return the index of the key at the given frame."""
+    for k in range(len(curve.keyframe_points)):
+        if frame == curve.keyframe_points[k].co[0]:
+            return k
+    return -1
+
 def get_key_from_curve_index(curve, int):
     """Returns the key on specified curve index, NOT SELECTED INDEX"""
     return curve.keyframe_points[int]
@@ -174,6 +181,19 @@ def select_bones_from_set(int):
     bpy.context.object.active_selection_set = int
     bpy.ops.pose.selection_set_select()
 
+def select_keys_on_column(selected_only=True):
+    """Selects keyframes that lie on the playhead. Do note that this function preserves channel selections and only affects keyframe selection."""
+    if selected_only:
+        curves = get_selected_fcurves()
+        if curves:
+            for curve in curves:
+                key_index = get_key_index_at_frame(curve,bpy.context.scene.frame_current)
+                key = curve.keyframe_points[key_index]
+                if key.co[0] == bpy.context.scene.frame_current:
+                    key.select_control_point = True
+    else:
+        bpy.ops.graph.select_column(mode='CFRA')
+
 def rename_active_selection_set(str):
     active = bpy.context.active_object
     active.selection_sets[active.active_selection_set].name = str
@@ -192,7 +212,6 @@ def delete_active_selection_set():
 
     if active.type == "ARMATURE" and bpy.context.mode == "POSE":
         bpy.ops.pose.selection_set_remove()
-
     
 def insert_key(keys, x, y, select=False):
     """Inserts a key on specified key array"""
@@ -202,9 +221,6 @@ def insert_key(keys, x, y, select=False):
     k.select_left_handle = select
     k.select_right_handle = select
     return k
-
-def select_keys_from_current(frames, range=False)
-    "Selects keys that are 'frames' away from the current frame"
 
 def set_area(area, type=None):
     area = bpy.context.area
