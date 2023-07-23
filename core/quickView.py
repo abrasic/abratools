@@ -175,7 +175,10 @@ class ABRA_OT_goto_keyframe_right(bpy.types.Operator):
                 api.dprint(f"The current key index is {key_index}")
                 while key_index == -1:
                     frame_before_jump = bpy.context.scene.frame_current
-                    bpy.ops.screen.keyframe_jump(next=False)
+                    if bpy.app.version >= (3, 6, 0):
+                        bpy.ops.graph.keyframe_jump(next=False)
+                    else:
+                        bpy.ops.screen.keyframe_jump(next=False)
                     frame_after_jump = bpy.context.scene.frame_current
                     key_index = api.get_key_index_at_frame(curve, bpy.context.scene.frame_current)
                     api.dprint(f"No key on this current frame. Jumping to frame {bpy.context.scene.frame_current} and the key index this time is {key_index}", col="yellow")
@@ -277,7 +280,10 @@ class ABRA_OT_goto_keyframe_left(bpy.types.Operator):
                 api.dprint(f"The current key index is {key_index}")
                 while key_index == -1:
                     frame_before_jump = bpy.context.scene.frame_current
-                    bpy.ops.screen.keyframe_jump(next=True)
+                    if bpy.app.version >= (3, 6, 0):
+                        bpy.ops.graph.keyframe_jump(next=True)
+                    else:
+                        bpy.ops.screen.keyframe_jump(next=True)
                     frame_after_jump = bpy.context.scene.frame_current
                     key_index = api.get_key_index_at_frame(curve, bpy.context.scene.frame_current)
                     api.dprint(f"No key on this current frame. Jumping to frame {bpy.context.scene.frame_current} and the key index this time is {key_index}", col="yellow")

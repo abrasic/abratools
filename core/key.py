@@ -283,7 +283,10 @@ class ABRA_OT_bake_keys(bpy.types.Operator):
             ref = bpy.context.scene.frame_current
             while bpy.context.scene.frame_current < range[1]:
                 s = 0
-                bpy.ops.screen.keyframe_jump()
+                if bpy.app.version >= (3, 6, 0):
+                    bpy.ops.graph.keyframe_jump()
+                else:
+                    bpy.ops.screen.keyframe_jump()
                 s += bpy.context.scene.frame_current - ref
                 if s == 0:
                     api.dprint("There are no more keyframes left to bake", col="yellow")
