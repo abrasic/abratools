@@ -78,6 +78,15 @@ class ABRA_OT_isolate_func(bpy.types.Operator):
             return {"FINISHED"}
         else:
             return {'CANCELLED'}
+
+@persistent
+def isolate_quick(self, context):
+    prefs = api.get_preferences()
+    viscurves = api.get_visible_fcurves()
+    api.dprint(viscurves,col="red")
+    if prefs.isolate_curves and viscurves is not None:
+        print("OK")
+
 class ABRA_OT_isolate_curves(bpy.types.Operator):
     bl_idname = "screen.at_isolate_curves"
     bl_label = "Isolate Curves"
@@ -116,11 +125,23 @@ def overlay_func(self, context):
     prefs = api.get_preferences()
     if prefs.auto_overlay:
         isPlaying = bpy.context.screen.is_animation_playing
+        api.dprint(f"Auto-Overlay Playing: {bpy.context.scene.frame_current} | {isPlaying}")
         for area in bpy.context.screen.areas:
             if area.type == 'VIEW_3D':
                 for space in area.spaces:
                     if space.type == 'VIEW_3D':
                         space.overlay.show_overlays = not isPlaying
+
+class ABRA_OT_overlay_func(bpy.types.Operator):
+    bl_idname = "screen.at_overlay_function"
+    bl_label = "Auto Overlay (Exec)"
+    bl_description = "Internal use only"
+    bl_options = {"REGISTER"}
+
+    def execute(self, context):
+        overlay_func(self, context)
+        api.dprint("TEST")
+        return {"FINISHED"} 
 
 class ABRA_OT_goto_keyframe_right(bpy.types.Operator):
     bl_idname = "screen.at_goto_keyframe_right"
@@ -498,6 +519,7 @@ ABRA_OT_auto_frame,
 ABRA_OT_auto_overlay,
 ABRA_OT_goto_keyframe_left,
 ABRA_OT_goto_keyframe_right,
+ABRA_OT_overlay_func,
 ABRA_OT_visible_loc,
 ABRA_OT_visible_rot,
 ABRA_OT_visible_scl,

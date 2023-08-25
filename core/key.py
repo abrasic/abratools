@@ -269,7 +269,7 @@ class ABRA_OT_bake_keys(bpy.types.Operator):
 
             # NLA Bake
             bpy.ops.graph.reveal()
-            bpy.ops.nla.bake(frame_start=range[0], frame_end=range[1], bake_types={bpy.context.mode}, use_current_action = True)
+            bpy.ops.nla.bake(frame_start=range[0], frame_end=range[1], bake_types={bpy.context.mode}, use_current_action = True, clean_curves=False)
 
             # Change interpolation type of new keys
             bpy.ops.graph.interpolation_type(type=prefs.bake_type)
@@ -283,10 +283,7 @@ class ABRA_OT_bake_keys(bpy.types.Operator):
             ref = bpy.context.scene.frame_current
             while bpy.context.scene.frame_current < range[1]:
                 s = 0
-                if bpy.app.version >= (3, 6, 0):
-                    bpy.ops.graph.keyframe_jump()
-                else:
-                    bpy.ops.screen.keyframe_jump()
+                bpy.context.scene.frame_current+=1
                 s += bpy.context.scene.frame_current - ref
                 if s == 0:
                     api.dprint("There are no more keyframes left to bake", col="yellow")

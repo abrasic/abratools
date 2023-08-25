@@ -28,7 +28,7 @@ def register():
 
     bpy.types.USERPREF_HT_header.append(toolshelf.drawToggle)
     bpy.types.VIEW3D_MT_editor_menus.append(toolshelf.vpToggleBtn)
-    bpy.app.handlers.frame_change_pre.append(quickView.overlay_func)
+    bpy.app.handlers.frame_change_post.append(quickView.overlay_func)
     bpy.types.Scene.set_selection = bpy.props.PointerProperty(type=panels.Set_Selector_Vars)
 
     wm = bpy.context.window_manager
@@ -40,7 +40,11 @@ def register():
         addon_keymaps.append((km, kmi))
 
         km = kc.keymaps.new(name='Animation Channels', space_type='EMPTY')
-        kmi = km.keymap_items.new(quickView.ABRA_OT_isolate_func.bl_idname, 'LEFTMOUSE', 'RELEASE', shift=True)
+        kmi = km.keymap_items.new(quickView.ABRA_OT_isolate_func.bl_idname, 'LEFTMOUSE', 'RELEASE', shift=1)
+        addon_keymaps.append((km, kmi))
+
+        km = kc.keymaps.new(name='Frames', space_type='EMPTY')
+        kmi = km.keymap_items.new(quickView.ABRA_OT_overlay_func.bl_idname, 'SPACE', 'RELEASE')
         addon_keymaps.append((km, kmi))
 
     print("[aT] AbraTools is now running")
