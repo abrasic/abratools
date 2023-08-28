@@ -39,8 +39,13 @@ def register():
         kmi = km.keymap_items.new(quickView.ABRA_OT_isolate_func.bl_idname, 'LEFTMOUSE', 'RELEASE')
         addon_keymaps.append((km, kmi))
 
+        # These would have CLICK type but it causes selection of channels to cease entirely in 3.6.2
         km = kc.keymaps.new(name='Animation Channels', space_type='EMPTY')
-        kmi = km.keymap_items.new(quickView.ABRA_OT_isolate_func.bl_idname, 'LEFTMOUSE', 'RELEASE', shift=1)
+        kmi = km.keymap_items.new(quickView.ABRA_OT_isolate_func.bl_idname, 'LEFTMOUSE', 'DOUBLE_CLICK', shift=1, head=False)
+        addon_keymaps.append((km, kmi))
+
+        km = kc.keymaps.new(name='Animation Channels', space_type='EMPTY')
+        kmi = km.keymap_items.new(quickView.ABRA_OT_isolate_func.bl_idname, 'LEFTMOUSE', 'DOUBLE_CLICK', ctrl=1)
         addon_keymaps.append((km, kmi))
 
         km = kc.keymaps.new(name='Frames', space_type='EMPTY')

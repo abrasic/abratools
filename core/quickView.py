@@ -90,7 +90,7 @@ def isolate_quick(self, context):
 class ABRA_OT_isolate_curves(bpy.types.Operator):
     bl_idname = "screen.at_isolate_curves"
     bl_label = "Isolate Curves"
-    bl_description = "While enabled, AbraTools will automatically hide F-Curve channels that aren't selected. This is a beta feature"
+    bl_description = "While enabled, AbraTools will automatically hide F-Curve channels that aren't selected when you double-click in the Graph Editor channel box. This is a beta feature"
     bl_options = {"REGISTER"}
 
     def execute(self, context):
