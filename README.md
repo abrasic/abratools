@@ -4,8 +4,8 @@
 **Code is a mess. Be careful using it in production. Bug reports, feature requests and PRs are appreciated.**
 
 * Working as of Blender 3.5.1.
-* Known bugs in 3.6.0:
-  * **Isolate Curves**: Due to an internal change with keymapping funcionality, Isolate Curves will only trigger by left-clicking only. Doing an initial shift-click, ctrl-click or box-selection of channels will not trigger F-Curve isolation. Instead, you need make your special selection and then shift-left-click on any channel to trigger Isolate Curves normally. We are actively finding a workaround to resolve this issue.
+* Known bugs in 3.6.2:
+  * **Isolate Curves**: Due to an internal change with keymapping funcionality, Isolate Curves can only be triggered by double-clicking inside of the channel box, instead of releasing left-click.
 * **Download** AbraTools [here](https://github.com/abrasic/abratools/releases). 
 * **Installation instructions** [here](https://docs.abx.gg/support/download-and-setup). 
 * **Read the docs** [here](https://docs.abx.gg).
