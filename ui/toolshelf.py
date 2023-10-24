@@ -87,8 +87,16 @@ class ABRA_OT_viewportTogglePrefs(bpy.types.Operator):
 
             areas = [area for area in context.screen.areas if area.type == "PREFERENCES"]
 
-            for area in areas:
-                bpy.ops.screen.area_close(cl)
+            if bpy.app.version[0] >= 4:
+                for area in areas:
+                    if len(area.regions) != 0:
+                        with bpy.context.temp_override(area=cl['area'], region=cl['region']):
+                            bpy.ops.screen.area_close()
+                    else:
+                        break
+            else:
+                for area in areas:
+                    bpy.ops.screen.area_close(cl)
 
         return {'FINISHED'}
 
