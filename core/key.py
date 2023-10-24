@@ -327,14 +327,24 @@ class ABRA_OT_select_children(bpy.types.Operator):
             selectedBones = bpy.context.selected_pose_bones
             if selectedBones:
                 for bone in selectedBones:
+                    api.dprint(f"Looping thru bone {str(bone.name)}")
                     armature = bone.id_data.data
-                    layers = armature.layers # Get currently visible bone layers
+                    if bpy.app.version[0] >= 4:
+                        layers = bone.bone.collections # Get currently visible bone layers
+                        api.dprint(str(layers))
+                    else:
+                        layers = armature.layers # Get currently visible bone layers
                     active_layers = []
                     i = 0
                     for layer in layers:
-                        if layer == True:
-                            active_layers.append(i) # Make a list of bone layers in use by armature
-                        i+=i
+                        if bpy.app.version[0] >= 4:
+                            if layer.is_visible == True:
+                                active_layers.append(layer.name) # Make a list of bone layers in use by armature
+                        else:
+                            if layer == True:
+                                active_layers.append(i) # Make a list of bone layers in use by armature
+                            i+=i
+                    api.dprint(f"Layers in use: {str(active_layers)}")
                     if not event.shift:    # Remove bone from selection if shift is not held
                         bone.bone.select = False
                     children = bone.children # Get children from iterating bone
@@ -349,9 +359,7 @@ class ABRA_OT_select_children(bpy.types.Operator):
                                     children = child.children
                                     if children:
                                         for child in children: # Loop thru child bones and check if they are visible. If not, skip them and use next visible child
-                                            print(child)
                                             if api.is_bone_visible(child.bone, active_layers):
-                                                print("child bone is finally visible. show this one")
                                                 child.bone.select = True
                                                 c_iter = True
                                     else:
@@ -389,18 +397,29 @@ class ABRA_OT_select_parent(bpy.types.Operator):
             selectedBones = bpy.context.selected_pose_bones
             if selectedBones:
                 for bone in selectedBones:
+                    api.dprint(f"Looping thru bone {str(bone.name)}")
                     armature = bone.id_data.data
-                    layers = armature.layers # Get currently visible bone layers
+                    if bpy.app.version[0] >= 4:
+                        layers = bone.bone.collections # Get currently visible bone layers
+                        api.dprint(str(layers))
+                    else:
+                        layers = armature.layers # Get currently visible bone layers
                     active_layers = []
                     i = 0
                     for layer in layers:
-                        if layer == True:
-                            active_layers.append(i) # Make a list of bone layers in use by armature
-                        i+=i
+                        if bpy.app.version[0] >= 4:
+                            if layer.is_visible == True:
+                                active_layers.append(layer.name) # Make a list of bone layers in use by armature
+                        else:
+                            if layer == True:
+                                active_layers.append(i) # Make a list of bone layers in use by armature
+                            i+=i
+                    api.dprint(f"Layers in use: {str(active_layers)}")
                     if not event.shift:
                         bone.bone.select = False
                     parent = bone.parent
                     if parent:
+                        api.dprint(f"Current parent is {parent.name}")
                         if api.is_bone_visible(parent.bone, active_layers):
                             parent.bone.select = True
                         else:  

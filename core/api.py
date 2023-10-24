@@ -369,8 +369,16 @@ def use_oss():
 
 def is_bone_visible(bone, layers):
     """Returns Bool. Determines if the bone is visible via active bone layers."""
-    for layer in layers:
-        if bone.layers[layer]:
-            return True
-        else:
-            return False
+    if bpy.app.version[0] >= 4:
+        for layer in layers:
+            try:
+                if bone.collections[layer]:
+                    return True
+            except KeyError:
+                    return False
+    else:
+        for layer in layers:
+            if bone.layers[layer]:
+                return True
+            else:
+                return False
