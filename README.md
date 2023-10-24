@@ -3,8 +3,8 @@
 
 **Code is a mess. Be careful using it in production. Bug reports, feature requests and PRs are appreciated.**
 
-* Working as of Blender 3.5.1.
-* Known bugs in 3.6.2:
+* Working as of Blender 4.0.
+* Known bugs in 3.6+:
   * **Isolate Curves**: Due to an internal change with keymapping funcionality, Isolate Curves can only be triggered by double-clicking inside of the channel box, instead of releasing left-click.
 * **Download** AbraTools [here](https://github.com/abrasic/abratools/releases). 
 * **Installation instructions** [here](https://docs.abx.gg/support/download-and-setup). 
