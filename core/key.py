@@ -281,9 +281,13 @@ class ABRA_OT_bake_keys(bpy.types.Operator):
             api.dprint("Initial bake complete. Moving to range start")
             bpy.context.scene.frame_current = range[0]
             ref = bpy.context.scene.frame_current
+
+            wm = bpy.context.window_manager
+            wm.progress_begin(range[0], range[1])
             while bpy.context.scene.frame_current < range[1]:
                 s = 0
                 bpy.context.scene.frame_current+=1
+                wm.progress_update(bpy.context.scene.frame_current)
                 s += bpy.context.scene.frame_current - ref
                 if s == 0:
                     api.dprint("There are no more keyframes left to bake", col="yellow")
@@ -295,6 +299,7 @@ class ABRA_OT_bake_keys(bpy.types.Operator):
                     api.dprint("Current frame is NOT divisible. Deleting keys on "+str(bpy.context.scene.frame_current)+")", col="yellow")
                     bpy.ops.graph.select_column(mode='CFRA')
                     bpy.ops.graph.delete(confirm=False)
+            wm.progress_end()
 
             bpy.context.scene.frame_current = frame_const
 
