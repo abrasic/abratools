@@ -298,9 +298,9 @@ class ABRA_OT_selsetspanel(bpy.types.Operator):
                     row.label(text="No selection sets exist for this armature.")
                     row.operator('armature.create_set', icon="ADD", text="Create a set from current selection")
             else:
-                layout.label(text="This tool only works in Pose Mode.")
+                layout.label(text="This tool only supports Pose Mode")
         else:
-            layout.label(text="Required addon is not installed")
+            layout.label(text="Please enable 'Bone Selection Sets' addon to use")
 
 cls = (ABRA_OT_mpathpanel,
 ABRA_OT_selsetspanel,

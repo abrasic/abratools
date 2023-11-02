@@ -57,7 +57,11 @@ class ABRA_OT_isolate_func(bpy.types.Operator):
                     api.dprint("Selecting keys in range")
                     bpy.ops.graph.select_column(mode='MARKERS_BETWEEN')
                     api.dprint("Framing")
-                    bpy.ops.graph.view_selected(cc)
+                    if bpy.app.version[0] >= 4:
+                        with bpy.context.temp_override(area=cc['area'], region=cc['region']):
+                            bpy.ops.graph.view_selected()
+                    else:
+                        bpy.ops.graph.view_selected(cc)
 
                     # Deselect again
                     api.dprint("Deselecting keys")
