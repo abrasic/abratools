@@ -526,7 +526,11 @@ class ABRA_OT_swap_rig_mode(bpy.types.Operator):
                         if i == 0:
                             bpy.context.view_layer.objects.active = o
 
-                        o.select_set(True)
+                        try:
+                            o.select_set(True)
+                        except RuntimeError:
+                            pass
+
                 else:
                     self.report({"INFO"}, "No meshes associated with armature")
                     return {"CANCELLED"}
