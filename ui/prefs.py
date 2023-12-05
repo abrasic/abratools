@@ -220,6 +220,18 @@ class AbraToolsPrefs(AddonPreferences):
         default = False
     )
 
+    vis_cursor_gizmo: BoolProperty(
+        name = key.ABRA_OT_cursor_gizmo.bl_label,
+        description = key.ABRA_OT_cursor_gizmo.bl_description,
+        default = False
+    )
+
+    cursor_gizmo: BoolProperty(
+        name = "Cursor Gizmo Enabled",
+        description = "For internal use. Checks if user enabled Cursor Gizmo",
+        default = False
+    )
+
     vis_cursortosel: BoolProperty(
         name = key.ABRA_OT_cursor_to_selected.bl_label,
         description = key.ABRA_OT_cursor_to_selected.bl_description,

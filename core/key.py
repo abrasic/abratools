@@ -1,4 +1,5 @@
 import bpy
+from bpy.app.handlers import persistent
 from . import api
 
 # $$\   $$\ $$$$$$$$\ $$\     $$\ $$$$$$\ $$\   $$\  $$$$$$\  
@@ -470,7 +471,6 @@ class ABRA_OT_cursor_to_selected(bpy.types.Operator):
         area.type = 'VIEW_3D'
 
         bpy.ops.view3d.snap_cursor_to_selected()
-
         area.type = old_type
         return {"FINISHED"}
 
@@ -487,6 +487,92 @@ class ABRA_OT_toggle_cursor_pivot(bpy.types.Operator):
             bpy.context.scene.tool_settings.transform_pivot_point = "CURSOR"
 
         return {"FINISHED"}
+    
+class ABRA_OT_cursor_gizmo(bpy.types.Operator):
+    bl_idname = "screen.at_cursor_gizmo"
+    bl_label = "Toggle Cursor Gizmo"
+    bl_description = "Toggles a gizmo that allows you to transform the 3D Cursor"
+    bl_options = {"REGISTER", "UNDO"}
+
+    def execute(self, context):
+        prefs = api.get_preferences()
+        pose_bypass = False
+        arm_object = ""
+        if bpy.context.mode == "POSE" and bpy.context.active_object.type == "ARMATURE":
+            pose_bypass = True
+            arm_object = context.active_object
+            if "aTCursorGizmoBridge" not in bpy.context.active_object.data.bones:
+                bpy.ops.object.editmode_toggle() # EDIT
+                bpy.ops.armature.select_all(action='DESELECT')
+                bpy.ops.armature.bone_primitive_add(name="aTCursorGizmoBridge") 
+                bpy.context.active_object.data.edit_bones.active = arm_object.data.edit_bones["aTCursorGizmoBridge"]
+                bpy.context.active_bone.length = 0.01
+                bpy.ops.object.editmode_toggle() # OBJECT
+        
+        if not "aTCursorGizmo" in bpy.data.objects:
+                if bpy.context.mode == "POSE":
+                    bpy.ops.object.posemode_toggle() # OBJECT
+                prefs.cursor_gizmo = True
+                bpy.ops.object.select_all(action='DESELECT')
+                bpy.ops.object.empty_add(type='PLAIN_AXES', align='WORLD', location=context.scene.cursor.location, rotation=context.scene.cursor.rotation_euler, scale=(1, 1, 1))
+                bpy.context.object.name = "aTCursorGizmo"
+                bpy.context.object.empty_display_size = 0.01
+                bpy.context.object.empty_display_type = "ARROWS"
+                bpy.context.object.select_set(True)
+
+                if pose_bypass:
+                    constr = bpy.data.objects["aTCursorGizmo"].constraints.new(type='COPY_TRANSFORMS')
+                    constr.target = arm_object
+                    constr.subtarget = "aTCursorGizmoBridge"
+                    bpy.context.view_layer.objects.active = arm_object
+                    bpy.ops.object.posemode_toggle() # POSE
+                    bpy.ops.pose.select_all(action='DESELECT')
+                    arm_object.data.bones["aTCursorGizmoBridge"].select = True
+
+
+        else:
+            prefs.cursor_gizmo = False
+            bpy.data.objects.remove(bpy.data.objects ['aTCursorGizmo'], do_unlink=True)
+            if pose_bypass and arm_object.type == "ARMATURE":
+                bpy.ops.object.editmode_toggle() # EDIT
+                bpy.ops.armature.select_all(action='DESELECT')
+                arm_object.data.edit_bones["aTCursorGizmoBridge"].select = True
+                bpy.ops.armature.delete()
+                bpy.ops.object.posemode_toggle() # POSE
+
+
+                
+        return {"FINISHED"}
+    
+@persistent
+def gizmo_func(self, context):
+    api.dprint("Gizmo Call")
+    prefs = api.get_preferences()
+    if prefs.cursor_gizmo and "aTCursorGizmo" in bpy.data.objects and "EMPTY":
+        if bpy.data.objects["aTCursorGizmo"].type == "EMPTY":
+            cmode = context.scene.cursor.rotation_mode
+            gizmo = bpy.data.objects["aTCursorGizmo"]
+
+            context.scene.cursor.location = gizmo.matrix_world.translation
+            if cmode != "QUATERNION":
+                gizmo.rotation_mode = cmode
+                context.scene.cursor.rotation_euler = gizmo.matrix_world.to_euler()
+            else:
+                gizmo.rotation_mode = "QUATERNION"
+                context.scene.cursor.rotation_quaternion = gizmo.matrix_world.to_quaternion()
+
+
+
+class ABRA_OT_gizmo_func(bpy.types.Operator):
+    bl_idname = "screen.at_gizmo_func"
+    bl_label = "Cursor Gizmo (Exec)"
+    bl_description = "Internal use only"
+    bl_options = {"REGISTER"}
+
+    def execute(self, context):
+        gizmo_func(self, context)
+        api.dprint("Cursor Gizmo Update")
+        return {"FINISHED"} 
 
 class ABRA_OT_selection_sets(bpy.types.Operator):
     bl_idname = "screen.at_selection_sets"
@@ -785,6 +871,7 @@ ABRA_OT_select_mirror,
 ABRA_OT_selection_sets,
 ABRA_OT_swap_rig_mode,
 ABRA_OT_cursor_to_selected,
+ABRA_OT_cursor_gizmo,
 ABRA_OT_toggle_cursor_pivot,
 ABRA_OT_tangent_keypath,
 ABRA_OT_tangent_keypathclear,

@@ -18,6 +18,7 @@ ic_copy_keys = ic["copy_keys"]
 ic_copy_pose = ic["copy_pose"]
 ic_key_timing = ic["copy_key_timing"]
 ic_create_path = ic["create_path"]
+ic_cursor_gizmo = ic["cursor_gizmo"]
 ic_cursor_to_selected = ic["cursor_to_selected"]
 ic_delete_keys = ic["delete_keys"]
 ic_delete_path = ic["delete_path"]
@@ -262,6 +263,10 @@ def prefsHeaderWrite(self, context):
         layout.operator(key.ABRA_OT_select_mirror.bl_idname, text='', icon_value=ic_select_mirror.icon_id)
     if (prefs.vis_cursortosel): 
         layout.operator(key.ABRA_OT_cursor_to_selected.bl_idname, text='', icon_value=ic_cursor_to_selected.icon_id)
+    if (prefs.vis_cursor_gizmo):
+        layout.operator_context = "EXEC_DEFAULT"
+        layout.operator(key.ABRA_OT_cursor_gizmo.bl_idname, text='', depress="aTCursorGizmo" in bpy.data.objects, icon_value=ic_cursor_gizmo.icon_id)
+        layout.operator_context = "INVOKE_DEFAULT"
     if (prefs.vis_toggle_cursor):
         cursor_mode = bpy.context.scene.tool_settings.transform_pivot_point == "CURSOR"
         layout.operator(key.ABRA_OT_toggle_cursor_pivot.bl_idname, text='', depress=cursor_mode, icon_value=ic_toggle_cursor_pivot.icon_id)
@@ -353,6 +358,7 @@ def prefsBodyWrite(self, context):
         col.prop(prefs, "vis_selparent", icon_value=ic_select_parent.icon_id)
         col.prop(prefs, "vis_selsiblings", icon_value=ic_select_siblings.icon_id)
         col.prop(prefs, "vis_selmirror", icon_value=ic_select_mirror.icon_id)
+        col.prop(prefs, "vis_cursor_gizmo", icon_value=ic_cursor_gizmo.icon_id)
         col.prop(prefs, "vis_cursortosel", icon_value=ic_cursor_to_selected.icon_id)
         col.prop(prefs, "vis_toggle_cursor", icon_value=ic_toggle_cursor_pivot.icon_id)
         col.prop(prefs, "vis_selsets", icon_value=ic_selection_sets.icon_id)
