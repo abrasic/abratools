@@ -1,9 +1,9 @@
 # AbraTools Beta
-### *AbraTools contains a list of many quality-of-life animation tools for Blender 3. It's made by animators, for animators.*
+### *AbraTools contains a list of many quality-of-life animation tools for Blender. It's made by animators, for animators.*
 
 **Code is a mess. Be careful using it in production. Bug reports, feature requests and PRs are appreciated.**
 
-* Working as of Blender 4.0.
+* Working as of Blender 4.0.1.
 * Known bugs in 3.6+:
   * **Isolate Curves**: Due to an internal change with keymapping funcionality, Isolate Curves can only be triggered by double-clicking inside of the channel box, instead of releasing left-click.
 * **Download** AbraTools [here](https://github.com/abrasic/abratools/releases). 
