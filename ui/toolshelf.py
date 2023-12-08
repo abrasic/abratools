@@ -302,7 +302,7 @@ def prefsBodyWrite(self, context):
 
     prefs = api.get_preferences()
 
-    # Limit the width of bo
+    # Limits the wide the menu panels can be. User can change the scaling 
     row = layout.row()
     row.alignment="LEFT"
     row.ui_units_x = 20 * prefs.panel_scale
@@ -312,11 +312,11 @@ def prefsBodyWrite(self, context):
     col.ui_units_x = 20 * prefs.panel_scale
 
     if (prefs.toolshelf_pages == "home"):
-        col.label(text="AbraTools Settings Panel")
-        col.label(text="Here, you can modify the appearance and tool visibility for the header.")
-        col.label(text="Once you're done, you can shrink the settings panel so you can only see the header.")
-        col.label(text="Thank you for using AbraTools.")
+        col.label(text="abraTools")
+        col.separator()
 
+        col.label(text="You can change visibility of tools in the other tabs")
+        col.label(text="You can shrink this area when you're done")
         col.separator()
 
         supportBox = col.box()
