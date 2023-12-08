@@ -299,10 +299,18 @@ def prefsBodyWrite(self, context):
     """Draw aT body (visibility options and settings)"""
 
     layout = self.layout
+
     prefs = api.get_preferences()
-    row = layout.box()
-    fill = row.split(factor=0.75)
-    col = fill.column()
+
+    # Limit the width of bo
+    row = layout.row()
+    row.alignment="LEFT"
+    row.ui_units_x = 20 * prefs.panel_scale
+    box = row.box()
+    col = box.column()
+    col.alignment = "LEFT"
+    col.ui_units_x = 20 * prefs.panel_scale
+
     if (prefs.toolshelf_pages == "home"):
         col.label(text="AbraTools Settings Panel")
         col.label(text="Here, you can modify the appearance and tool visibility for the header.")
@@ -311,8 +319,11 @@ def prefsBodyWrite(self, context):
 
         col.separator()
 
-        col.operator("wm.url_open", text="Documentation").url = "https://docs.abx.gg"
-        col.operator("wm.url_open", text="GitHub").url = "https://github.com/abrasic/abratools"
+        supportBox = col.box()
+        supportBox.label(text="Support")
+        bc = supportBox.row()
+        bc.operator("wm.url_open", text="Documentation").url = "https://docs.abx.gg"
+        bc.operator("wm.url_open", text="GitHub").url = "https://github.com/abrasic/abratools"
 
         col.separator(factor=3)
         col.label(text="Developed with")
@@ -369,25 +380,35 @@ def prefsBodyWrite(self, context):
         col.prop(prefs, "vis_keypath", icon_value=ic_create_path.icon_id)
         col.prop(prefs, "vis_rangemarkers", icon_value=ic_range_to_markers.icon_id)
     if (prefs.toolshelf_pages == "settings"):
-        col.prop(prefs, "header_col")
-        col.prop(prefs, "button_width")
+        row.scale_x = 2
+        col.label(text="Appearance", icon="BRUSHES_ALL")
+        colorsBox = col.box()
+        colorsBox.prop(prefs, "header_col")
+        colorsBox.prop(prefs, "button_width")
+        colorsBox.prop(prefs, "panel_scale")
+
         col.separator()
-        col.label(text="Third-party Addons:")
-        addon = col.grid_flow(columns=2)
+
+        col.label(text="Dependencies", icon="LIGHTPROBE_CUBEMAP")
+        addonsBox = col.box()
+        addonsBox.label(text="Some tools require third-party addons in order to use.", icon="INFO")
+        addonsBox.label(text="We are not affiliated nor endorsed by these addons", icon="INFO")
+
+        addon = addonsBox.grid_flow(columns=2)
         if api.is_addon_enabled("AnimCopy"):
             addon.label(text="Animcopy (INSTALLED)", icon="CHECKBOX_HLT")
         else:
             addon.label(text="Animcopy", icon="CHECKBOX_DEHLT")
         addon.operator("wm.url_open", text="By Blastframe | Click to Buy", icon="URL").url = "https://blendermarket.com/products/animcopy"
 
-        addon = col.grid_flow(columns=2)
+        addon = addonsBox.grid_flow(columns=2)
         if api.is_addon_enabled("copy_global_transform"):
             addon.label(text="Copy Global Transform (INSTALLED)", icon="CHECKBOX_HLT")
         else:
             addon.label(text="Copy Global Transform", icon="CHECKBOX_DEHLT")
         addon.label(text="Native Add-on")
 
-        addon = col.grid_flow(columns=2)
+        addon = addonsBox.grid_flow(columns=2)
         if api.is_addon_enabled("bone_selection_sets"):
             addon.label(text="Bone Selection Sets (INSTALLED)", icon="CHECKBOX_HLT")
         else:
@@ -395,14 +416,12 @@ def prefsBodyWrite(self, context):
         addon.label(text="Native Add-on")
 
         col.separator()
-        col.label(text="Some tools require third-party addons in order to use", icon="INFO")
-        col.label(text="We are not affiliated nor endorsed by these addons", icon="INFO")
 
-        col.separator()
-        col.prop(prefs, "dev_debug")
+        col.label(text="Advanced", icon="MODIFIER_OFF")
+        devBox = col.box()
+        devBox.prop(prefs, "dev_debug")
 
     layout.label(text="aT | beta1")
-
 
     return 
     

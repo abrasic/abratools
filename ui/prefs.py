@@ -342,10 +342,17 @@ class AbraToolsPrefs(AddonPreferences):
     )
 
     button_width: bpy.props.FloatProperty(
-        name = "Button Width",
+        name = "Header Button Width",
         min = 0.8, max = 2.0,
         default = 1.0,
         description = "Sets the width of buttons in the toolshelf"
+    )
+
+    panel_scale: bpy.props.FloatProperty(
+        name = "Menu Width Scale",
+        min = 0.4, max = 2.0,
+        default = 1.0,
+        description = "Changes the maximum width of panels in the menu"
     )
 
     dev_debug: bpy.props.BoolProperty(
