@@ -89,4 +89,13 @@ Quickly see the curves that matter to you most.
 
 <img src='https://files.gitbook.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FVEvUhh6zNMLIFbTZCBjF%2Fuploads%2FiFOCL2B09nS2NMmJNlJu%2Fcopypaste.gif?alt=media&token=f6973c0a-c066-4516-ae0a-826fc68da871' height='325'>
 
+## Custom Scripts
+
+> Create your own Python scripts and use them on the toolshelf
+
+[Learn more](https://docs.abx.gg/feature/custom-scripts)
+
+![custom](https://github.com/abrasic/abratools/assets/43157991/fb7cbba9-efa3-4694-b570-8ac33af606cd)
+
+
 **Plus ~~many~~ a few more.**
