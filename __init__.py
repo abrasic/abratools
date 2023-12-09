@@ -11,12 +11,12 @@ bl_info = {
     'tracker_url': 'https://github.com/abrasic/abratools',
 }
 
-import bpy, os
-from .core import key, quickView
+import bpy, os, importlib.util
+from .core import key, quickView, customScripts
 from .ui import prefs, panels, toolshelf
 ################################
 
-classes = quickView.cls + key.cls + prefs.cls + panels.cls + toolshelf.cls
+classes = quickView.cls + key.cls + prefs.cls + panels.cls + toolshelf.cls + customScripts.cls
 icons_coll = {}
 addon_keymaps = []
 

@@ -1,4 +1,5 @@
-import bpy, addon_utils, math
+import bpy, addon_utils, os, math, importlib.util
+from . import api
 
 def get_preferences():
     """Returns AddonPreferences type"""
@@ -382,3 +383,24 @@ def is_bone_visible(bone, layers):
                 return True
             else:
                 return False
+            
+def get_custom_scripts():
+    files = []
+    """Returns array consisting of [str file.py, str script_info name, str icon name]. Retrieves python files located in <root>/scripts."""
+    custom_scripts = os.path.join(os.path.dirname(__file__), os.pardir, "scripts")
+    for file in os.listdir(custom_scripts):
+        if os.path.splitext(file)[1] == ".py":
+            
+            spec = importlib.util.spec_from_file_location("atools_" + os.path.splitext(file)[0],custom_scripts + "\\" + file)
+            modu = importlib.util.module_from_spec(spec)
+            
+            spec.loader.exec_module(modu) # Accesses file
+            
+            try:
+                if modu.script_info:
+                    if modu.script_info.name:
+                        files.append([file, modu.script_info.name, modu.script_info.icon])
+            except AttributeError:
+                return {}
+            
+    return files

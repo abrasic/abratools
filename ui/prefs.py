@@ -17,8 +17,9 @@ class AbraToolsPrefs(AddonPreferences):
             ('tangents', 'Tangents', '', '', 3),
             ('selection', 'Selection', '', '', 4),
             ('other', 'Other', '', '', 5),
+            ('custom', 'Scripts', '', '', 6),
             None,
-            ('settings', 'Settings', '', '', 6),
+            ('settings', 'Settings', '', '', 7),
 
         ],
         default='home'

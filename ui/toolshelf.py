@@ -1,6 +1,6 @@
 import bpy 
 
-from ..core import api, key, quickView
+from ..core import api, key, quickView, customScripts
 from .icons import icons_coll
 
 prefsHeaderOld = None
@@ -287,9 +287,12 @@ def prefsHeaderWrite(self, context):
         layout.operator(key.ABRA_OT_tangent_keypathclear.bl_idname, text='', icon_value=ic_delete_path.icon_id)
         layout.operator_context = "EXEC_DEFAULT"
 
+        scripts = api.get_custom_scripts()
+        for script in scripts:
+            layout.operator(customScripts.ABRA_OT_execute_script.bl_idname, text='', icon=script[2]).file = script[0]
+
     layout.separator_spacer()
-    
-    toggle = layout.column()
+    toggle = layout.row()
     toggle.alert = True
     toggle.operator("at.toggleprefs",text="",icon='PANEL_CLOSE')
 
@@ -379,6 +382,26 @@ def prefsBodyWrite(self, context):
         col.prop(prefs, "vis_rangesel", icon_value=ic_range_to_selection.icon_id)
         col.prop(prefs, "vis_keypath", icon_value=ic_create_path.icon_id)
         col.prop(prefs, "vis_rangemarkers", icon_value=ic_range_to_markers.icon_id)
+    if (prefs.toolshelf_pages == "custom"):
+        col.label(text="Loaded Scripts", icon="SCRIPT")
+        shelp = col.row()
+        shelp.operator(customScripts.ABRA_OT_open_scripts_path.bl_idname, text="Open Scripts Folder", icon="FILE_FOLDER")
+        shelp.operator("wm.url_open", text="Help", icon="URL").url = "https://docs.abx.gg/feature/custom-scripts"
+
+        scripts = api.get_custom_scripts()
+        col.separator()
+
+        print(len(scripts))
+        if len(scripts) > 0:
+            for script in scripts:
+                scriptBox = col.box()
+                sc = scriptBox.row()
+                sc.label(text=f"{script[1]}", icon=script[2])
+                sc.label(text=script[0])
+        else:
+            scriptBox = col.box()
+            scriptBox.label(text="You don't have any custom scripts installed")
+
     if (prefs.toolshelf_pages == "settings"):
         row.scale_x = 2
         col.label(text="Appearance", icon="BRUSHES_ALL")
