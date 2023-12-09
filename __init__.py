@@ -6,7 +6,7 @@ bl_info = {
     'description': 'Blender animation toolkit',
     'location' : '3D Viewport or Preferences > Header > aT',
     'category': 'Animation',
-    'warning': 'beta1 | This is a beta version of AbraTools',
+    'warning': 'beta2 | This is a beta version of AbraTools',
     'doc_url': 'https://docs.abx.gg/support/download-and-setup',
     'tracker_url': 'https://github.com/abrasic/abratools',
 }

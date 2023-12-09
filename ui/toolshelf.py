@@ -391,7 +391,6 @@ def prefsBodyWrite(self, context):
         scripts = api.get_custom_scripts()
         col.separator()
 
-        print(len(scripts))
         if len(scripts) > 0:
             for script in scripts:
                 scriptBox = col.box()
@@ -444,7 +443,7 @@ def prefsBodyWrite(self, context):
         devBox = col.box()
         devBox.prop(prefs, "dev_debug")
 
-    layout.label(text="aT | beta1")
+    layout.label(text="aT | beta2")
 
     return 
     
