@@ -401,6 +401,6 @@ def get_custom_scripts():
                     if modu.script_info.name:
                         files.append([file, modu.script_info.name, modu.script_info.icon])
             except AttributeError:
-                return {}
+                pass
             
     return files
