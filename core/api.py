@@ -310,9 +310,14 @@ def retime_keys():
 
     # Select and transform markers
     dprint("Moving markers")
-    if prefs.retime_markers and len(bpy.context.scene.timeline_markers):
-        bpy.ops.marker.select_leftright(mode='RIGHT')
-        bpy.ops.marker.move(frames=prefs.retime_frameoffset)
+    bpy.ops.marker.select_all(action='DESELECT')
+    bpy.ops.marker.select_leftright(mode='RIGHT')
+    if prefs.retime_markers:
+        for marker in bpy.context.scene.timeline_markers:
+            if marker.select:
+                bpy.ops.marker.move(frames=prefs.retime_frameoffset)
+                bpy.ops.marker.select_all(action='DESELECT')
+                break
 
     # Add to end frame range
     dprint("Extending frame range")
@@ -321,7 +326,6 @@ def retime_keys():
     # Cleanup
     dprint("Cleaning up selections")
     bpy.ops.action.select_all(action='DESELECT')
-    #bpy.ops.marker.select_all(action='DESELECT')
     bpy.ops.object.mode_set(mode=old_mode)
     area.type = old_type
     dprint("Done")

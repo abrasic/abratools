@@ -81,8 +81,8 @@ class ABRA_OT_retimepanel(bpy.types.Operator):
     def draw(self, context):
         prefs = api.get_preferences()
         layout = self.layout
-        layout.prop(prefs, "retime_framestart")
-        layout.prop(prefs, "retime_frameoffset")
+        layout.prop(prefs, "retime_framestart", icon="TRIA_DOWN_BAR")
+        layout.prop(prefs, "retime_frameoffset", icon="TRACKING_FORWARDS_SINGLE")
         layout.separator()
         layout.prop(prefs,"retime_onlyvisible")
         layout.prop(prefs,"retime_hiddenobjects")
