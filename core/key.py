@@ -137,6 +137,7 @@ class ABRA_OT_key_timing(bpy.types.Operator):
                 # Copy Timing from non-active object
                 api.dprint("Copying timing from non-active")
                 frameKeys = []
+                frange = api.get_frame_range()
                 for bone in bones:
                     if bone != context.active_pose_bone:
                         api.dprint("Copying frames from bone: "+str(bone.name))
@@ -145,7 +146,7 @@ class ABRA_OT_key_timing(bpy.types.Operator):
                             api.dprint("=== ITERATING CHANNEL: "+i.data_path)
                             i.select = True
                             for x in i.keyframe_points:
-                                if x.co[0] > context.scene.frame_start and x.co[0] < context.scene.frame_end:
+                                if x.co[0] > frange[0] and x.co[0] < frange[1]:
                                     x.select_control_point=True
                                     if x.co[0] not in frameKeys:
                                         frameKeys.append(x.co[0])
@@ -745,8 +746,13 @@ class ABRA_OT_range_to_selection(bpy.types.Operator):
         range = api.get_range_from_selected_keys()
 
         if range[0] != range[1]:
-            bpy.context.scene.frame_start = int(range[0])
-            bpy.context.scene.frame_end = int(range[1])
+            prefs = api.get_preferences()
+            if prefs.use_preview_range and context.scene.use_preview_range:
+                bpy.context.scene.frame_preview_start = int(range[0])
+                bpy.context.scene.frame_preview_end = int(range[1])
+            else:
+                bpy.context.scene.frame_start = int(range[0])
+                bpy.context.scene.frame_end = int(range[1])
             
         area.type = old_type
         return {"FINISHED"}
@@ -784,8 +790,13 @@ class ABRA_OT_range_to_markers(bpy.types.Operator):
             if not marker_check[0]:
                 frame_range[0] = current_frame
                 
-            context.scene.frame_start = frame_range[0]
-            context.scene.frame_end = frame_range[1] - 1
+            prefs = api.get_preferences()
+            if prefs.use_preview_range and context.scene.use_preview_range:
+                context.scene.frame_preview_start = frame_range[0]
+                context.scene.frame_preview_end = frame_range[1] - 1
+            else:
+                context.scene.frame_start = frame_range[0]
+                context.scene.frame_end = frame_range[1] - 1
             
         area.type = old_type
         return {"FINISHED"}

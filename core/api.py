@@ -30,7 +30,12 @@ def dprint(text, col=None):
         print(color + 'ABRATOOLS DEBUG:' + '\x1b[0m ' + text)
 
 def get_frame_range():
-    return [bpy.context.scene.frame_start, bpy.context.scene.frame_end]
+    prefs = get_preferences()
+
+    if prefs.use_preview_range and bpy.context.scene.use_preview_range:
+        return [bpy.context.scene.frame_preview_start, bpy.context.scene.frame_preview_end]
+    else:
+        return [bpy.context.scene.frame_start, bpy.context.scene.frame_end]
 
 def get_current_frame():
     return bpy.context.scene.frame_current

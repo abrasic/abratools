@@ -411,6 +411,12 @@ def prefsBodyWrite(self, context):
 
         col.separator()
 
+        col.label(text="Tool Behaviour", icon="PROPERTIES")
+        toolBox = col.box()
+        toolBox.prop(prefs, "use_preview_range")
+        
+        col.separator()
+
         col.label(text="Dependencies", icon="LIGHTPROBE_CUBEMAP")
         addonsBox = col.box()
         addonsBox.label(text="Some tools require third-party addons in order to use.", icon="INFO")

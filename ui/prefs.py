@@ -356,6 +356,12 @@ class AbraToolsPrefs(AddonPreferences):
         description = "Changes the maximum width of panels in the menu"
     )
 
+    use_preview_range: bpy.props.BoolProperty(
+        name = "Use Preview Range",
+        default = False,
+        description = "Certain tools utilize the current frame range for their tasks. When this is enabled, it will utilize the preview range instead, so long as it's available"
+    )
+
     dev_debug: bpy.props.BoolProperty(
         name = "Debug Mode",
         default = False,
