@@ -29,6 +29,7 @@ ic_key_all_shapes = ic["key_all_shapes"]
 ic_key_selected = ic["key_selected"]
 ic_key_visible = ic["key_visible"]
 ic_key_whole_armature = ic["key_whole_armature"]
+ic_orient_switcher = ic["orient_switcher"]
 ic_paste_keys = ic["paste_keys"]
 ic_paste_pose = ic["paste_pose"]
 ic_range_to_selection = ic["range_to_selection"]
@@ -261,6 +262,8 @@ def prefsHeaderWrite(self, context):
         layout.operator(key.ABRA_OT_select_siblings.bl_idname, text='', icon_value=ic_select_siblings.icon_id)
     if (prefs.vis_selmirror): 
         layout.operator(key.ABRA_OT_select_mirror.bl_idname, text='', icon_value=ic_select_mirror.icon_id)
+    if (prefs.vis_orient_switcher): 
+        layout.operator(key.ABRA_OT_orient_switcher.bl_idname, text='', icon_value=ic_orient_switcher.icon_id)
     if (prefs.vis_cursortosel): 
         layout.operator(key.ABRA_OT_cursor_to_selected.bl_idname, text='', icon_value=ic_cursor_to_selected.icon_id)
     if (prefs.vis_cursor_gizmo):
@@ -372,6 +375,7 @@ def prefsBodyWrite(self, context):
         col.prop(prefs, "vis_selparent", icon_value=ic_select_parent.icon_id)
         col.prop(prefs, "vis_selsiblings", icon_value=ic_select_siblings.icon_id)
         col.prop(prefs, "vis_selmirror", icon_value=ic_select_mirror.icon_id)
+        col.prop(prefs, "vis_orient_switcher", icon_value=ic_orient_switcher.icon_id)
         col.prop(prefs, "vis_cursor_gizmo", icon_value=ic_cursor_gizmo.icon_id)
         col.prop(prefs, "vis_cursortosel", icon_value=ic_cursor_to_selected.icon_id)
         col.prop(prefs, "vis_toggle_cursor", icon_value=ic_toggle_cursor_pivot.icon_id)

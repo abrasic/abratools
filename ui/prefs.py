@@ -3,9 +3,8 @@ from os.path import basename, dirname
 from bpy.types import AddonPreferences
 from bpy.props import IntProperty, StringProperty, EnumProperty, BoolProperty
 
-from ..core import key, quickView
+from ..core import key, quickView, api
 from . import toolshelf
-
 class AbraToolsPrefs(AddonPreferences):
     bl_idname = basename(dirname(dirname(__file__)))
     toolshelf_pages: EnumProperty(
@@ -106,7 +105,7 @@ class AbraToolsPrefs(AddonPreferences):
     vis_goto_left: BoolProperty(
         name = quickView.ABRA_OT_goto_keyframe_left.bl_label,
         description = quickView.ABRA_OT_goto_keyframe_left.bl_description,
-        default = True
+        default = False
     )
 
     vis_goto_right: BoolProperty(
@@ -230,6 +229,28 @@ class AbraToolsPrefs(AddonPreferences):
     cursor_gizmo: BoolProperty(
         name = "Cursor Gizmo Enabled",
         description = "For internal use. Checks if user enabled Cursor Gizmo",
+        default = False
+    )
+    
+    vis_available_axes: EnumProperty(
+        name = "Toggleable Axes",
+        description= "List of Axes to add to the toggle",
+        items = (
+            ("GLOBAL", "Global", ""),
+            ("LOCAL", "Local", ""),
+            ("NORMAL", "Normal", ""),
+            ("GIMBAL", "Gimbal", ""),
+            ("VIEW", "View", ""),
+            ("CURSOR", "Cursor", ""),
+            ("PARENT", "Parent", ""),
+        ),
+        default = {"GLOBAL", "LOCAL", "NORMAL"},
+        options = {"ENUM_FLAG"},
+    )
+
+    vis_orient_switcher: BoolProperty(
+        name = key.ABRA_OT_orient_switcher.bl_label,
+        description = key.ABRA_OT_orient_switcher.bl_description,
         default = False
     )
 

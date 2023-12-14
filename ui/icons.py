@@ -24,6 +24,7 @@ icons.load("key_all_shapes", os.path.join(icons_dir, "key_all_shapes.png"), 'IMA
 icons.load("key_selected", os.path.join(icons_dir, "key_selected.png"), 'IMAGE')
 icons.load("key_visible", os.path.join(icons_dir, "key_visible.png"), 'IMAGE')
 icons.load("key_whole_armature", os.path.join(icons_dir, "key_whole_armature.png"), 'IMAGE')
+icons.load("orient_switcher", os.path.join(icons_dir, "orient_switcher.png"), 'IMAGE')
 icons.load("paste_keys", os.path.join(icons_dir, "paste_keys.png"), 'IMAGE')
 icons.load("paste_pose", os.path.join(icons_dir, "paste_pose.png"), 'IMAGE')
 icons.load("range_to_selection", os.path.join(icons_dir, "range_to_selection.png"), 'IMAGE')

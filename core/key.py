@@ -459,7 +459,51 @@ class ABRA_OT_select_mirror(bpy.types.Operator):
         else:
             self.report({"INFO"}, "Currently only supports Pose Mode")
         return {"FINISHED"}
+class ABRA_OT_orient_switcher(bpy.types.Operator):
+    bl_idname = "screen.at_orient_switcher"
+    bl_label = "Orient Switcher"
+    bl_description = "Quickly switch to your preferred orientation axes. Shift + Click this tool to change which orientations you'd like to switch from"
+    bl_options = {"REGISTER", "UNDO"}
 
+    def invoke(self, context, event):
+
+        if event.shift:
+            bpy.ops.message.axispanel("INVOKE_DEFAULT")
+        else:
+            prefs = api.get_preferences()
+            try:
+                bpy.context.scene.transform_orientation_slots[0].type = "" # Hacky way to get all orientations. This should fail every time
+            except Exception as e:
+                ax = []
+                ay = []
+                s = str(e).split("in ")[1].strip("()").split(', ') # Grab available axes from error
+                for t in s:
+                    ax.append(t.strip("'"))
+
+                current = context.scene.transform_orientation_slots[0].type
+
+                # For some reason the EnumProperty value returns the the selected types out-of-order. 
+                # The array needs to be sorted how they are shown in the panel, so for now we have to do it this way lol
+                for a in ax:
+                    if a in prefs.vis_available_axes:
+                        ay.append(a)
+                api.dprint(f"Ordered: {str(ay)}")
+
+                for i, item in enumerate(ay):
+                    if current == item:
+                        try:
+                            context.scene.transform_orientation_slots[0].type = ay[i+1]
+                            break
+                        except:
+                            bpy.context.scene.transform_orientation_slots[0].type = ay[0]
+                            break
+                    else:
+                        bpy.context.scene.transform_orientation_slots[0].type = ay[0]
+
+                self.report({"INFO"}, bpy.context.scene.transform_orientation_slots[0].type)
+
+        return {"FINISHED"}
+    
 class ABRA_OT_cursor_to_selected(bpy.types.Operator):
     bl_idname = "screen.at_cursor_to_selected"
     bl_label = "Cursor to Selected"
@@ -881,6 +925,7 @@ ABRA_OT_select_parent,
 ABRA_OT_select_mirror,
 ABRA_OT_selection_sets,
 ABRA_OT_swap_rig_mode,
+ABRA_OT_orient_switcher,
 ABRA_OT_cursor_to_selected,
 ABRA_OT_cursor_gizmo,
 ABRA_OT_toggle_cursor_pivot,

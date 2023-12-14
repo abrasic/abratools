@@ -302,10 +302,29 @@ class ABRA_OT_selsetspanel(bpy.types.Operator):
         else:
             layout.label(text="Please enable 'Bone Selection Sets' addon to use")
 
+class ABRA_OT_axispanel(bpy.types.Operator):
+    bl_label = "Orientations"
+    bl_idname = "message.axispanel"
+ 
+    def execute(self, context):
+        return {'FINISHED'}
+ 
+    def invoke(self, context, event):
+        return context.window_manager.invoke_props_dialog(self, width = 90)
+ 
+    def draw(self, context):
+        prefs = api.get_preferences()
+
+        layout = self.layout.row()
+        colLeft = layout.column()
+
+        colLeft.prop(prefs, "vis_available_axes")
+
 cls = (ABRA_OT_mpathpanel,
 ABRA_OT_selsetspanel,
 ABRA_OT_retimepanel,
 ABRA_OT_bakepanel,
+ABRA_OT_axispanel,
 Set_Selector,
 Set_Selector_Vars,
 Rename_Set,
