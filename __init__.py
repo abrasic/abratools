@@ -7,11 +7,11 @@ bl_info = {
     'location' : '3D Viewport or Preferences > Header > aT',
     'category': 'Animation',
     'warning': 'beta2 | This is a beta version of AbraTools',
-    'doc_url': 'https://docs.abx.gg/support/download-and-setup',
+    'doc_url': 'https://docs.abx.gg/',
     'tracker_url': 'https://github.com/abrasic/abratools',
 }
 
-import bpy, os, importlib.util
+import bpy, os, importlib.util, time
 from .core import key, quickView, customScripts
 from .ui import prefs, panels, toolshelf
 ################################
@@ -21,6 +21,7 @@ icons_coll = {}
 addon_keymaps = []
 
 def register():
+    atime = time.time()
     bpy.context.preferences.themes[0].preferences.space.header = bpy.context.preferences.themes[0].text_editor.space.header ## Temporary
     
     for cls in classes:
@@ -53,7 +54,7 @@ def register():
         kmi = km.keymap_items.new(quickView.ABRA_OT_overlay_func.bl_idname, 'SPACE', 'RELEASE')
         addon_keymaps.append((km, kmi))
 
-    print("[aT] AbraTools is now running")
+    print(f"[aT] AbraTools started in {(time.time() - atime)} seconds")
 
 def unregister():
     bpy.context.preferences.themes[0].preferences.space.header = toolshelf.prefsOldHeaderCol
