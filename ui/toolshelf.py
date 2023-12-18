@@ -16,7 +16,6 @@ ic_auto_frame = ic["auto_frame"]
 ic_bake_on_nths = ic["bake_on_nths"]
 ic_copy_keys = ic["copy_keys"]
 ic_copy_pose = ic["copy_pose"]
-ic_key_timing = ic["copy_key_timing"]
 ic_create_path = ic["create_path"]
 ic_cursor_gizmo = ic["cursor_gizmo"]
 ic_cursor_to_selected = ic["cursor_to_selected"]
@@ -35,6 +34,8 @@ ic_paste_pose = ic["paste_pose"]
 ic_range_to_selection = ic["range_to_selection"]
 ic_range_to_markers = ic["range_to_markers"]
 ic_retime_scene = ic["retime_scene"]
+ic_share_active = ic["share_active"]
+ic_share_common = ic["share_common"]
 ic_select_children = ic["select_children"]
 ic_select_mirror = ic["select_mirror"]
 ic_select_parent = ic["select_parent"]
@@ -231,8 +232,10 @@ def prefsHeaderWrite(self, context):
         layout.operator_context = "INVOKE_DEFAULT"
         layout.operator(key.ABRA_OT_bake_keys.bl_idname, text='', icon_value=ic_bake_on_nths.icon_id)
         layout.operator_context = "EXEC_DEFAULT"
-    if (prefs.vis_keytiming): 
-        layout.operator(key.ABRA_OT_key_timing.bl_idname, text='', icon_value=ic_key_timing.icon_id)
+    if (prefs.vis_share_active): 
+        layout.operator(key.ABRA_OT_share_active_key_timing.bl_idname, text='', icon_value=ic_share_active.icon_id)
+    if (prefs.vis_share_common): 
+        layout.operator(key.ABRA_OT_share_common_key_timing.bl_idname, text='', icon_value=ic_share_common.icon_id)
     if (prefs.vis_keyshape): 
         layout.operator(key.ABRA_OT_key_shapekeys.bl_idname, text='', icon_value=ic_key_all_shapes.icon_id)
     if (prefs.vis_keyarmature): 
@@ -358,7 +361,8 @@ def prefsBodyWrite(self, context):
         col.prop(prefs, "vis_keypastepose", icon_value=ic_paste_pose.icon_id)
         col.prop(prefs, "vis_keydelete", icon_value=ic_delete_keys.icon_id)
         col.prop(prefs, "vis_keybake", icon_value=ic_bake_on_nths.icon_id)
-        col.prop(prefs, "vis_keytiming", icon_value=ic_key_timing.icon_id)
+        col.prop(prefs, "vis_share_active", icon_value=ic_share_active.icon_id)
+        col.prop(prefs, "vis_share_common", icon_value=ic_share_common.icon_id)
         col.prop(prefs, "vis_keyshape", icon_value=ic_key_all_shapes.icon_id)
         col.prop(prefs, "vis_keyarmature", icon_value=ic_key_whole_armature.icon_id)
         col.prop(prefs, "vis_keyretime", icon_value=ic_retime_scene.icon_id)
@@ -418,20 +422,12 @@ def prefsBodyWrite(self, context):
         col.label(text="Tool Behaviour", icon="PROPERTIES")
         toolBox = col.box()
         toolBox.prop(prefs, "use_preview_range")
+        toolBox.prop(prefs, "fcurve_scan_limit")
         
         col.separator()
 
         col.label(text="Dependencies", icon="LIGHTPROBE_CUBEMAP")
         addonsBox = col.box()
-        addonsBox.label(text="Some tools require third-party addons in order to use.", icon="INFO")
-        addonsBox.label(text="We are not affiliated nor endorsed by these addons", icon="INFO")
-
-        addon = addonsBox.grid_flow(columns=2)
-        if api.is_addon_enabled("AnimCopy"):
-            addon.label(text="Animcopy (INSTALLED)", icon="CHECKBOX_HLT")
-        else:
-            addon.label(text="Animcopy", icon="CHECKBOX_DEHLT")
-        addon.operator("wm.url_open", text="By Blastframe | Click to Buy", icon="URL").url = "https://blendermarket.com/products/animcopy"
 
         addon = addonsBox.grid_flow(columns=2)
         if api.is_addon_enabled("copy_global_transform"):

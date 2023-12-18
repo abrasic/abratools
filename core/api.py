@@ -362,14 +362,14 @@ def use_oss():
         if area.type == 'GRAPH_EDITOR':
             for space in area.spaces:
                 if space.type == "GRAPH_EDITOR":
-                    print("Detected graph editor with: "+ str(space.dopesheet.show_only_selected))
+                    api.dprint("Detected graph editor with: "+ str(space.dopesheet.show_only_selected))
                     if space.dopesheet.show_only_selected == False:
                         use_selected = False
                         break
         elif area.type == 'DOPESHEET_EDITOR':
             for space in area.spaces:
                 if space.type == "DOPESHEET_EDITOR":
-                    print("Detected dope sheet with: "+ str(space.dopesheet.show_only_selected))
+                    api.dprint("Detected dope sheet with: "+ str(space.dopesheet.show_only_selected))
                     if space.dopesheet.show_only_selected == False:
                         reveal_curves = True
                         use_selected = False
@@ -413,3 +413,18 @@ def get_custom_scripts():
                 pass
             
     return files
+
+def fcurve_overload(fcurves):
+    """Returns bool. True if F-Curve/array length exceeds user-specified scan limit. """
+    prefs = get_preferences()
+    if prefs.fcurve_scan_limit == 0:
+        return False
+    elif len(fcurves) > prefs.fcurve_scan_limit:
+        return True
+    else:
+        return False
+        
+def select_keys_in_range(min,max):
+    bpy.ops.graph.select_box(mode="SET",xmin=min-1,xmax=max+1,ymin=-2**30,ymax=2**30, include_handles=False, use_curve_selection=True)
+    return None
+

@@ -164,9 +164,15 @@ class AbraToolsPrefs(AddonPreferences):
         default = True,
     )
 
-    vis_keytiming: BoolProperty(
-        name = key.ABRA_OT_key_timing.bl_label,
-        description = key.ABRA_OT_key_timing.bl_description,
+    vis_share_active: BoolProperty(
+        name = key.ABRA_OT_share_active_key_timing.bl_label,
+        description = key.ABRA_OT_share_active_key_timing.bl_description,
+        default = True
+    )
+
+    vis_share_common: BoolProperty(
+        name = key.ABRA_OT_share_common_key_timing.bl_label,
+        description = key.ABRA_OT_share_common_key_timing.bl_description,
         default = True
     )
     
@@ -381,6 +387,13 @@ class AbraToolsPrefs(AddonPreferences):
         name = "Use Preview Range",
         default = False,
         description = "Certain tools utilize the current frame range for their tasks. When this is enabled, it will utilize the preview range instead, so long as it's available"
+    )
+
+    fcurve_scan_limit: bpy.props.IntProperty(
+        name = "F-Curve Scan Limit",
+        default = 0,
+        description = "Prevents software hanging by blocking execution for specific tools that are looping through an exceeded amount of F-Curves (ex. Go To Previous/Next Keyframe). 0 disables this option.",
+        min = 0
     )
 
     dev_debug: bpy.props.BoolProperty(

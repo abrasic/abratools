@@ -114,65 +114,120 @@ class ABRA_OT_key_delete(bpy.types.Operator):
         api.key_clipboard(self, type="delete")
         return {"FINISHED"}
 
-class ABRA_OT_key_timing(bpy.types.Operator):
-    bl_idname = "screen.at_copy_key_timing"
-    bl_label = "Copy Key Timing *"
-    bl_description = "* 'Animcopy' addon required. Select two bones, where the active bone will share the key timing of the other"
+class ABRA_OT_share_common_key_timing(bpy.types.Operator):
+    bl_idname = "screen.at_common_key_timing"
+    bl_label = "Share Common Key Timing"
+    bl_description = "Inserts keys onto selected objects that will match the common timing between eachother"
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
-        if api.is_addon_enabled("AnimCopy") and bpy.context.mode == "POSE":
-            api.dprint("Addon detected", col="green")
-            bones = bpy.context.selected_pose_bones
-            api.dprint("Selected bones: "+str(len(bones)))
-            if len(bones) == 2:
-                api.dprint("Two bones selected. Starting copier...", col="green")
-                area = context.area
-                old_type = area.type
-                area.type = 'GRAPH_EDITOR'
-                obj = context.object
-                action = obj.animation_data.action
-                bpy.ops.graph.select_all(action='DESELECT')
+        prefs = api.get_preferences()
+        area = bpy.context.area
+        old = area.type
+        area.type = 'GRAPH_EDITOR'
 
-                # Copy Timing from non-active object
-                api.dprint("Copying timing from non-active")
-                frameKeys = []
-                frange = api.get_frame_range()
-                for bone in bones:
-                    if bone != context.active_pose_bone:
-                        api.dprint("Copying frames from bone: "+str(bone.name))
-                        boneAction = action.groups.get(bone.name)
-                        for i in boneAction.channels:
-                            api.dprint("=== ITERATING CHANNEL: "+i.data_path)
-                            i.select = True
-                            for x in i.keyframe_points:
-                                if x.co[0] > frange[0] and x.co[0] < frange[1]:
-                                    x.select_control_point=True
-                                    if x.co[0] not in frameKeys:
-                                        frameKeys.append(x.co[0])
-                                else:
-                                    x.select_control_point=False
-                        api.dprint("FINAL FRAMES TO COPY:", col="blue")
-                        api.dprint(str(frameKeys), col="blue")
+        range = api.get_frame_range()
+        area.spaces[0].dopesheet.show_only_selected = True
 
-                        bpy.ops.graph.copy_timing_and_ease()
-                        bpy.ops.graph.select_all(action='DESELECT')
-                        context.active_object.data.bones[bone.name].select = False
+        bpy.ops.graph.reveal()
+        curves = api.get_visible_fcurves()
 
-                # Paste timing from active object
-                for bone in bones:
-                    if bone == context.active_pose_bone:
-                        boneAction = action.groups.get(bone.name)
-                        for i in boneAction.channels:
-                            i.select = True
-                            bpy.ops.graph.paste_timing()
-                
-                area.type = old_type
-            else:
-                self.report({"INFO"}, "Select exactly two bones")
+        # Grab frame numbers that contain keys in current range
+        timings = []
+
+        if not api.fcurve_overload(curves):
+            for curve in curves:
+                for key in curve.keyframe_points:
+                    co = key.co.x
+                    if co not in timings and co >= range[0] and co <= range[1]:
+                        timings.append(co)
+
+            for curve in curves:
+                for i, time in enumerate(timings):
+                    curve.keyframe_points.insert(frame=time, value = curve.evaluate(int(time)))
         else:
-            self.report({"INFO"}, "Required addon is not installed")
+            area.type = old
+            self.report({"ERROR"}, f"Preventing overload ({prefs.fcurve_scan_limit} FCurves max, {len(curves)} active)")
+        area.type = old
+
+        return{"FINISHED"}
+
+class ABRA_OT_share_active_key_timing(bpy.types.Operator):
+    bl_idname = "screen.at_active_key_timing"
+    bl_label = "Share Active Key Timing"
+    bl_description = "Adds keys onto selected objects that will match the timing of the active object"
+    bl_options = {"REGISTER", "UNDO"}
+
+    def execute(self, context):
+        prefs = api.get_preferences()
+        area = bpy.context.area
+        old = area.type
+        area.type = 'GRAPH_EDITOR'
+        range = api.get_frame_range()
+        area.spaces[0].dopesheet.show_only_selected = True
+
+        active = []
+        objs = []
+        active_curves = []
+        non_active_curves = []
+
+        if bpy.context.mode == "OBJECT":
+            active = bpy.context.active_object
+            objs = bpy.context.selected_objects
+
+            try:
+                active_curves = active.animation_data.action.fcurves
+            except AttributeError:
+                return {"CANCELLED"}
+
+            for ob in objs:
+                if ob != active:
+                    for fcurve in ob.animation_data.action.fcurves:
+                        non_active_curves.append(fcurve)
+
+        elif bpy.context.mode == "POSE":
+            active = bpy.context.active_pose_bone
+            objs = bpy.context.selected_pose_bones
+
+            arm_list = []
+            for ob in bpy.context.selected_objects:
+                if ob.type == "ARMATURE":
+                    for fcurve in ob.animation_data.action.fcurves:
+                        arm_list.append(fcurve)          
+
+            active_curves = [f for f in arm_list if active.name in f.data_path.split('"')[1]]
+
+            bone_names_list = [b.name for b in objs if b != active]
+            non_active_curves = [f for f in arm_list if f.data_path.split('"')[1] in bone_names_list]
+
+        timings = [] 
+        if not api.fcurve_overload(active_curves + non_active_curves):
+            for curve in active_curves: # Keyframe numbers from active object
+                for key in curve.keyframe_points:
+                    co = key.co.x
+                    if co not in timings and co >= range[0] and co <= range[1]:
+                        timings.append(co)
+
+            for curve in non_active_curves: # Non-active object curves
+                for time in timings:
+                    curve.keyframe_points.insert(frame=time, value = curve.evaluate(int(time)))
+        else:
+            area.type = old
+            self.report({"ERROR"}, f"Preventing overload ({prefs.fcurve_scan_limit} FCurves max, {len(active_curves + non_active_curves)} active)")   
+
+        if bpy.context.mode == "OBJECT":
+            bpy.ops.object.select_all(action='DESELECT')
+            objs[-1].select_set(True)   
+            bpy.context.view_layer.objects.active = objs[-1].bone
+        elif bpy.context.mode == "POSE":
+            bpy.ops.pose.select_all(action='DESELECT')
+            for ob in objs:
+                if ob != active:
+                    ob.bone.select = True
+
+        area.type = old
         return {"FINISHED"}
+
 
 class ABRA_OT_key_shapekeys(bpy.types.Operator):
     bl_idname = "screen.at_key_shapes_all"
@@ -433,7 +488,6 @@ class ABRA_OT_select_parent(bpy.types.Operator):
                             p_iter = False
                             while p_iter == False:
                                 parent = parent.parent
-                                print(parent)
                                 if parent:
                                     if api.is_bone_visible(parent.bone, active_layers):
                                         parent.bone.select = True
@@ -914,7 +968,8 @@ ABRA_OT_key_paste,
 ABRA_OT_key_copy_pose,
 ABRA_OT_key_paste_pose,
 ABRA_OT_key_delete,
-ABRA_OT_key_timing,
+ABRA_OT_share_active_key_timing,
+ABRA_OT_share_common_key_timing,
 ABRA_OT_key_shapekeys,
 ABRA_OT_key_armature,
 ABRA_OT_key_retime,

@@ -89,7 +89,7 @@ def isolate_quick(self, context):
     viscurves = api.get_visible_fcurves()
     api.dprint(viscurves,col="red")
     if prefs.isolate_curves and viscurves is not None:
-        print("OK")
+        pass
 
 class ABRA_OT_isolate_curves(bpy.types.Operator):
     bl_idname = "screen.at_isolate_curves"
@@ -154,6 +154,7 @@ class ABRA_OT_goto_keyframe_right(bpy.types.Operator):
     bl_options = {"REGISTER"}
 
     def execute(self, context):
+        use_oss = api.use_oss()[0]
         area = bpy.context.area
         old = area.type
         area.type = 'GRAPH_EDITOR'
@@ -162,17 +163,17 @@ class ABRA_OT_goto_keyframe_right(bpy.types.Operator):
         curves = api.get_selected_fcurves()
         current_frame_init = bpy.context.scene.frame_current
 
-        if not curves:
-            curves = api.get_visible_fcurves()
+        bpy.context.space_data.dopesheet.show_only_selected = use_oss
 
         if curves:
-            if len(curves) <= 50:
+            if not api.fcurve_overload(curves):
                 # THIS CODE IS DISGUSTING
                 nearest = large_number = 2**30
                 ranged = False
                 move_range = [-2**30, 2**30]
 
                 api.dprint("GOTO RIGHT STARTED", col="green")
+
                 for curve in curves:
                     selected_keys = api.get_selected_keys(curve)
                     
@@ -247,9 +248,11 @@ class ABRA_OT_goto_keyframe_right(bpy.types.Operator):
                     bpy.ops.graph.select_box(mode="SUB",axis_range=True, xmin=-2**30,xmax=2**30,ymin=-2**30,ymax=2**30, include_handles=False, wait_for_input=False)   
                     api.select_keys_on_column(selected_only=True)
             else:
-                self.report({"ERROR"}, f"Preventing overload (50 FCurves max, {len(curves)} active)")
+                prefs = api.get_preferences()
+                self.report({"ERROR"}, f"Preventing overload ({prefs.fcurve_scan_limit} FCurves max, {len(curves)} active)")
         else:
-            self.report({"INFO"}, "Unable to jump. Are FCurves visible? Is 'Only Show Selected' on?")
+            if api.get_visible_fcurves():
+                bpy.ops.graph.keyframe_jump(next=True)
 
         area.type = old
                 
@@ -262,6 +265,7 @@ class ABRA_OT_goto_keyframe_left(bpy.types.Operator):
     bl_options = {"REGISTER"}
 
     def execute(self, context):
+        use_oss = api.use_oss()[0]
         area = bpy.context.area
         old = area.type
         area.type = 'GRAPH_EDITOR'
@@ -270,11 +274,10 @@ class ABRA_OT_goto_keyframe_left(bpy.types.Operator):
         curves = api.get_selected_fcurves()
         current_frame_init = bpy.context.scene.frame_current
 
-        if not curves:
-            curves = api.get_visible_fcurves()
+        bpy.context.space_data.dopesheet.show_only_selected = use_oss
 
         if curves:
-            if len(curves) <= 50:
+            if not api.fcurve_overload(curves):
                 # THIS CODE IS STILL DISGUSTING
                 nearest = large_number = -2**30
                 ranged = False
@@ -355,9 +358,11 @@ class ABRA_OT_goto_keyframe_left(bpy.types.Operator):
                     bpy.ops.graph.select_box(mode="SUB",axis_range=True, xmin=-2**30,xmax=2**30,ymin=-2**30,ymax=2**30, include_handles=False, wait_for_input=False)   
                     api.select_keys_on_column(selected_only=True)
             else:
-                self.report({"ERROR"}, f"Preventing overload (50 FCurves max, {len(curves)} active)")
+                prefs = api.get_preferences()
+                self.report({"ERROR"}, f"Preventing overload ({prefs.fcurve_scan_limit} FCurves max, {len(curves)} active)")
         else:
-            self.report({"INFO"}, "Unable to jump. Are FCurves visible? Is 'Only Show Selected' on?")
+            if api.get_visible_fcurves():
+                bpy.ops.graph.keyframe_jump(next=False)
 
         area.type = old
                 
