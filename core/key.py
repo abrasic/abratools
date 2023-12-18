@@ -302,7 +302,7 @@ class ABRA_OT_bake_keys(bpy.types.Operator):
 
             # Get data ready for bake
             prefs = api.get_preferences()
-            range = api.get_frame_range()
+            frange = api.get_frame_range()
             frame_const = bpy.context.scene.frame_current
             step = prefs.bake_framestep
 
@@ -320,13 +320,15 @@ class ABRA_OT_bake_keys(bpy.types.Operator):
                 return {"CANCELLED"}
 
             # Begin inserting keyframes by moving playhead on every nth frame until playhead reaches end of range.
-            api.dprint("BAKING RANGE ("+str(range[0])+"-"+str(range[1])+")", col="red")
+            api.dprint("BAKING RANGE ("+str(frange[0])+"-"+str(frange[1])+")", col="red")
+
             # Deselect for interpolation change later
             bpy.ops.graph.select_all(action='DESELECT')
 
             # NLA Bake
             bpy.ops.graph.reveal()
-            bpy.ops.nla.bake(frame_start=range[0], frame_end=range[1], bake_types={bpy.context.mode}, use_current_action = True, clean_curves=False)
+            api.dprint(f"frame_start= {frange[0]}, frame_end={frange[1]}, bake_types={bpy.context.mode}, use_current_action = True, clean_curves=False")
+            bpy.ops.nla.bake(frame_start=frange[0], frame_end=frange[1], bake_types={bpy.context.mode}, use_current_action = True, clean_curves=False)
 
             # Change interpolation type of new keys
             bpy.ops.graph.interpolation_type(type=prefs.bake_type)
@@ -336,34 +338,31 @@ class ABRA_OT_bake_keys(bpy.types.Operator):
             bpy.ops.graph.select_all(action='DESELECT')
 
             api.dprint("Initial bake complete. Moving to range start")
-            bpy.context.scene.frame_current = range[0]
-            ref = bpy.context.scene.frame_current
 
-            wm = bpy.context.window_manager
-            wm.progress_begin(range[0], range[1])
-            while bpy.context.scene.frame_current < range[1]:
-                s = 0
-                bpy.context.scene.frame_current+=1
-                wm.progress_update(bpy.context.scene.frame_current)
-                s += bpy.context.scene.frame_current - ref
-                if s == 0:
-                    api.dprint("There are no more keyframes left to bake", col="yellow")
-                    break
-                api.dprint("Playhead jumped to frame " + str(bpy.context.scene.frame_current) + " with a total offset of "+ str(s))
-                if s % step == 0:
-                    api.dprint("Current frame is divisible. Skipping...")
-                else:
-                    api.dprint("Current frame is NOT divisible. Deleting keys on "+str(bpy.context.scene.frame_current)+")", col="yellow")
-                    bpy.ops.graph.select_column(mode='CFRA')
-                    bpy.ops.graph.delete(confirm=False)
-            wm.progress_end()
+            if step > 1:
+
+                # Create an array containing frame numbers within range
+                frames_to_remove = list(range(frange[0], frange[1]))
+
+                # Remove frames from step
+                for frame in frames_to_remove:
+                    s = 0
+                    s += frame - (frange[0]-1)
+                    if s % step != 0:
+                        frames_to_remove.remove(frame)
+
+                api.dprint(f"Frames to delete: {frames_to_remove}")
+                # Delete keys from array
+                for curve in api.get_visible_fcurves():
+                    for frame in frames_to_remove:
+                        curve.keyframe_points.remove(curve.keyframe_points[api.get_key_index_at_frame(curve, frame)])
 
             bpy.context.scene.frame_current = frame_const
 
-            # Remove overalpping keys incase of a double bake (dumb workaround)
-            bpy.ops.graph.select_all(action='SELECT')
-            bpy.ops.graph.clean(threshold=0) 
-            bpy.ops.graph.select_all(action='DESELECT')
+            # Remove overlapping keys incase of a double bake (dumb workaround, will remove keys with static values)
+            # bpy.ops.graph.select_all(action='SELECT')
+            # bpy.ops.graph.clean(threshold=0) 
+            # bpy.ops.graph.select_all(action='DESELECT')
 
             area.type = old_type
             api.dprint("Bake should be complete", col="green")
