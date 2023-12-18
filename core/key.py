@@ -135,6 +135,10 @@ class ABRA_OT_share_common_key_timing(bpy.types.Operator):
         # Grab frame numbers that contain keys in current range
         timings = []
 
+        if not curves:
+            area.type = old
+            return {"CANCELLED"}
+
         if not api.fcurve_overload(curves):
             for curve in curves:
                 for key in curve.keyframe_points:
@@ -148,6 +152,8 @@ class ABRA_OT_share_common_key_timing(bpy.types.Operator):
         else:
             area.type = old
             self.report({"ERROR"}, f"Preventing overload ({prefs.fcurve_scan_limit} FCurves max, {len(curves)} active)")
+            return {"CANCELLED"}
+        
         area.type = old
 
         return{"FINISHED"}
@@ -178,6 +184,7 @@ class ABRA_OT_share_active_key_timing(bpy.types.Operator):
             try:
                 active_curves = active.animation_data.action.fcurves
             except AttributeError:
+                area.type = old
                 return {"CANCELLED"}
 
             for ob in objs:
@@ -192,8 +199,13 @@ class ABRA_OT_share_active_key_timing(bpy.types.Operator):
             arm_list = []
             for ob in bpy.context.selected_objects:
                 if ob.type == "ARMATURE":
-                    for fcurve in ob.animation_data.action.fcurves:
-                        arm_list.append(fcurve)          
+                    try:
+                        for fcurve in ob.animation_data.action.fcurves:
+                            arm_list.append(fcurve)          
+                    except AttributeError:
+                        area.type = old
+                        self.report({"WARNING"}, f"There are no F-Curves available")  
+                        return {"CANCELLED"}
 
             active_curves = [f for f in arm_list if active.name in f.data_path.split('"')[1]]
 
