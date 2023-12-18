@@ -328,7 +328,7 @@ class ABRA_OT_bake_keys(bpy.types.Operator):
             # NLA Bake
             bpy.ops.graph.reveal()
             api.dprint(f"frame_start= {frange[0]}, frame_end={frange[1]}, bake_types={bpy.context.mode}, use_current_action = True, clean_curves=False")
-            bpy.ops.nla.bake(frame_start=frange[0], frame_end=frange[1], bake_types={bpy.context.mode}, use_current_action = True, clean_curves=False)
+            bpy.ops.nla.bake(frame_start=frange[0], frame_end=frange[1], bake_types={bpy.context.mode}, visual_keying=prefs.visual_keying, clear_constraints=prefs.clear_constraints, clear_parents=prefs.clear_parents, use_current_action = True, clean_curves=prefs.clean_curves)
 
             # Change interpolation type of new keys
             bpy.ops.graph.interpolation_type(type=prefs.bake_type)
@@ -352,10 +352,16 @@ class ABRA_OT_bake_keys(bpy.types.Operator):
                         frames_to_remove.remove(frame)
 
                 api.dprint(f"Frames to delete: {frames_to_remove}")
+
                 # Delete keys from array
-                for curve in api.get_visible_fcurves():
+                visible = api.get_visible_fcurves()
+                wm = bpy.context.window_manager
+                wm.progress_begin(0, len(visible))
+                for i, curve in enumerate(visible):
                     for frame in frames_to_remove:
                         curve.keyframe_points.remove(curve.keyframe_points[api.get_key_index_at_frame(curve, frame)])
+                        wm.progress_update(i)
+                wm.progress_end()
 
             bpy.context.scene.frame_current = frame_const
 

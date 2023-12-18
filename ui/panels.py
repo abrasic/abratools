@@ -106,6 +106,12 @@ class ABRA_OT_bakepanel(bpy.types.Operator):
         layout.prop(prefs, "bake_framestep")
         layout.prop(prefs, "bake_type")
         layout.prop(prefs, "bake_handle")
+        layout.separator()
+        layout.prop(prefs, "visual_keying")
+        layout.prop(prefs, "clean_curves")
+        layout.separator()
+        layout.prop(prefs, "clear_constraints")
+        layout.prop(prefs, "clear_parents")
 
 class Set_Selector_Vars(bpy.types.PropertyGroup):
     renaming: bpy.props.BoolProperty(name="renaming", description="", default=False)

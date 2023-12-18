@@ -442,6 +442,30 @@ class AbraToolsPrefs(AddonPreferences):
         min = 1
     )
 
+    visual_keying: BoolProperty(
+        name = "Visual Keying",
+        description = "Bake out final/evaluated transforms, such as from F-Curve modifiers",
+        default = False,
+    )
+
+    clean_curves: BoolProperty(
+        name = "Clean Curves",
+        description = "After baking, redundant/static keys will be removed",
+        default = False,
+    )
+
+    clear_constraints: BoolProperty(
+        name = "Clear Constraints",
+        description = "After baking, constraints on selected objects will be removed",
+        default = False,
+    )
+
+    clear_parents: BoolProperty(
+        name = "Clear Parents",
+        description = "After baking, parents on objects will be cleared",
+        default = False,
+    )
+
     bake_type: EnumProperty(
         name = "Interpolation",
         description = "The type of interpolation that baked keys will use. In most cases, Bezier is recommended",
