@@ -87,7 +87,7 @@ class ABRA_OT_key_copy_pose(bpy.types.Operator):
 
             return {"FINISHED"} 
         else:
-            self.report({"INFO"}, "This tool only works in Pose Mode.")
+            self.report({"INFO"}, "This tool only works in Pose Mode")
             return {"CANCELLED"}
         
 class ABRA_OT_key_paste_pose(bpy.types.Operator):
@@ -101,7 +101,7 @@ class ABRA_OT_key_paste_pose(bpy.types.Operator):
             bpy.ops.pose.paste(flipped=event.shift, selected_mask=True)
             return {"FINISHED"}
         else:
-            self.report({"INFO"}, "This tool only works in Pose Mode.")
+            self.report({"INFO"}, "This tool only works in Pose Mode")
             return {"CANCELLED"}
 
 class ABRA_OT_key_delete(bpy.types.Operator):
@@ -320,14 +320,14 @@ class ABRA_OT_bake_keys(bpy.types.Operator):
 
             # Basic checks
             if api.get_visible_fcurves() is None:
-                self.report({"INFO"}, "At least one F-Curve needs to be visible")
+                self.report({"WARNING"}, f"There are no F-Curves available")
                 area.type = old_type
                 return {"CANCELLED"}
 
             if bpy.context.mode == "POSE" or bpy.context.mode == "OBJECT":
                 pass
             else:
-                self.report({"INFO"}, "Unsupported mode. You must be in either Object or Pose mode.")
+                self.report({"ERROR"}, "This tool only works in Object or Pose Mode")
                 area.type = old_type
                 return {"CANCELLED"}
 
@@ -444,7 +444,7 @@ class ABRA_OT_select_children(bpy.types.Operator):
                                     else:
                                         break
         else:
-            self.report({"INFO"}, "Currently only supports Pose Mode")
+            self.report({"ERROR"}, "This tool only works in Pose Mode")
         return {"FINISHED"}
 
 class ABRA_OT_select_siblings(bpy.types.Operator):
@@ -462,7 +462,7 @@ class ABRA_OT_select_siblings(bpy.types.Operator):
                     for child in parent.children:
                         child.bone.select = True
         else:
-            self.report({"INFO"}, "Currently only supports Pose Mode")
+            self.report({"ERROR"}, "This tool only works in Pose Mode")
         return {"FINISHED"}
 
 class ABRA_OT_select_parent(bpy.types.Operator):
@@ -512,7 +512,7 @@ class ABRA_OT_select_parent(bpy.types.Operator):
                                 else:
                                     break
         else:
-            self.report({"INFO"}, "Currently only supports Pose Mode")
+            self.report({"ERROR"}, "This tool only works in Pose Mode")
         return {"FINISHED"}
 
 class ABRA_OT_select_mirror(bpy.types.Operator):
@@ -528,7 +528,7 @@ class ABRA_OT_select_mirror(bpy.types.Operator):
             else:
                 bpy.ops.pose.select_mirror()
         else:
-            self.report({"INFO"}, "Currently only supports Pose Mode")
+            self.report({"ERROR"}, "This tool only works in Pose Mode")
         return {"FINISHED"}
 class ABRA_OT_orient_switcher(bpy.types.Operator):
     bl_idname = "screen.at_orient_switcher"

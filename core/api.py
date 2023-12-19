@@ -311,15 +311,18 @@ def retime_keys():
     bpy.ops.transform.transform(mode='TIME_TRANSLATE', value=(prefs.retime_frameoffset, 0, 0, 0), orient_axis='X', orient_type='GLOBAL', orient_matrix=((1, 0, 0), (0, 1, 0), (0, 0, 1)), orient_matrix_type='GLOBAL', constraint_axis=(True, False, False))
 
     # Select and transform markers
-    dprint("Moving markers")
-    bpy.ops.marker.select_all(action='DESELECT')
-    bpy.ops.marker.select_leftright(mode='RIGHT')
-    if prefs.retime_markers:
-        for marker in bpy.context.scene.timeline_markers:
-            if marker.select:
-                bpy.ops.marker.move(frames=prefs.retime_frameoffset)
-                bpy.ops.marker.select_all(action='DESELECT')
-                break
+    if len(bpy.context.scene.timeline_markers):
+        dprint("Moving markers")
+        bpy.ops.marker.select_all(action='DESELECT')
+        bpy.ops.marker.select_leftright(mode='RIGHT')
+        if prefs.retime_markers:
+            for marker in bpy.context.scene.timeline_markers:
+                if marker.select:
+                    bpy.ops.marker.move(frames=prefs.retime_frameoffset)
+                    bpy.ops.marker.select_all(action='DESELECT')
+                    break
+    else:
+        dprint("No markers in this scene")
 
     # Add to end frame range
     dprint("Extending frame range")

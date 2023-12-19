@@ -72,7 +72,6 @@ class ABRA_OT_retimepanel(bpy.types.Operator):
  
     def execute(self, context):
         api.retime_keys()
-        self.report({'INFO'}, "Retimed keys")
         return {'FINISHED'}
  
     def invoke(self, context, event):
