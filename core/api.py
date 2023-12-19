@@ -87,8 +87,10 @@ def get_range_from_selected_keys():
                     minimum = firstKey
                 if not maximum or lastKey > maximum:
                     maximum = lastKey
-                    
-        if minimum > maximum:
+
+        if minimum == None or maximum == None:
+            return [0,0]
+        elif minimum > maximum:
             omax = minimum
             minimum = maximum
             maximum = omax

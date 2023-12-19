@@ -868,6 +868,9 @@ class ABRA_OT_range_to_selection(bpy.types.Operator):
             else:
                 bpy.context.scene.frame_start = int(range[0])
                 bpy.context.scene.frame_end = int(range[1])
+        else:
+            area.type = old_type
+            return {"CANCELLED"}
             
         area.type = old_type
         return {"FINISHED"}

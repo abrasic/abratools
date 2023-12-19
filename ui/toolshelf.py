@@ -72,13 +72,9 @@ class ABRA_OT_viewportTogglePrefs(bpy.types.Operator):
     bl_description = "Opens an abraTools toolshelf below this editor"
 
     def execute(self, context):
-        last_area = bpy.context.screen.areas[-1]
-        if last_area.type != "PREFERENCES":
-            bpy.ops.screen.area_split(direction='HORIZONTAL', factor=-0.999)
-            area = bpy.context.screen.areas[-1]
-            area.type = "PREFERENCES"
-            writeOnPrefs()
-        else:
+        prefs_area = [area for area in context.screen.areas if area.type == "PREFERENCES"]
+        
+        if prefs_area:
             restorePrefs()
             cl = context.copy() 
             area = [area for area in context.screen.areas if area.type == "PREFERENCES"][-1]
@@ -100,6 +96,12 @@ class ABRA_OT_viewportTogglePrefs(bpy.types.Operator):
             else:
                 for area in areas:
                     bpy.ops.screen.area_close(cl)
+        else:
+            bpy.ops.screen.area_split(direction='HORIZONTAL', factor=-0.999)
+            area = bpy.context.screen.areas[-1]
+            area.type = "PREFERENCES"
+            writeOnPrefs()
+
 
         return {'FINISHED'}
 
