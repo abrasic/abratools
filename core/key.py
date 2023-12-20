@@ -335,7 +335,10 @@ class ABRA_OT_bake_keys(bpy.types.Operator):
             api.dprint("BAKING RANGE ("+str(frange[0])+"-"+str(frange[1])+")", col="red")
 
             # Deselect for interpolation change later
-            bpy.ops.graph.select_all(action='DESELECT')
+            try:
+                bpy.ops.graph.select_all(action='DESELECT')
+            except RuntimeError:
+                pass
 
             # NLA Bake
             bpy.ops.graph.reveal()
