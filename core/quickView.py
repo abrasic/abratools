@@ -54,8 +54,12 @@ class ABRA_OT_isolate_func(bpy.types.Operator):
                     mright = bpy.context.scene.timeline_markers.new("aTmR", frame=rn[1])
 
                     # Call native operators
-                    api.dprint("Selecting keys in range")
-                    bpy.ops.graph.select_column(mode='MARKERS_BETWEEN')
+                    try:
+                        api.dprint("Selecting keys in range")
+                        bpy.ops.graph.select_column(mode='MARKERS_BETWEEN')
+                    except RuntimeError:
+                        api.dprint("Could not select keys (are any keyframes visible?)")
+
                     api.dprint("Framing")
                     if bpy.app.version[0] >= 4:
                         with bpy.context.temp_override(area=cc['area'], region=cc['region']):
@@ -69,8 +73,11 @@ class ABRA_OT_isolate_func(bpy.types.Operator):
 
                     # select_all removes selection of the channel, which will cause it to hide the next time isolate curves is enabled.
                     # The workaround I've found is to make a giant selection box to substract all keyframes but keep the channels themselves selected
-                    bpy.ops.graph.select_box(mode="SUB",xmin=-2**30,xmax=2**30,ymin=-2**30,ymax=2**30)
-                    bpy.ops.marker.select_all(action='DESELECT')
+                    try:
+                        bpy.ops.graph.select_box(mode="SUB",xmin=-2**30,xmax=2**30,ymin=-2**30,ymax=2**30)
+                        bpy.ops.marker.select_all(action='DESELECT')
+                    except RuntimeError:
+                        api.dprint("Could not frame (are any keyframes visible?)")
 
                     # Delete markers
                     api.dprint("Deleting markers")
@@ -175,62 +182,63 @@ class ABRA_OT_goto_keyframe_right(bpy.types.Operator):
                 api.dprint("GOTO RIGHT STARTED", col="green")
 
                 for curve in curves:
-                    selected_keys = api.get_selected_keys(curve)
-                    
-                    # Atleast one key for each FCurve in the function needs to be selected otherwise the len() on the next if will break. It doesnt matter which one, it will get filtered out eventually
-                    if selected_keys is None:
-                        api.dprint("A selected FCurve has no selected keys. Selecting one automatically...", col="yellow")
-                        curve.keyframe_points[0].select_control_point = True
+                    if len(curve.keyframe_points):
                         selected_keys = api.get_selected_keys(curve)
-                        bpy.context.scene.frame_current = current # If you comment this out the function is faster but is less accurate
-                    
-                    # Determine the key selection. If one (incl. for each curve) is selected, use standard jump-and-select.
-                    # If two or more keys are selected for one FCurve, limit the jumping to that range and dont do any sort of selection.
-                    if ranged or len(selected_keys) > 1:
-                        ranged = True
-                        api.dprint("More than one key is selected for this curve. Ranged movement will be enabled",col="blue")
-                        candidate_range = api.get_range_from_selected_keys()
                         
-                        if move_range[0] < candidate_range[0]:
-                            move_range[0] = candidate_range[0]
-                        if move_range[1] > candidate_range[0]:
-                            move_range[1] = candidate_range[1]
-                        api.dprint(f"Range is {move_range[0]}, {move_range[1]}")
-                    
-                    # Put the playhead on a key to determine the next 
-                    key_index = api.get_key_index_at_frame(curve, current_frame_init)
-                    api.dprint(f"The current key index is {key_index}")
-                    while key_index == -1:
-                        frame_before_jump = bpy.context.scene.frame_current
-                        if bpy.app.version >= (3, 6, 0):
-                            bpy.ops.graph.keyframe_jump(next=False)
+                        # Atleast one key for each FCurve in the function needs to be selected otherwise the len() on the next if will break. It doesnt matter which one, it will get filtered out eventually
+                        if selected_keys is None:
+                                api.dprint("A selected FCurve has no selected keys. Selecting one automatically...", col="yellow")
+                                curve.keyframe_points[0].select_control_point = True
+                                selected_keys = api.get_selected_keys(curve)
+                                bpy.context.scene.frame_current = current # If you comment this out the function is faster but is less accurate
+                        
+                        # Determine the key selection. If one (incl. for each curve) is selected, use standard jump-and-select.
+                        # If two or more keys are selected for one FCurve, limit the jumping to that range and dont do any sort of selection.
+                        if ranged or len(selected_keys) > 1:
+                            ranged = True
+                            api.dprint("More than one key is selected for this curve. Ranged movement will be enabled",col="blue")
+                            candidate_range = api.get_range_from_selected_keys()
+                            
+                            if move_range[0] < candidate_range[0]:
+                                move_range[0] = candidate_range[0]
+                            if move_range[1] > candidate_range[0]:
+                                move_range[1] = candidate_range[1]
+                            api.dprint(f"Range is {move_range[0]}, {move_range[1]}")
+                        
+                        # Put the playhead on a key to determine the next 
+                        key_index = api.get_key_index_at_frame(curve, current_frame_init)
+                        api.dprint(f"The current key index is {key_index}")
+                        while key_index == -1:
+                            frame_before_jump = bpy.context.scene.frame_current
+                            if bpy.app.version >= (3, 6, 0):
+                                bpy.ops.graph.keyframe_jump(next=False)
+                            else:
+                                bpy.ops.screen.keyframe_jump(next=False)
+                            frame_after_jump = bpy.context.scene.frame_current
+                            key_index = api.get_key_index_at_frame(curve, bpy.context.scene.frame_current)
+                            api.dprint(f"No key on this current frame. Jumping to frame {bpy.context.scene.frame_current} and the key index this time is {key_index}", col="yellow")
+                            
+                            if frame_before_jump == frame_after_jump: # No more keys to jump towards that direction
+                                api.dprint("No more keys in that direction anyways...")
+                                key_index = 0
+                                break
+                            
+                        next_key_value = curve.keyframe_points[key_index].co[0]
+                        if len(curve.keyframe_points) <= key_index + 1:
+                            if not ranged:
+                                api.dprint("End of FCurve detected. Selecting the last key instead...", col="yellow")
+                                next_key_value = curve.keyframe_points[key_index].co[0]
                         else:
-                            bpy.ops.screen.keyframe_jump(next=False)
-                        frame_after_jump = bpy.context.scene.frame_current
-                        key_index = api.get_key_index_at_frame(curve, bpy.context.scene.frame_current)
-                        api.dprint(f"No key on this current frame. Jumping to frame {bpy.context.scene.frame_current} and the key index this time is {key_index}", col="yellow")
+                            next_key_value = curve.keyframe_points[key_index + 1].co[0]
                         
-                        if frame_before_jump == frame_after_jump: # No more keys to jump towards that direction
-                            api.dprint("No more keys in that direction anyways...")
-                            key_index = 0
-                            break
+                        # Determine if obtained value is nearest
+                        if nearest > next_key_value and next_key_value > current_frame_init:
+                            api.dprint(f"NEW NEAREST VALUE CHANGED FROM {nearest} TO {next_key_value}")
+                            nearest = next_key_value
                         
-                    next_key_value = curve.keyframe_points[key_index].co[0]
-                    if len(curve.keyframe_points) <= key_index + 1:
-                        if not ranged:
-                            api.dprint("End of FCurve detected. Selecting the last key instead...", col="yellow")
-                            next_key_value = curve.keyframe_points[key_index].co[0]
-                    else:
-                        next_key_value = curve.keyframe_points[key_index + 1].co[0]
-                    
-                    # Determine if obtained value is nearest
-                    if nearest > next_key_value and next_key_value > current_frame_init:
-                        api.dprint(f"NEW NEAREST VALUE CHANGED FROM {nearest} TO {next_key_value}")
-                        nearest = next_key_value
-                    
-                    api.dprint(f"Decided frame jump is at frame {int(nearest)}",col="purple")
-                        
-                    bpy.context.scene.frame_current = current_frame_init
+                        api.dprint(f"Decided frame jump is at frame {int(nearest)}",col="purple")
+                            
+                        bpy.context.scene.frame_current = current_frame_init
 
                 # Dont move playhead to large number if nearest value never changed (most likely happens if at the start/end of FCurve)
                 if large_number != nearest:
@@ -252,7 +260,10 @@ class ABRA_OT_goto_keyframe_right(bpy.types.Operator):
                 self.report({"ERROR"}, f"Preventing overload ({prefs.fcurve_scan_limit} FCurves max, {len(curves)} active)")
         else:
             if api.get_visible_fcurves():
-                bpy.ops.graph.keyframe_jump(next=True)
+                if bpy.app.version >= (3, 6, 0):
+                    bpy.ops.graph.keyframe_jump(next=True)
+                else:
+                    bpy.ops.screen.keyframe_jump(next=True)
 
         area.type = old
                 
@@ -285,62 +296,63 @@ class ABRA_OT_goto_keyframe_left(bpy.types.Operator):
 
                 api.dprint("GOTO LEFT STARTED", col="green")
                 for curve in curves:
-                    selected_keys = api.get_selected_keys(curve)
-                    
-                    # Atleast one key for each FCurve in the function needs to be selected otherwise the len() on the next if will break. It doesnt matter which one, it will get filtered out eventually
-                    if selected_keys is None:
-                        api.dprint("A selected FCurve has no selected keys. Selecting one automatically...", col="yellow")
-                        curve.keyframe_points[len(curve.keyframe_points)-1].select_control_point = True
+                    if len(curve.keyframe_points):
                         selected_keys = api.get_selected_keys(curve)
-                        bpy.context.scene.frame_current = current # If you comment this out the function is faster but is less accurate
-                    
-                    # Determine the key selection. If one (incl. for each curve) is selected, use standard jump-and-select.
-                    # If two or more keys are selected for one FCurve, limit the jumping to that range and dont do any sort of selection.
-                    if ranged or len(selected_keys) > 1:
-                        ranged = True
-                        api.dprint("More than one key is selected for this curve. Ranged movement will be enabled",col="blue")
-                        candidate_range = api.get_range_from_selected_keys()
                         
-                        if move_range[0] < candidate_range[0]:
-                            move_range[0] = candidate_range[0]
-                        if move_range[1] > candidate_range[0]:
-                            move_range[1] = candidate_range[1]
-                        api.dprint(f"Range is {move_range[0]}, {move_range[1]}")
-                    
-                    # Put the playhead on a key to determine the next 
-                    key_index = api.get_key_index_at_frame(curve, current_frame_init)
-                    api.dprint(f"The current key index is {key_index}")
-                    while key_index == -1:
-                        frame_before_jump = bpy.context.scene.frame_current
-                        if bpy.app.version >= (3, 6, 0):
-                            bpy.ops.graph.keyframe_jump(next=True)
+                        # Atleast one key for each FCurve in the function needs to be selected otherwise the len() on the next if will break. It doesnt matter which one, it will get filtered out eventually
+                        if selected_keys is None:
+                                api.dprint("A selected FCurve has no selected keys. Selecting one automatically...", col="yellow")
+                                curve.keyframe_points[len(curve.keyframe_points)-1].select_control_point = True
+                                selected_keys = api.get_selected_keys(curve)
+                                bpy.context.scene.frame_current = current # If you comment this out the function is faster but is less accurate
+                        
+                        # Determine the key selection. If one (incl. for each curve) is selected, use standard jump-and-select.
+                        # If two or more keys are selected for one FCurve, limit the jumping to that range and dont do any sort of selection.
+                        if ranged or len(selected_keys) > 1:
+                            ranged = True
+                            api.dprint("More than one key is selected for this curve. Ranged movement will be enabled",col="blue")
+                            candidate_range = api.get_range_from_selected_keys()
+                            
+                            if move_range[0] < candidate_range[0]:
+                                move_range[0] = candidate_range[0]
+                            if move_range[1] > candidate_range[0]:
+                                move_range[1] = candidate_range[1]
+                            api.dprint(f"Range is {move_range[0]}, {move_range[1]}")
+                        
+                        # Put the playhead on a key to determine the next 
+                        key_index = api.get_key_index_at_frame(curve, current_frame_init)
+                        api.dprint(f"The current key index is {key_index}")
+                        while key_index == -1:
+                            frame_before_jump = bpy.context.scene.frame_current
+                            if bpy.app.version >= (3, 6, 0):
+                                bpy.ops.graph.keyframe_jump(next=True)
+                            else:
+                                bpy.ops.screen.keyframe_jump(next=True)
+                            frame_after_jump = bpy.context.scene.frame_current
+                            key_index = api.get_key_index_at_frame(curve, bpy.context.scene.frame_current)
+                            api.dprint(f"No key on this current frame. Jumping to frame {bpy.context.scene.frame_current} and the key index this time is {key_index}", col="yellow")
+                            
+                            if frame_before_jump == frame_after_jump: # No more keys to jump towards that direction
+                                api.dprint("No more keys in that direction anyways...")
+                                key_index = 0
+                                break
+                            
+                        next_key_value = curve.keyframe_points[key_index].co[0]
+                        if key_index == 0:
+                            if not ranged:
+                                api.dprint("End of FCurve detected. Selecting the last key instead...", col="yellow")
+                                next_key_value = curve.keyframe_points[key_index].co[0]
                         else:
-                            bpy.ops.screen.keyframe_jump(next=True)
-                        frame_after_jump = bpy.context.scene.frame_current
-                        key_index = api.get_key_index_at_frame(curve, bpy.context.scene.frame_current)
-                        api.dprint(f"No key on this current frame. Jumping to frame {bpy.context.scene.frame_current} and the key index this time is {key_index}", col="yellow")
+                            next_key_value = curve.keyframe_points[key_index - 1].co[0]
                         
-                        if frame_before_jump == frame_after_jump: # No more keys to jump towards that direction
-                            api.dprint("No more keys in that direction anyways...")
-                            key_index = 0
-                            break
+                        # Determine if obtained value is nearest
+                        if nearest < next_key_value and next_key_value < current_frame_init:
+                            api.dprint(f"NEW NEAREST VALUE CHANGED FROM {nearest} TO {next_key_value}")
+                            nearest = next_key_value
                         
-                    next_key_value = curve.keyframe_points[key_index].co[0]
-                    if key_index == 0:
-                        if not ranged:
-                            api.dprint("End of FCurve detected. Selecting the last key instead...", col="yellow")
-                            next_key_value = curve.keyframe_points[key_index].co[0]
-                    else:
-                        next_key_value = curve.keyframe_points[key_index - 1].co[0]
-                    
-                    # Determine if obtained value is nearest
-                    if nearest < next_key_value and next_key_value < current_frame_init:
-                        api.dprint(f"NEW NEAREST VALUE CHANGED FROM {nearest} TO {next_key_value}")
-                        nearest = next_key_value
-                    
-                    api.dprint(f"Decided frame jump is at frame {int(nearest)}",col="purple")
-                        
-                    bpy.context.scene.frame_current = current_frame_init
+                        api.dprint(f"Decided frame jump is at frame {int(nearest)}",col="purple")
+                            
+                        bpy.context.scene.frame_current = current_frame_init
 
                 # Dont move playhead to large number if nearest value never changed (most likely happens if at the start/end of FCurve)
                 if large_number != nearest:
@@ -362,7 +374,10 @@ class ABRA_OT_goto_keyframe_left(bpy.types.Operator):
                 self.report({"ERROR"}, f"Preventing overload ({prefs.fcurve_scan_limit} FCurves max, {len(curves)} active)")
         else:
             if api.get_visible_fcurves():
-                bpy.ops.graph.keyframe_jump(next=False)
+                if bpy.app.version >= (3, 6, 0):
+                    bpy.ops.graph.keyframe_jump(next=False)
+                else:
+                    bpy.ops.screen.keyframe_jump(next=False)
 
         area.type = old
                 

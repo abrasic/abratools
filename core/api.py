@@ -195,10 +195,11 @@ def select_keys_on_column(selected_only=True):
         curves = get_selected_fcurves()
         if curves:
             for curve in curves:
-                key_index = get_key_index_at_frame(curve,bpy.context.scene.frame_current)
-                key = curve.keyframe_points[key_index]
-                if key.co[0] == bpy.context.scene.frame_current:
-                    key.select_control_point = True
+                if len (curve.keyframe_points):
+                    key_index = get_key_index_at_frame(curve,bpy.context.scene.frame_current)
+                    key = curve.keyframe_points[key_index]
+                    if key.co[0] == bpy.context.scene.frame_current:
+                        key.select_control_point = True
     else:
         bpy.ops.graph.select_column(mode='CFRA')
 
