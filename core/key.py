@@ -314,7 +314,15 @@ class ABRA_OT_share_active_key_timing(bpy.types.Operator):
             bone_names_list = [b.name for b in objs if b != active]
             non_active_curves = [f for f in arm_list if f.data_path.split('"')[1] in bone_names_list]
 
-        timings = [] 
+        timings = []
+        conv = []
+
+        if isinstance(active_curves, bpy.types.bpy_prop_collection): # Object Mode
+            for c in active_curves:
+                conv.append(c)
+
+            active_curves = conv
+
         if not api.fcurve_overload(active_curves + non_active_curves):
             for curve in active_curves: # Keyframe numbers from active object
                 for key in curve.keyframe_points:
@@ -331,8 +339,10 @@ class ABRA_OT_share_active_key_timing(bpy.types.Operator):
 
         if bpy.context.mode == "OBJECT":
             bpy.ops.object.select_all(action='DESELECT')
-            objs[-1].select_set(True)   
-            bpy.context.view_layer.objects.active = objs[-1].bone
+            bpy.context.view_layer.objects.active = objs[0]
+            for ob in objs:
+                if ob != active:
+                    ob.select_set(True)   
         elif bpy.context.mode == "POSE":
             bpy.ops.pose.select_all(action='DESELECT')
             for ob in objs:
@@ -353,9 +363,15 @@ class ABRA_OT_key_shapekeys(bpy.types.Operator):
         if bpy.context.mode == "OBJECT":
             for obj in bpy.context.selected_objects:
                 if obj.type == "MESH":
-                    for key in obj.data.shape_keys.key_blocks:
-                        if (key != "Basis"):
-                            key.keyframe_insert(data_path="value")
+                    try:
+                        shape_keys = obj.data.shape_keys
+                    except AttributeError:
+                        break
+
+                    if shape_keys:
+                        for key in shape_keys.key_blocks:
+                            if (key != "Basis"):
+                                key.keyframe_insert(data_path="value")
 
                 for window in bpy.context.window_manager.windows:
                     for area in window.screen.areas:
