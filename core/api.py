@@ -432,5 +432,14 @@ def fcurve_overload(fcurves):
         
 def select_keys_in_range(min,max):
     bpy.ops.graph.select_box(mode="SET",xmin=min-1,xmax=max+1,ymin=-2**30,ymax=2**30, include_handles=False, use_curve_selection=True)
+    
     return None
 
+def are_keys_selected(curves):
+    """Returns bool. True if any keyframes are selected from fcurves given."""
+    for curve in curves:
+        for key in curve.keyframe_points:
+            if key.select_control_point:
+                return True
+            
+    return False

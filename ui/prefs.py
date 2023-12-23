@@ -175,7 +175,19 @@ class AbraToolsPrefs(AddonPreferences):
         description = key.ABRA_OT_share_common_key_timing.bl_description,
         default = True
     )
+
+    vis_copy_timing: BoolProperty(
+        name = key.ABRA_OT_copy_timing.bl_label,
+        description = key.ABRA_OT_copy_timing.bl_description,
+        default = True
+    )
     
+    vis_paste_timing: BoolProperty(
+        name = key.ABRA_OT_paste_timing.bl_label,
+        description = key.ABRA_OT_paste_timing.bl_description,
+        default = True
+    )
+
     vis_keyshape: BoolProperty(
         name = key.ABRA_OT_key_shapekeys.bl_label,
         description = key.ABRA_OT_key_shapekeys.bl_description,

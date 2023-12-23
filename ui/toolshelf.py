@@ -16,6 +16,7 @@ ic_auto_frame = ic["auto_frame"]
 ic_bake_on_nths = ic["bake_on_nths"]
 ic_copy_keys = ic["copy_keys"]
 ic_copy_pose = ic["copy_pose"]
+ic_copy_timing = ic["copy_timing"]
 ic_create_path = ic["create_path"]
 ic_cursor_gizmo = ic["cursor_gizmo"]
 ic_cursor_to_selected = ic["cursor_to_selected"]
@@ -31,6 +32,7 @@ ic_key_whole_armature = ic["key_whole_armature"]
 ic_orient_switcher = ic["orient_switcher"]
 ic_paste_keys = ic["paste_keys"]
 ic_paste_pose = ic["paste_pose"]
+ic_paste_timing = ic["paste_timing"]
 ic_range_to_selection = ic["range_to_selection"]
 ic_range_to_markers = ic["range_to_markers"]
 ic_retime_scene = ic["retime_scene"]
@@ -238,6 +240,10 @@ def prefsHeaderWrite(self, context):
         layout.operator(key.ABRA_OT_share_active_key_timing.bl_idname, text='', icon_value=ic_share_active.icon_id)
     if (prefs.vis_share_common): 
         layout.operator(key.ABRA_OT_share_common_key_timing.bl_idname, text='', icon_value=ic_share_common.icon_id)
+    if (prefs.vis_copy_timing): 
+        layout.operator(key.ABRA_OT_copy_timing.bl_idname, text='', icon_value=ic_copy_timing.icon_id)
+    if (prefs.vis_paste_timing): 
+        layout.operator(key.ABRA_OT_paste_timing.bl_idname, text='', icon_value=ic_paste_timing.icon_id)
     if (prefs.vis_keyshape): 
         layout.operator(key.ABRA_OT_key_shapekeys.bl_idname, text='', icon_value=ic_key_all_shapes.icon_id)
     if (prefs.vis_keyarmature): 
@@ -365,6 +371,8 @@ def prefsBodyWrite(self, context):
         col.prop(prefs, "vis_keybake", icon_value=ic_bake_on_nths.icon_id)
         col.prop(prefs, "vis_share_active", icon_value=ic_share_active.icon_id)
         col.prop(prefs, "vis_share_common", icon_value=ic_share_common.icon_id)
+        col.prop(prefs, "vis_copy_timing", icon_value=ic_copy_timing.icon_id)
+        col.prop(prefs, "vis_paste_timing", icon_value=ic_copy_timing.icon_id)
         col.prop(prefs, "vis_keyshape", icon_value=ic_key_all_shapes.icon_id)
         col.prop(prefs, "vis_keyarmature", icon_value=ic_key_whole_armature.icon_id)
         col.prop(prefs, "vis_keyretime", icon_value=ic_retime_scene.icon_id)

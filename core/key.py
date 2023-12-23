@@ -113,6 +113,108 @@ class ABRA_OT_key_delete(bpy.types.Operator):
     def execute(self, context):
         api.key_clipboard(self, type="delete")
         return {"FINISHED"}
+class clipboard(bpy.types.PropertyGroup):
+    timing: bpy.props.FloatProperty(name="Timing")
+class ABRA_OT_copy_timing(bpy.types.Operator):
+    bl_idname = "screen.at_copy_timing"
+    bl_label = "Copy Timing"
+    bl_description = "Copies the timing/frames in which selected keys are placed on. If no selection is used, all keys within the frame range is used instead"
+    bl_options = {"REGISTER", "UNDO"}
+
+    def execute(self, context):
+        prefs = api.get_preferences()
+        area = bpy.context.area
+        old = area.type
+        area.type = 'GRAPH_EDITOR'
+
+        range = api.get_frame_range()
+        area.spaces[0].dopesheet.show_only_selected = api.use_oss()[0]
+
+        curves = api.get_selected_fcurves()
+        if not len(curves):
+            api.dprint("No curves are selected. Getting visible ones instead...")
+            curves = api.get_visible_fcurves()
+
+        timings = []
+
+        if not curves:
+            area.type = old
+            return {"CANCELLED"}
+        
+        keys_selected = api.are_keys_selected(curves)
+
+        bpy.context.scene.at_time_clipboard.clear()
+        if not api.fcurve_overload(curves):
+            for curve in curves:
+                for key in curve.keyframe_points:
+                    co = key.co.x
+                    if keys_selected:
+                        api.dprint("Keys are selected. Limiting selection to those...")
+                        if co not in timings and co >= range[0] and co <= range[1] and key.select_control_point:
+                            timings.append(co)
+                    else:
+                        api.dprint("Keys are not selected")
+                        if co not in timings and co >= range[0] and co <= range[1]:
+                            timings.append(co)
+
+            for t in timings:
+                key = bpy.context.scene.at_time_clipboard.add()
+                key.timing = t
+
+            for a in bpy.context.scene.at_time_clipboard:
+                api.dprint(str(a.timing))
+        else:
+            area.type = old
+            self.report({"ERROR"}, f"Preventing overload ({prefs.fcurve_scan_limit} FCurves max, {len(curves)} active)")
+            return {"CANCELLED"}
+        
+        area.type = old
+
+        return{"FINISHED"}
+    
+class ABRA_OT_paste_timing(bpy.types.Operator):
+    bl_idname = "screen.at_paste_timing"
+    bl_label = "Paste Timing"
+    bl_description = "On selected F-Curves, inserts keyframes on frames from Copy Timing clipboard. If no F-Curves are selected, it will scan thru all visible F-Curves instead"
+    bl_options = {"REGISTER", "UNDO"}
+
+    def execute(self, context):
+        prefs = api.get_preferences()
+        area = bpy.context.area
+        old = area.type
+        area.type = 'GRAPH_EDITOR'
+
+        range = api.get_frame_range()
+
+        if len(context.scene.at_time_clipboard):
+            area.spaces[0].dopesheet.show_only_selected = api.use_oss()[0]
+
+            curves = api.get_selected_fcurves()
+            if not len(curves):
+                api.dprint("No curves are selected. Getting visible ones instead...")
+                curves = api.get_visible_fcurves()
+
+            if not curves:
+                area.type = old
+                return {"CANCELLED"}
+
+            if not api.fcurve_overload(curves):
+                for curve in curves:
+                    for i in context.scene.at_time_clipboard:
+                        if i.timing >= range[0] and i.timing <= range[1]:
+                            curve.keyframe_points.insert(frame=i.timing, value = curve.evaluate(i.timing))
+            else:
+                area.type = old
+                self.report({"ERROR"}, f"Preventing overload ({prefs.fcurve_scan_limit} FCurves max, {len(curves)} active)")
+                return {"CANCELLED"}
+            
+            area.type = old
+
+            return{"FINISHED"}
+        else:
+            area.type = old
+            self.report({"WARNING"}, "No data in clipboard")
+            return{"CANCELLED"}
 
 class ABRA_OT_share_common_key_timing(bpy.types.Operator):
     bl_idname = "screen.at_common_key_timing"
@@ -985,7 +1087,8 @@ class ABRA_OT_tangent_autoclamp(bpy.types.Operator):
         
 ############################################
 
-cls = (ABRA_OT_key_selected,
+cls = (clipboard,
+ABRA_OT_key_selected,
 ABRA_OT_key_visible,
 ABRA_OT_key_copy,
 ABRA_OT_key_paste,
@@ -994,6 +1097,7 @@ ABRA_OT_key_paste_pose,
 ABRA_OT_key_delete,
 ABRA_OT_share_active_key_timing,
 ABRA_OT_share_common_key_timing,
+ABRA_OT_copy_timing,
 ABRA_OT_key_shapekeys,
 ABRA_OT_key_armature,
 ABRA_OT_key_retime,
@@ -1007,6 +1111,7 @@ ABRA_OT_swap_rig_mode,
 ABRA_OT_orient_switcher,
 ABRA_OT_cursor_to_selected,
 ABRA_OT_cursor_gizmo,
+ABRA_OT_paste_timing,
 ABRA_OT_toggle_cursor_pivot,
 ABRA_OT_tangent_keypath,
 ABRA_OT_tangent_keypathclear,

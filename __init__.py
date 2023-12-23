@@ -29,9 +29,12 @@ def register():
 
     bpy.types.USERPREF_HT_header.append(toolshelf.drawToggle)
     bpy.types.VIEW3D_MT_editor_menus.append(toolshelf.vpToggleBtn)
+
     bpy.app.handlers.frame_change_post.append(quickView.overlay_func)
     bpy.app.handlers.depsgraph_update_post.append(key.gizmo_func)
+
     bpy.types.Scene.set_selection = bpy.props.PointerProperty(type=panels.Set_Selector_Vars)
+    bpy.types.Scene.at_time_clipboard = bpy.props.CollectionProperty(type=key.clipboard)
 
     wm = bpy.context.window_manager
     kc = wm.keyconfigs.addon
@@ -58,12 +61,15 @@ def register():
 
 def unregister():
     bpy.context.preferences.themes[0].preferences.space.header = toolshelf.prefsOldHeaderCol
+
     bpy.types.USERPREF_HT_header.remove(toolshelf.drawToggle)
     bpy.types.VIEW3D_MT_editor_menus.remove(toolshelf.vpToggleBtn)
+
     bpy.app.handlers.frame_change_post.remove(quickView.overlay_func)
     bpy.app.handlers.depsgraph_update_post.remove(key.gizmo_func)
 
     del bpy.types.Scene.set_selection
+    del bpy.types.Scene.at_time_clipboard
     
     for cls in classes:
         bpy.utils.unregister_class(cls)
