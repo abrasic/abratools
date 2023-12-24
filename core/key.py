@@ -477,12 +477,9 @@ class ABRA_OT_bake_keys(bpy.types.Operator):
                 # Create an array containing frame numbers within range
                 frames_to_remove = list(range(frange[0], frange[1]))
 
-                # Remove frames from step
-                for frame in frames_to_remove:
-                    s = 0
-                    s += frame - (frange[0]-1)
-                    if s % step != 0:
-                        frames_to_remove.remove(frame)
+                # Prune frames from step
+                frames_to_keep = frames_to_remove[0::step]
+                pruned = [i for i in frames_to_remove if i not in frames_to_keep]
 
                 api.dprint(f"Frames to delete: {frames_to_remove}")
 
@@ -492,12 +489,10 @@ class ABRA_OT_bake_keys(bpy.types.Operator):
                 wm.progress_begin(0, len(visible))
                 for i, curve in enumerate(visible):
                     if len(curve.keyframe_points):
-                        for frame in frames_to_remove:
+                        for frame in pruned:
                             curve.keyframe_points.remove(curve.keyframe_points[api.get_key_index_at_frame(curve, frame)])
                             wm.progress_update(i)
                 wm.progress_end()
-
-            bpy.context.scene.frame_current = frame_const
 
             # Remove overlapping keys incase of a double bake (dumb workaround, will remove keys with static values)
             # bpy.ops.graph.select_all(action='SELECT')
