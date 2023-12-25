@@ -731,6 +731,13 @@ class ABRA_OT_cursor_gizmo(bpy.types.Operator):
         prefs = api.get_preferences()
         pose_bypass = False
         arm_object = ""
+
+        area = bpy.context.area
+        old = area.type
+        area.type = 'VIEW_3D'
+
+        bpy.ops.view3d.snap_cursor_to_selected()
+
         if bpy.context.mode == "POSE" and bpy.context.active_object.type == "ARMATURE":
             pose_bypass = True
             arm_object = context.active_object
@@ -773,7 +780,7 @@ class ABRA_OT_cursor_gizmo(bpy.types.Operator):
                 bpy.ops.armature.delete()
                 bpy.ops.object.posemode_toggle() # POSE
 
-
+        area.type = old
                 
         return {"FINISHED"}
     
