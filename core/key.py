@@ -475,13 +475,13 @@ class ABRA_OT_bake_keys(bpy.types.Operator):
             if step > 1:
 
                 # Create an array containing frame numbers within range
-                frames_to_remove = list(range(frange[0], frange[1]))
+                frames_to_remove = list(range(frange[0], frange[1]+1))
 
                 # Prune frames from step
                 frames_to_keep = frames_to_remove[0::step]
                 pruned = [i for i in frames_to_remove if i not in frames_to_keep]
 
-                api.dprint(f"Frames to delete: {frames_to_remove}")
+                api.dprint(f"Frames to remove: {pruned}")
 
                 # Delete keys from array
                 visible = api.get_visible_fcurves()
