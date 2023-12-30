@@ -339,7 +339,8 @@ class ABRA_OT_share_active_key_timing(bpy.types.Operator):
 
         if bpy.context.mode == "OBJECT":
             bpy.ops.object.select_all(action='DESELECT')
-            bpy.context.view_layer.objects.active = objs[0]
+            if len(objs):
+                bpy.context.view_layer.objects.active = objs[0]
             for ob in objs:
                 if ob != active:
                     ob.select_set(True)   
