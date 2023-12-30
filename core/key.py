@@ -1,4 +1,4 @@
-import bpy
+import bpy, re
 from bpy.app.handlers import persistent
 from . import api
 
@@ -463,42 +463,45 @@ class ABRA_OT_bake_keys(bpy.types.Operator):
             api.dprint(f"frame_start= {frange[0]}, frame_end={frange[1]}, bake_types={bpy.context.mode}, use_current_action = True, clean_curves=False")
             bpy.ops.nla.bake(frame_start=frange[0], frame_end=frange[1], bake_types={bpy.context.mode}, visual_keying=prefs.visual_keying, clear_constraints=prefs.clear_constraints, clear_parents=prefs.clear_parents, use_current_action = True, clean_curves=prefs.clean_curves)
 
-            # Change interpolation type of new keys
-            bpy.ops.graph.interpolation_type(type=prefs.bake_type)
-            bpy.ops.graph.handle_type(type=prefs.bake_handle)
-
             # Deselect everything one final time
             bpy.ops.graph.select_all(action='DESELECT')
 
             api.dprint("Initial bake complete. Moving to range start")
 
-            if step > 1:
+            # Create an array containing frame numbers within range
+            frames_to_remove = list(range(frange[0], frange[1]+1))
 
-                # Create an array containing frame numbers within range
-                frames_to_remove = list(range(frange[0], frange[1]+1))
+            # Prune frames from step
+            frames_to_keep = frames_to_remove[0::step]
+            pruned = [i for i in frames_to_remove if i not in frames_to_keep]
 
-                # Prune frames from step
-                frames_to_keep = frames_to_remove[0::step]
-                pruned = [i for i in frames_to_remove if i not in frames_to_keep]
+            api.dprint(f"Frames to remove: {pruned}")
 
-                api.dprint(f"Frames to remove: {pruned}")
-
-                # Delete keys from array
-                visible = api.get_visible_fcurves()
-                wm = bpy.context.window_manager
-                wm.progress_begin(0, len(visible))
-                for i, curve in enumerate(visible):
-                    if len(curve.keyframe_points):
-                        for frame in pruned:
+            # Delete keys from array
+            visible = api.get_visible_fcurves()
+            wm = bpy.context.window_manager
+            wm.progress_begin(0, len(visible))
+            for i, curve in enumerate(visible):
+                if len(curve.keyframe_points):
+                    api.dprint(f"Pruning curve: {str(curve.data_path)}", col="yellow")
+                    if not re.search("(location$|rotation_quaternion$|rotation_euler$|scale$)", curve.data_path):
+                        api.dprint(f"--- This is not a transform F-Curve. Inserting keys...", col="blue")
+                        for ins in frames_to_remove:
+                            curve.keyframe_points.insert(ins, curve.evaluate(ins), options={"FAST"})
+                    for frame in pruned:
+                        try:
                             curve.keyframe_points.remove(curve.keyframe_points[api.get_key_index_at_frame(curve, frame)])
-                            wm.progress_update(i)
-                wm.progress_end()
+                        except IndexError: # This would probably happen on NLA Strip Controls
+                            api.dprint(f"Cannot remove keys from this curve")
+                            break
+                        wm.progress_update(i)
+            wm.progress_end()
 
-            # Remove overlapping keys incase of a double bake (dumb workaround, will remove keys with static values)
-            # bpy.ops.graph.select_all(action='SELECT')
-            # bpy.ops.graph.clean(threshold=0) 
-            # bpy.ops.graph.select_all(action='DESELECT')
-
+            # Change interpolation type of new keys
+            api.select_keys_in_range(frange[0], frange[1])
+            bpy.ops.graph.interpolation_type(type=prefs.bake_type)
+            bpy.ops.graph.handle_type(type=prefs.bake_handle)
+                
             area.type = old_type
             api.dprint("Bake should be complete", col="green")
             return {"FINISHED"}
