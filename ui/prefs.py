@@ -454,6 +454,16 @@ class AbraToolsPrefs(AddonPreferences):
         min = 1
     )
 
+    bake_method: EnumProperty(
+        name = "Method",
+        description = "The type of method to use for baking keys.\n\nNLA: \n-Uses standard 'NLA > Bake Action' prodecure.\n-Will bake on ALL F-Curves (even hidden ones) on selected bones or objects.\n-Does not preserve keyframe handle type and is not entirely accurate.\n-Does not support non-transform F-Curves (custom property, shape keys, etc).\n\nEvaluation:\n-May be slower but is more accurate.\n-Only bakes on visible F-Curves.\n-Supports all types of F-Curves.\n",
+        items = (
+            ("NLA", "NLA", ""),
+            ("Evaluation", "Evaluation", ""),
+        ),
+        default = "Evaluation",
+    )
+
     visual_keying: BoolProperty(
         name = "Visual Keying",
         description = "Bake out final/evaluated transforms, such as from F-Curve modifiers",

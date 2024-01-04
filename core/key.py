@@ -1,4 +1,4 @@
-import bpy, re
+import bpy, re, time
 from bpy.app.handlers import persistent
 from . import api
 
@@ -427,9 +427,11 @@ class ABRA_OT_bake_keys(bpy.types.Operator):
             return {"FINISHED"}
         else:
             # Set to GE
+            use_oss = api.use_oss()[0]
             area = bpy.context.area
             old_type = area.type
             area.type = 'GRAPH_EDITOR'
+            area.spaces[0].dopesheet.show_only_selected = use_oss
 
             # Get data ready for bake
             prefs = api.get_preferences()
@@ -449,25 +451,9 @@ class ABRA_OT_bake_keys(bpy.types.Operator):
                 self.report({"ERROR"}, "This tool only works in Object or Pose Mode")
                 area.type = old_type
                 return {"CANCELLED"}
-
-            # Begin inserting keyframes by moving playhead on every nth frame until playhead reaches end of range.
-            api.dprint("BAKING RANGE ("+str(frange[0])+"-"+str(frange[1])+")", col="red")
-
-            # Deselect for interpolation change later
-            try:
-                bpy.ops.graph.select_all(action='DESELECT')
-            except RuntimeError:
-                pass
-
-            # NLA Bake
-            bpy.ops.graph.reveal()
-            api.dprint(f"frame_start= {frange[0]}, frame_end={frange[1]}, bake_types={bpy.context.mode}, use_current_action = True, clean_curves=False")
-            bpy.ops.nla.bake(frame_start=frange[0], frame_end=frange[1], bake_types={bpy.context.mode}, visual_keying=prefs.visual_keying, clear_constraints=prefs.clear_constraints, clear_parents=prefs.clear_parents, use_current_action = True, clean_curves=prefs.clean_curves)
-
-            # Deselect everything one final time
+            
+            before_baketime = time.time()
             bpy.ops.graph.select_all(action='DESELECT')
-
-            api.dprint("Initial bake complete. Moving to range start")
 
             # Create an array containing frame numbers within range
             frames_to_remove = list(range(frange[0], frange[1]+1))
@@ -476,35 +462,62 @@ class ABRA_OT_bake_keys(bpy.types.Operator):
             frames_to_keep = frames_to_remove[0::step]
             pruned = [i for i in frames_to_remove if i not in frames_to_keep]
 
+            api.dprint(f"Frames to keep: {frames_to_keep}")
             api.dprint(f"Frames to remove: {pruned}")
 
-            # Delete keys from array
             visible = api.get_visible_fcurves()
+
+            if api.fcurve_overload(visible):
+                area.type = old_type
+                self.report({"ERROR"}, f"Preventing overload ({prefs.fcurve_scan_limit} FCurves max, {len(visible)} active)")
+                return {"CANCELLED"}
+
+            if prefs.bake_method == "NLA":
+                bpy.ops.graph.reveal()
+                api.dprint(f"Baking using NLA...")
+                bpy.ops.nla.bake(frame_start=frange[0], frame_end=frange[1], bake_types={bpy.context.mode}, visual_keying=prefs.visual_keying, clear_constraints=prefs.clear_constraints, clear_parents=prefs.clear_parents, use_current_action = True, clean_curves=prefs.clean_curves)
+                bpy.ops.graph.interpolation_type(type=prefs.bake_type)
+                bpy.ops.graph.handle_type(type=prefs.bake_handle)
+
             wm = bpy.context.window_manager
             wm.progress_begin(0, len(visible))
             for i, curve in enumerate(visible):
                 if len(curve.keyframe_points):
-                    api.dprint(f"Pruning curve: {str(curve.data_path)}", col="yellow")
-                    if not re.search("(location$|rotation_quaternion$|rotation_euler$|scale$)", curve.data_path):
-                        api.dprint(f"--- This is not a transform F-Curve. Inserting keys...", col="blue")
-                        for ins in frames_to_remove:
+                    api.dprint(f"Working on curve: {str(curve.data_path)}", col="yellow")
+                    if prefs.bake_method == "Evaluation":
+                        api.dprint(f"Baking using Evaluation...")
+                        for ins in frames_to_keep:
                             curve.keyframe_points.insert(ins, curve.evaluate(ins), options={"FAST"})
+
+                            new_key_index = api.get_key_index_at_frame(curve, ins)
+                            key_before = api.get_key_left_neighbour(curve, new_key_index)
+
+                            if key_before and key_before.handle_right_type == "AUTO":
+                                curve.keyframe_points[new_key_index].handle_left_type = "AUTO"
+                                curve.keyframe_points[new_key_index].handle_right_type = "AUTO"
+                            else:
+                                curve.keyframe_points[new_key_index].handle_left_type = "AUTO_CLAMPED"
+                                curve.keyframe_points[new_key_index].handle_right_type = "AUTO_CLAMPED"
+
+                    area.tag_redraw()
+
                     for frame in pruned:
                         try:
-                            curve.keyframe_points.remove(curve.keyframe_points[api.get_key_index_at_frame(curve, frame)])
+                            to_remove_index = api.get_key_index_at_frame(curve, frame)
+                            if to_remove_index != -1:
+                                curve.keyframe_points.remove(curve.keyframe_points[to_remove_index])
                         except IndexError: # This would probably happen on NLA Strip Controls
-                            api.dprint(f"Cannot remove keys from this curve")
+                            api.dprint(f"--- Cannot remove keys from this curve")
                             break
                         wm.progress_update(i)
             wm.progress_end()
 
             # Change interpolation type of new keys
-            api.select_keys_in_range(frange[0], frange[1])
-            bpy.ops.graph.interpolation_type(type=prefs.bake_type)
-            bpy.ops.graph.handle_type(type=prefs.bake_handle)
+            #bpy.ops.graph.interpolation_type(type=prefs.bake_type)
+            #bpy.ops.graph.handle_type(type=prefs.bake_handle)
                 
             area.type = old_type
-            api.dprint("Bake should be complete", col="green")
+            api.dprint(f"Bake completed in {round(time.time() - before_baketime, 2)}s", col="green")
             return {"FINISHED"}
 
 #  $$$$$$\  $$$$$$$$\ $$\       $$$$$$$$\  $$$$$$\ $$$$$$$$\ $$$$$$\  $$$$$$\  $$\   $$\ 

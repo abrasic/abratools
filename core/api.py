@@ -107,7 +107,7 @@ def get_key_handle_coords(curve, key):
 
 def get_handle_distance(curve, key):
     """Returns [x1, y1, x2, y2] distance of handles from key"""
-    key_coords = get_key_coords(curve, key)
+    key_coords = [curve.keyframe_points[key].co[0] , curve.keyframe_points[key].co[1]]
     handle_coords = get_key_handle_coords(curve, key)
     x1 = abs(key_coords[0] - handle_coords[0])
     y1 = abs(key_coords[1] - handle_coords[1])

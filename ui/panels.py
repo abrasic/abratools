@@ -102,15 +102,20 @@ class ABRA_OT_bakepanel(bpy.types.Operator):
     def draw(self, context):
         prefs = api.get_preferences()
         layout = self.layout
+        layout.prop(prefs, "bake_method")
         layout.prop(prefs, "bake_framestep")
-        layout.prop(prefs, "bake_type")
-        layout.prop(prefs, "bake_handle")
+
         layout.separator()
-        layout.prop(prefs, "visual_keying")
-        layout.prop(prefs, "clean_curves")
-        layout.separator()
-        layout.prop(prefs, "clear_constraints")
-        layout.prop(prefs, "clear_parents")
+        box = layout.box()
+        if prefs.bake_method == "NLA":
+            box.prop(prefs, "bake_type")
+            box.prop(prefs, "bake_handle")
+            box.prop(prefs, "visual_keying")
+            box.prop(prefs, "clean_curves")
+            box.prop(prefs, "clear_constraints")
+            box.prop(prefs, "clear_parents")
+        else:
+            pass
 
 class Set_Selector_Vars(bpy.types.PropertyGroup):
     renaming: bpy.props.BoolProperty(name="renaming", description="", default=False)
