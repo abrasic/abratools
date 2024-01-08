@@ -1,4 +1,5 @@
 import bpy, re, time
+import numpy as np
 from bpy.app.handlers import persistent
 from . import api
 
@@ -414,7 +415,7 @@ class ABRA_OT_key_retime(bpy.types.Operator):
         prefs.retime_framestart = context.scene.frame_current
         bpy.ops.message.retimepanel("INVOKE_DEFAULT")
         return {"FINISHED"}
-
+    
 class ABRA_OT_bake_keys(bpy.types.Operator):
     bl_idname = "screen.at_bake_keys"
     bl_label = "Bake Keys"
@@ -452,8 +453,10 @@ class ABRA_OT_bake_keys(bpy.types.Operator):
                 area.type = old_type
                 return {"CANCELLED"}
             
-            before_baketime = time.time()
-            bpy.ops.graph.select_all(action='DESELECT')
+            baketime = time.time()
+            phase1_baketime = baketime
+            phase2_baketime = baketime
+            phase3_baketime = baketime
 
             # Create an array containing frame numbers within range
             frames_to_remove = list(range(frange[0], frange[1]+1))
@@ -467,57 +470,179 @@ class ABRA_OT_bake_keys(bpy.types.Operator):
 
             visible = api.get_visible_fcurves()
 
+            if prefs.bake_method == "NLA":
+                bpy.ops.graph.reveal()
+                visible = api.get_visible_fcurves()
+                for i, curve in enumerate(visible):
+                    if len(curve.keyframe_points):
+                        api.dprint(f"Pruning curve: {str(curve.data_path)}", col="yellow")
+                        if not re.search("(location$|rotation_quaternion$|rotation_euler$|scale$)", curve.data_path):
+                            api.dprint(f"--- This is not a transform F-Curve. Inserting keys...", col="blue")
+                            for ins in frames_to_remove:
+                                curve.keyframe_points.insert(ins, curve.evaluate(ins), options={"FAST"})
+                bpy.ops.graph.select_all(action='DESELECT')
+                api.dprint(f"Baking using NLA...")
+                bpy.ops.nla.bake(frame_start=frange[0], frame_end=frange[1], bake_types={bpy.context.mode}, visual_keying=prefs.visual_keying, clear_constraints=prefs.clear_constraints, clear_parents=prefs.clear_parents, use_current_action = True, clean_curves=prefs.clean_curves)
+
+                bpy.ops.graph.interpolation_type(type=prefs.bake_type)
+                bpy.ops.graph.handle_type(type=prefs.bake_handle)
+                bpy.ops.graph.select_all(action='DESELECT')
+
             if api.fcurve_overload(visible):
                 area.type = old_type
                 self.report({"ERROR"}, f"Preventing overload ({prefs.fcurve_scan_limit} FCurves max, {len(visible)} active)")
                 return {"CANCELLED"}
 
-            if prefs.bake_method == "NLA":
-                bpy.ops.graph.reveal()
-                api.dprint(f"Baking using NLA...")
-                bpy.ops.nla.bake(frame_start=frange[0], frame_end=frange[1], bake_types={bpy.context.mode}, visual_keying=prefs.visual_keying, clear_constraints=prefs.clear_constraints, clear_parents=prefs.clear_parents, use_current_action = True, clean_curves=prefs.clean_curves)
-                bpy.ops.graph.interpolation_type(type=prefs.bake_type)
-                bpy.ops.graph.handle_type(type=prefs.bake_handle)
-
             wm = bpy.context.window_manager
             wm.progress_begin(0, len(visible))
-            for i, curve in enumerate(visible):
+
+            if prefs.bake_method == "Newton-Raphson":
+                api.dprint(f"Baking using Newton-Raphson...")
+
+                api.dprint(f"PHASE 1: PRE-BAKE", col="orange")
+                for cl, curve in enumerate(visible):
+
+                    bpy.ops.graph.select_all(action='DESELECT')
+
+                    api.dprint(f"Pre-sampling curve {str(curve.data_path)}...", col="yellow")
+
+                    try:
+                        first_key_frame = curve.keyframe_points[0]
+                        last_key_frame = curve.keyframe_points[-1]
+                    except IndexError:
+                        continue
+
+                    # If a new key is inserted before first_key_frame or last_key_frame, and either of them are automatic tangents, it's going to create a gigantic overshoot that will be part of the final bake. We don't want this.
+                    # As an attempt to avoid this, if the very first key is beyond the frame range bounds, insert keys backwards to prevent the automatic overshooting.
+                    api.dprint(f"{first_key_frame.co[0]} || {last_key_frame.co[0]}")
+                    
+                    if first_key_frame.co[0] > frange[1] or last_key_frame.co[0] < frange[0]: # If the baked segment starts at a starting/end constant on F-Curve
+                        api.dprint(f"Start/End Segment Case")
+
+                        # We need to freeze the right handle of last key otherwise if it's automatic it will make a giant overshoot
+                        if first_key_frame.co[0] > frange[1]:
+                            api.dprint(f"--- Segment starts at beginning of F-Curve")
+                            first_key_frame.handle_left_type = "FREE"
+                            first_key_frame.handle_left[1] = first_key_frame.co[1]
+                            
+                        elif last_key_frame.co[0] < frange[0]:
+                            api.dprint(f"--- Segment starts at end of F-Curve")
+                            last_key_frame.handle_right_type = "FREE"
+                            last_key_frame.handle_right[1] = last_key_frame.co[1]
+                    
+                    if first_key_frame.co[0] > frange[0] and first_key_frame.co[0] < frange[1]:
+                        curve.keyframe_points.insert(first_key_frame.co[0]-1, curve.evaluate(first_key_frame.co[0]-1), options={"FAST"})
+                        first_key_frame.handle_left_type = "AUTO_CLAMPED"
+                        first_key_frame.handle_right_type = "AUTO_CLAMPED"
+
+                        curve.keyframe_points.insert(frange[0], curve.evaluate(first_key_frame.co[0]), options={"FAST"})
+
+                    if last_key_frame.co[0] > frange[0] and last_key_frame.co[0] < frange[1]:
+                        curve.keyframe_points.insert(last_key_frame.co[0]+1, curve.evaluate(last_key_frame.co[0]+1), options={"FAST"})
+                        last_key_frame.handle_left_type = "AUTO_CLAMPED"
+                        last_key_frame.handle_right_type = "AUTO_CLAMPED"
+
+                        curve.keyframe_points.insert(frange[1], curve.evaluate(last_key_frame.co[0]), options={"FAST"})
+
+                    curve.keyframe_points.insert(frange[0], curve.evaluate(frange[0]), options={"FAST"})
+                    curve.keyframe_points.insert(frange[1], curve.evaluate(frange[1]), options={"FAST"})
+                    wm.progress_update(cl)
+
+
+                # Using a hacky marker workaround to select range since its faster
+                bpy.context.scene.timeline_markers.new("aT_tmp", frame=-999) # If the user is not using markers, make one. therwise context will fail
+                bpy.ops.marker.select_all(action='DESELECT')
+                bpy.context.scene.timeline_markers.new("bakeL", frame=frange[0])
+                bpy.context.scene.timeline_markers.new("bakeR", frame=frange[1])
+
+                bpy.ops.graph.select_column(mode='MARKERS_BETWEEN')
+                bpy.context.scene.timeline_markers.remove(bpy.context.scene.timeline_markers[-1])
+                bpy.context.scene.timeline_markers.remove(bpy.context.scene.timeline_markers[-1])
+                bpy.context.scene.timeline_markers.remove(bpy.context.scene.timeline_markers["aT_tmp"])
+
+                if bpy.data.version > (4,0,0):
+                    bpy.ops.graph.bake_keys()
+                else:
+                    bpy.ops.graph.sample()
+
+                phase1_baketime = round(time.time() - baketime, 2)
+
+            
+
+
+            api.dprint(f"PHASE 2: TANGENT SOLVING", col="orange")
+            for clen, curve in enumerate(visible):
                 if len(curve.keyframe_points):
-                    api.dprint(f"Working on curve: {str(curve.data_path)}", col="yellow")
-                    if prefs.bake_method == "Evaluation":
-                        api.dprint(f"Baking using Evaluation...")
-                        for ins in frames_to_keep:
-                            curve.keyframe_points.insert(ins, curve.evaluate(ins), options={"FAST"})
+                    if prefs.bake_method == "Newton-Raphson":
 
-                            new_key_index = api.get_key_index_at_frame(curve, ins)
-                            key_before = api.get_key_left_neighbour(curve, new_key_index)
+                        bpy.ops.graph.select_all(action='DESELECT')
+                        
+                        if step > 1:
+                            for ins in frames_to_keep:
+                                api.dprint(f"[[[ FRAME {ins} ]]]")
+                                x = []
+                                y = []
+                                substeps = prefs.newton_substeps
 
-                            if key_before and key_before.handle_right_type == "AUTO":
-                                curve.keyframe_points[new_key_index].handle_left_type = "AUTO"
-                                curve.keyframe_points[new_key_index].handle_right_type = "AUTO"
-                            else:
-                                curve.keyframe_points[new_key_index].handle_left_type = "AUTO_CLAMPED"
-                                curve.keyframe_points[new_key_index].handle_right_type = "AUTO_CLAMPED"
+                                key_now = api.get_key_index_at_frame(curve, ins)
+                                key_next = api.get_key_index_at_frame(curve, ins+step)
 
-                    area.tag_redraw()
+                                if curve.keyframe_points[key_now].interpolation == "BEZIER":
+                                    for i, v in enumerate(range(0, substeps+1)):
+                                        next_step = ins + step
+                                        xapp = (((next_step-ins)/substeps)*(v))+ins
+                                        x.append(xapp)
+                                        y.append(curve.evaluate(xapp))
 
-                    for frame in pruned:
-                        try:
-                            to_remove_index = api.get_key_index_at_frame(curve, frame)
-                            if to_remove_index != -1:
-                                curve.keyframe_points.remove(curve.keyframe_points[to_remove_index])
-                        except IndexError: # This would probably happen on NLA Strip Controls
-                            api.dprint(f"--- Cannot remove keys from this curve")
-                            break
-                        wm.progress_update(i)
+                                        api.dprint(f"X = {xapp}, Y = {curve.evaluate(xapp)}")
+
+
+                                    pts = np.array([x,y]).T
+                                    handles = api.get_control_points_from_best_fit(pts, err=prefs.newton_err)
+
+                                    x_bez = []
+                                    y_bez = []
+
+                                    for bez in handles:
+                                        for pt in bez:
+                                            x_bez.append(pt[0])
+                                            y_bez.append(pt[1])
+                                    api.dprint(f"Left Control Point: {x_bez[:2][1], y_bez[:2][1]}")
+                                    api.dprint(f"Right Control Point: {x_bez[2:4][0], y_bez[2:4][0]}")
+
+                                    curve.keyframe_points[key_now].handle_right_type = "FREE"
+                                    curve.keyframe_points[key_now].handle_right[0] = x_bez[:2][1]
+                                    curve.keyframe_points[key_now].handle_right[1] = y_bez[:2][1]
+
+                                    curve.keyframe_points[key_next].handle_left_type = "FREE"
+                                    curve.keyframe_points[key_next].handle_left[0] = x_bez[2:4][0]
+                                    curve.keyframe_points[key_next].handle_left[1] = y_bez[2:4][0]
+
+                                    if prefs.newton_autoalign:
+                                        curve.keyframe_points[key_now].handle_right_type = "ALIGNED"
+                                        curve.keyframe_points[key_next].handle_left_type = "ALIGNED"
+                                else:
+                                    api.dprint(f"Key is not bezier. Skipping...")
+
+                                wm.progress_update(clen)
+
+                for ins in pruned:
+                    try:
+                        curve.keyframe_points.remove(curve.keyframe_points[api.get_key_index_at_frame(curve, ins)])
+                    except IndexError:
+                        pass
+
+            phase2_baketime = round(time.time() - baketime,2)
+
             wm.progress_end()
 
-            # Change interpolation type of new keys
-            #bpy.ops.graph.interpolation_type(type=prefs.bake_type)
-            #bpy.ops.graph.handle_type(type=prefs.bake_handle)
+            # Remove overalpping keys incase of a double bake (dumb workaround)
+            bpy.ops.graph.select_all(action='SELECT')
+            bpy.ops.graph.clean(threshold=0)
+            bpy.ops.graph.select_all(action='DESELECT')
                 
             area.type = old_type
-            api.dprint(f"Bake completed in {round(time.time() - before_baketime, 2)}s", col="green")
+            api.dprint(f"{frange[1] - frange[0]} frames with {len(visible)} F-Curves solved in {phase2_baketime}s (prebake {phase1_baketime}s)", col="green")
             return {"FINISHED"}
 
 #  $$$$$$\  $$$$$$$$\ $$\       $$$$$$$$\  $$$$$$\ $$$$$$$$\ $$$$$$\  $$$$$$\  $$\   $$\ 

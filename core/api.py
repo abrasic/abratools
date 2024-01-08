@@ -1,4 +1,5 @@
 import bpy, addon_utils, os, math, importlib.util
+import numpy as np
 from . import api
 
 def get_preferences():
@@ -443,3 +444,134 @@ def are_keys_selected(curves):
                 return True
             
     return False
+
+def get_control_points_from_best_fit(pts, err):
+    """Returns bezier curve that would best fit the given points"""
+
+    ctrl_left = np_normalize(pts[1] - pts[0])
+    ctrl_right = np_normalize(pts[-2] - pts[-1])
+    return fit_curve(pts, ctrl_left, ctrl_right, err)
+
+### CURVE FITTING FUNCTIONS
+# Courtesy of https://stackoverflow.com/questions/75489204
+
+def q(p,t):
+    return (1.0-t)**3 * p[0] + 3*(1.0-t)**2 * t * p[1] + 3*(1.0-t)* t**2 * p[2] + t**3 * p[3]
+
+def q_prime(p,t):
+    return 3*(1.0-t)**2 * (p[1]-p[0]) + 6*(1.0-t) * t * (p[2]-p[1]) + 3*t**2 * (p[3]-p[2])
+
+def q_prime_prime(p,t):
+    return 6*(1.0-t) * (p[2]-2*p[1]+p[0]) + 6*(t) * (p[3]-2*p[2]+p[1])
+
+def newton_raphson(bez, point, u):
+    d = q(bez, u)-point
+    numerator = (d * q_prime(bez, u)).sum()
+    denominator = (q_prime(bez, u)**2 + d * q_prime_prime(bez, u)).sum()
+
+    if denominator == 0.0:
+        return u
+    else:
+        return u - numerator/denominator
+
+def parametrize(pts):
+    u = [0.0]
+    for i in range(1, len(pts)):
+        u.append(u[i-1] + np.linalg.norm(pts[i] - pts[i-1]))
+
+    for i, v in enumerate(u):
+        u[i] = u[i] / u[-1]
+
+    return u
+
+def reparametrize(bez, pts, u):
+    return [newton_raphson(bez, point, u) for point, u in zip(pts, u)]
+
+def generate_curve(pts, u, lt, rt):
+    bez = [pts[0], None, None, pts[-1]]
+
+    A = np.zeros((len(u), 2,2))
+    for i, v in enumerate(u):
+        A[i][0] = lt  * 3*(1-v)**2 * v
+        A[i][1] = rt * 3*(1-v)    * v**2
+
+    C = np.zeros((2,2))
+    X = np.zeros(2)
+
+    for i, (pt, u) in enumerate(zip(pts,u)):
+        C[0][0] += np.dot(A[i][0], A[i][0])
+        C[0][1] += np.dot(A[i][0], A[i][1])
+        C[1][0] += np.dot(A[i][0], A[i][1])
+        C[1][1] += np.dot(A[i][1], A[i][1])
+
+        t = pt - q([pts[0], pts[0], pts[-1], pts[-1]], u)
+
+        X[0] += np.dot(A[i][0], t)
+        X[1] += np.dot(A[i][1], t)
+
+    det_C0_C1 = C[0][0] * C[1][1] - C[1][0] * C[0][1]
+    det_C0_X  = C[0][0] * X[1] - C[1][0] * X[0]
+    det_X_C1  = X[0] * C[1][1] - X[1] * C[0][1]
+
+    alpha_l = 0.0 if det_C0_C1 == 0 else det_X_C1 / det_C0_C1
+    alpha_r = 0.0 if det_C0_C1 == 0 else det_C0_X / det_C0_C1
+
+    segLength = np.linalg.norm(pts[0] - pts[-1])
+    epsilon = 1.0e-6 * segLength
+    if alpha_l < epsilon or alpha_r < epsilon:
+        bez[1] = bez[0] + lt * (segLength / 3.0)
+        bez[2] = bez[3] + rt * (segLength / 3.0)
+
+    else:
+        bez[1] = bez[0] + lt * alpha_l
+        bez[2] = bez[3] + rt * alpha_r
+
+    return bez
+
+def get_max_error(pts, bez, u):
+    max_dist = 0.0
+    split = len(pts)/2
+    for i, (point, u) in enumerate(zip(pts, u)):
+        dist = ((q(bez,u)-point)**2).sum(-1)
+        #dist = np.linalg.norm(q(bez, u)-point)**2
+        if dist > max_dist:
+            max_dist = dist
+            split = i
+
+    return max_dist, split
+
+def fit_curve(pts, lt, rt, err):
+
+    if len(pts) == 2:
+        dist = np.linalg.norm(pts[0] - pts[1]) / 3.0
+        bez = [pts[0], pts[0] + lt * dist, pts[1] + rt * dist, pts[1]]
+        return [bez]
+
+    u = parametrize(pts)
+    bez = generate_curve(pts, u, lt, rt)
+
+    max_err, split = get_max_error(pts, bez, u)
+    if max_err < err:
+        return [bez]
+    
+    if max_err < err**2:
+        for i in range(20):
+            up = reparametrize(bez, pts, u)
+            bez = generate_curve(pts, up, lt, rt)
+            max_err, split = get_max_error(pts, bez, up)
+
+            if max_err < err:
+                return [bez]
+            u = up
+    beziers = []
+    ct = np_normalize(pts[split-1]-pts[split+1])
+    beziers += fit_curve(pts[:split+1], lt, ct, err)
+    beziers += fit_curve(pts[split:], -ct, rt, err)
+
+    return beziers
+
+def np_normalize(v):
+    mg = math.sqrt(v.dot(v))
+    if mg < np.finfo(float).eps:
+        return v
+    return v / mg

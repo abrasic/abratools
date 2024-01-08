@@ -115,7 +115,9 @@ class ABRA_OT_bakepanel(bpy.types.Operator):
             box.prop(prefs, "clear_constraints")
             box.prop(prefs, "clear_parents")
         else:
-            pass
+            box.prop(prefs, "newton_err")
+            box.prop(prefs, "newton_substeps")
+            box.prop(prefs, "newton_autoalign")
 
 class Set_Selector_Vars(bpy.types.PropertyGroup):
     renaming: bpy.props.BoolProperty(name="renaming", description="", default=False)

@@ -456,12 +456,32 @@ class AbraToolsPrefs(AddonPreferences):
 
     bake_method: EnumProperty(
         name = "Method",
-        description = "The type of method to use for baking keys.\n\nNLA: \n-Uses standard 'NLA > Bake Action' prodecure.\n-Will bake on ALL F-Curves (even hidden ones) on selected bones or objects.\n-Does not preserve keyframe handle type and is not entirely accurate.\n-Does not support non-transform F-Curves (custom property, shape keys, etc).\n\nEvaluation:\n-May be slower but is more accurate.\n-Only bakes on visible F-Curves.\n-Supports all types of F-Curves.\n",
+        description = "The type of method to use for baking keys.\n\nNLA: \n-Uses standard 'NLA > Bake Action' prodecure.\n-Will bake on ALL F-Curves (even hidden ones) on selected bones or objects.\n-Does not preserve keyframe handle type and is not entirely accurate.\n-Does not support non-transform F-Curves (custom property, shape keys, etc).\nNewton-Raphson:\n-May be slower but is more accurate.\n-Only bakes on visible F-Curves.\n-Supports all types of F-Curves.\n",
         items = (
             ("NLA", "NLA", ""),
-            ("Evaluation", "Evaluation", ""),
+            ("Newton-Raphson", "Newton-Raphson", ""),
         ),
-        default = "Evaluation",
+        default = "Newton-Raphson",
+    )
+
+    newton_err: IntProperty(
+        name= "Error Threshold",
+        description= "Determines how 'strict' the algorithm will be at guessing curve tangents. \n\nA larger value may result in more accurate curves, but will take longer to solve",
+        default=5,
+        min=1
+    )
+
+    newton_substeps: IntProperty(
+        name= "Substeps",
+        description= "How many points are used inbetween keys as data to be used to calculate curve tangents.\n\nA larger value may result in more accurate curves, but will take longer to solve",
+        default=10,
+        min=1
+    )
+
+    newton_autoalign: BoolProperty(
+        name = "Auto Align",
+        description = "Baked keys will be converted back into 'Aligned' handles to prevent sharp tangents",
+        default = True,
     )
 
     visual_keying: BoolProperty(
