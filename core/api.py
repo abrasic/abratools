@@ -28,7 +28,7 @@ def dprint(text, col=None):
         else:
             color = '\x1b[1;30;40m'
 
-        print(color + 'ABRATOOLS DEBUG:' + '\x1b[0m ' + text)
+        print(color + 'ABRATOOLS DEBUG:' + '\x1b[0m ' + str(text))
 
 def get_frame_range():
     prefs = get_preferences()
@@ -50,6 +50,13 @@ def get_selected_fcurves(visible=False):
         return bpy.context.selected_visible_fcurves
     else:
         return bpy.context.selected_editable_fcurves
+    
+def get_standard_curves():
+    gsf = get_selected_fcurves()
+    if len(gsf):
+        return gsf
+    else:
+        return bpy.context.visible_fcurves
 
 def get_fcurve_data_path(curve):
     return curve.data_path

@@ -206,6 +206,12 @@ class AbraToolsPrefs(AddonPreferences):
         default = True
     )
 
+    vis_delete_static_channels: BoolProperty(
+        name = key.ABRA_OT_delete_static_channels.bl_label,
+        description = key.ABRA_OT_delete_static_channels.bl_description,
+        default = False
+    )
+
     vis_keyretime: BoolProperty(
         name = key.ABRA_OT_key_retime.bl_label,
         description = key.ABRA_OT_key_retime.bl_description,

@@ -404,6 +404,52 @@ class ABRA_OT_key_armature(bpy.types.Operator):
                 
         return {"FINISHED"}
 
+class ABRA_OT_delete_static_channels(bpy.types.Operator):
+    bl_idname = "screen.at_delete_static_channels"
+    bl_label = "Delete Static Channels"
+    bl_description = "Deletes any visible F-Curves that do not change value"
+    bl_options = {"REGISTER", "UNDO"}
+
+    def execute(self, context):
+        use_oss = api.use_oss()[0]
+        area = bpy.context.area
+        old_type = area.type
+        area.type = 'GRAPH_EDITOR'
+        area.spaces[0].dopesheet.show_only_selected = use_oss
+        visible = api.get_standard_curves()
+        fd = 0
+        
+        if visible:
+            wm = bpy.context.window_manager
+            wm.progress_begin(0, len(visible))
+            for ci, curve in enumerate(visible):
+                api.dprint(f"[[ {curve.data_path} ]]", col="blue")
+                kfp = curve.keyframe_points
+                conf = len(kfp)
+                numbers = np.zeros(conf)
+
+                if conf:
+                    for r, i in enumerate(kfp):
+                        numbers[r] = i.co[1]
+
+                    if np.min(numbers) == np.max(numbers):
+                        api.dprint("--- Curve is static. Deleting...", col="red")
+                        ac = curve.id_data
+                        ac.fcurves.remove(curve)
+                        fd += 1
+                    else:
+                        api.dprint("--- Curve is moving...", col="blue")
+                wm.progress_update(ci)
+            
+            wm.progress_end()
+            self.report({"INFO"}, f"Removed {fd} F-Curves")
+            area.type = old_type
+            
+            return {"FINISHED"}
+        else:
+            area.type = old_type
+            return {"CANCELLED"}
+
 class ABRA_OT_key_retime(bpy.types.Operator):
     bl_idname = "screen.at_key_retime"
     bl_label = "Retime Scene"
@@ -1260,6 +1306,7 @@ ABRA_OT_share_common_key_timing,
 ABRA_OT_copy_timing,
 ABRA_OT_key_shapekeys,
 ABRA_OT_key_armature,
+ABRA_OT_delete_static_channels,
 ABRA_OT_key_retime,
 ABRA_OT_bake_keys,
 ABRA_OT_select_children,

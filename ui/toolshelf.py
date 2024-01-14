@@ -22,6 +22,7 @@ ic_cursor_gizmo = ic["cursor_gizmo"]
 ic_cursor_to_selected = ic["cursor_to_selected"]
 ic_delete_keys = ic["delete_keys"]
 ic_delete_path = ic["delete_path"]
+ic_delete_static_channels = ic["delete_static_channels"]
 ic_goto_left = ic["goto_left"]
 ic_goto_right = ic["goto_right"]
 ic_isolate_curves = ic["isolate_curves"]
@@ -248,6 +249,8 @@ def prefsHeaderWrite(self, context):
         layout.operator(key.ABRA_OT_key_shapekeys.bl_idname, text='', icon_value=ic_key_all_shapes.icon_id)
     if (prefs.vis_keyarmature): 
         layout.operator(key.ABRA_OT_key_armature.bl_idname, text='', icon_value=ic_key_whole_armature.icon_id)
+    if (prefs.vis_delete_static_channels):
+        layout.operator(key.ABRA_OT_delete_static_channels.bl_idname, text='', icon_value=ic_delete_static_channels.icon_id)
     if (prefs.vis_keyretime): 
         layout.operator(key.ABRA_OT_key_retime.bl_idname, text='', icon_value=ic_retime_scene.icon_id)
 
@@ -375,6 +378,7 @@ def prefsBodyWrite(self, context):
         col.prop(prefs, "vis_paste_timing", icon_value=ic_copy_timing.icon_id)
         col.prop(prefs, "vis_keyshape", icon_value=ic_key_all_shapes.icon_id)
         col.prop(prefs, "vis_keyarmature", icon_value=ic_key_whole_armature.icon_id)
+        col.prop(prefs, "vis_delete_static_channels", icon_value=ic_delete_static_channels.icon_id)
         col.prop(prefs, "vis_keyretime", icon_value=ic_retime_scene.icon_id)
     if (prefs.toolshelf_pages == "tangents"):
         col.label(text="Tools that modify tangents of keyframes")

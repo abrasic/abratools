@@ -36,9 +36,9 @@ class ABRA_OT_execute_script(bpy.types.Operator):
         area.type = modu.script_info.context
 
         try:
-            modu.execute() # Executes code from that file
+            modu.execute() # Run script
         except Exception as e:
-            self.report({'ERROR'}, "[aT] " + str(e))
+            self.report({'ERROR'}, "[aT] Script '" + self.file + "' created an error" + "\n" + "----------------------------" + "\n" + traceback.format_exc())
             area.type = old_type
             return {"CANCELLED"}
         
