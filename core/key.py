@@ -68,7 +68,9 @@ class ABRA_OT_nudge_left(bpy.types.Operator):
                 closest = 2**30
                 for curve in fcurves:
                     api.dprint(f"---- {curve.data_path} ----")
-                    for k in curve.keyframe_points:
+                    kfp = list(curve.keyframe_points)
+                    kfp.reverse()
+                    for k in kfp:
                         distance = k.co[0] - cfra
                         if k.co[0] <= context.scene.frame_current:
                             api.dprint(f"Key exceeds playhead {k.co[0]}. Breaking")
