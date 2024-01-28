@@ -12,6 +12,174 @@ from . import api
 # $$ | \$$\ $$$$$$$$\     $$ |    $$$$$$\ $$ | \$$ |\$$$$$$  |
 # \__|  \__|\________|    \__|    \______|\__|  \__| \______/ 
 
+class ABRA_OT_nudge_left(bpy.types.Operator):
+    bl_idname = "screen.at_nudge_left"
+    bl_label = "Nudge Left"
+    bl_description = "Moves/nudges selected keyframes to the left based on Nudge Interval value"
+    bl_options = {"REGISTER", "UNDO"}
+
+    def execute(self, context):
+        area = bpy.context.area
+        old = area.type
+        area.type = 'GRAPH_EDITOR'
+        area.spaces[0].dopesheet.show_only_selected = api.use_oss()[0]
+
+        prefs = api.get_preferences()
+        fcurves = api.get_standard_curves()
+
+        #F-Curves are not selected when keys are selected in Dope Sheet
+        for curve in fcurves:
+            curve.select = True
+
+        key_editable = bpy.context.selected_editable_keyframes
+
+        if len(key_editable):
+            api.dprint("Keys are selected. Only move what is selected.")
+            cfra = context.scene.frame_current
+            near = -2**30
+            far = 2**30
+            for k in key_editable:
+                if k.co[0] > near:
+                    near = k.co[0]
+                if k.co[0] < far:
+                    far = k.co[0]
+
+            bpy.ops.transform.translate(value=(-(prefs.nudge_interval), 0, 0))
+            if (far - prefs.nudge_interval) <= cfra and (near + prefs.nudge_interval) >= cfra:
+                context.scene.frame_current -= prefs.nudge_interval
+        else:
+            api.dprint("No keys are selected. Check for keys on playhead.")
+            try:
+                bpy.ops.graph.select_column(mode='CFRA')
+            except RuntimeError:
+                area.type = old
+                return {"CANCELLED"}
+            key_editable = bpy.context.selected_editable_keyframes
+
+            if len(key_editable):
+            # If keys are on playhead, move only the keys on the playhead and move current frame.
+                bpy.ops.transform.translate(value=(-(prefs.nudge_interval), 0, 0))
+                context.scene.frame_current -= prefs.nudge_interval
+                bpy.ops.graph.select_all(action='DESELECT')
+            else:
+                api.dprint("No keys selected or on playhead.")
+                cfra = context.scene.frame_current
+                key_selection = []
+                closest = 2**30
+                for curve in fcurves:
+                    api.dprint(f"---- {curve.data_path} ----")
+                    for k in curve.keyframe_points:
+                        distance = k.co[0] - cfra
+                        if k.co[0] <= context.scene.frame_current:
+                            api.dprint(f"Key exceeds playhead {k.co[0]}. Breaking")
+                            break
+                        if (distance < closest):
+                            closest = distance
+                            api.dprint(f"NEW CLOSEST FRAME: {closest}", col="red")
+
+                api.dprint(f"Closest distance appears to be {closest}", col="orange")
+
+                bpy.ops.graph.select_all(action='DESELECT')
+                if closest != 2**30:
+                    for curve in fcurves:
+                        try:
+                            frame_target = int(closest+cfra)
+                            key_index = api.get_key_index_at_frame(curve,frame_target)
+                            if curve.keyframe_points[key_index].co[0] == frame_target:
+                                curve.keyframe_points[key_index].select_control_point = True
+                        except IndexError:
+                            continue
+
+                    bpy.ops.transform.translate(value=(-int(closest), 0, 0))
+                    bpy.ops.graph.select_all(action='DESELECT')
+
+        area.type = old
+        return {"FINISHED"}
+    
+class ABRA_OT_nudge_right(bpy.types.Operator):
+    bl_idname = "screen.at_nudge_right"
+    bl_label = "Nudge Right"
+    bl_description = "Moves/nudges selected keyframes to the right based on Nudge Interval value"
+    bl_options = {"REGISTER", "UNDO"}
+
+    def execute(self, context):
+        area = bpy.context.area
+        old = area.type
+        area.type = 'GRAPH_EDITOR'
+        area.spaces[0].dopesheet.show_only_selected = api.use_oss()[0]
+
+        prefs = api.get_preferences()
+        fcurves = api.get_standard_curves()
+
+        #F-Curves are not selected when keys are selected in Dope Sheet
+        for curve in fcurves:
+            curve.select = True
+
+        key_editable = bpy.context.selected_editable_keyframes
+
+        if len(key_editable):
+            api.dprint("Keys are selected. Only move what is selected.")
+            cfra = context.scene.frame_current
+            near = -2**30
+            far = 2**30
+            for k in key_editable:
+                if k.co[0] > near:
+                    near = k.co[0]
+                if k.co[0] < far:
+                    far = k.co[0]
+
+            bpy.ops.transform.translate(value=((prefs.nudge_interval), 0, 0))
+            if (far - prefs.nudge_interval) <= cfra and (near + prefs.nudge_interval) >= cfra:
+                context.scene.frame_current += prefs.nudge_interval
+        else:
+            api.dprint("No keys are selected. Check for keys on playhead.")
+            try:
+                bpy.ops.graph.select_column(mode='CFRA')
+            except RuntimeError:
+                area.type = old
+                return {"CANCELLED"}
+            key_editable = bpy.context.selected_editable_keyframes
+
+            if len(key_editable):
+            # If keys are on playhead, move only the keys on the playhead and move current frame.
+                bpy.ops.transform.translate(value=((prefs.nudge_interval), 0, 0))
+                context.scene.frame_current += prefs.nudge_interval
+                bpy.ops.graph.select_all(action='DESELECT')
+            else:
+                api.dprint("No keys selected or on playhead.")
+                cfra = context.scene.frame_current
+                key_selection = []
+                closest = 2**30
+                for curve in fcurves:
+                    api.dprint(f"---- {curve.data_path} ----")
+                    for k in curve.keyframe_points:
+                        distance = cfra - k.co[0]
+                        if k.co[0] >= context.scene.frame_current:
+                            api.dprint(f"Key exceeds playhead {k.co[0]}. Breaking")
+                            break
+                        if (distance < closest):
+                            closest = distance
+                            api.dprint(f"NEW CLOSEST FRAME: {closest}", col="red")
+
+                api.dprint(f"Closest distance appears to be {closest}", col="orange")
+
+                bpy.ops.graph.select_all(action='DESELECT')
+                if closest != 2**30:
+                    for curve in fcurves:
+                        try:
+                            frame_target = int(cfra-closest)
+                            key_index = api.get_key_index_at_frame(curve,frame_target)
+                            if curve.keyframe_points[key_index].co[0] == frame_target:
+                                curve.keyframe_points[key_index].select_control_point = True
+                        except IndexError:
+                            continue
+
+                    bpy.ops.transform.translate(value=(int(closest), 0, 0))
+                    bpy.ops.graph.select_all(action='DESELECT')
+
+        area.type = old
+        return {"FINISHED"}
+
 class ABRA_OT_key_selected(bpy.types.Operator):
     bl_idname = "screen.at_quick_insert"
     bl_label = "Key Selected Curves"
@@ -1294,6 +1462,8 @@ class ABRA_OT_tangent_autoclamp(bpy.types.Operator):
 ############################################
 
 cls = (clipboard,
+ABRA_OT_nudge_left,
+ABRA_OT_nudge_right,
 ABRA_OT_key_selected,
 ABRA_OT_key_visible,
 ABRA_OT_key_copy,

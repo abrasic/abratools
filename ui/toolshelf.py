@@ -1,4 +1,4 @@
-import bpy 
+import bpy, math
 
 from ..core import api, key, quickView, customScripts
 from .icons import icons_coll
@@ -30,6 +30,9 @@ ic_key_all_shapes = ic["key_all_shapes"]
 ic_key_selected = ic["key_selected"]
 ic_key_visible = ic["key_visible"]
 ic_key_whole_armature = ic["key_whole_armature"]
+ic_nudge_left = ic["nudge_left"]
+ic_nudge_right = ic["nudge_right"]
+ic_nudge_interval = ic["nudge_interval"]
 ic_orient_switcher = ic["orient_switcher"]
 ic_paste_keys = ic["paste_keys"]
 ic_paste_pose = ic["paste_pose"]
@@ -217,6 +220,14 @@ def prefsHeaderWrite(self, context):
         layout.operator(quickView.ABRA_OT_goto_keyframe_right.bl_idname, text='', icon_value=ic_goto_right.icon_id)
 
     ## KEYING ##
+    if prefs.vis_nudge_left:
+        layout.operator(key.ABRA_OT_nudge_left.bl_idname, text='', icon_value=ic_nudge_left.icon_id)
+    if prefs.vis_nudge_right:
+        layout.operator(key.ABRA_OT_nudge_right.bl_idname, text='', icon_value=ic_nudge_right.icon_id)
+    if prefs.vis_nudge_interval:
+        intwin = layout.row()
+        intwin.scale_x = ((math.sqrt(prefs.button_width)/20)+0.80)-(prefs.button_width/4)
+        intwin.prop(prefs, "nudge_interval", text='')
     if (prefs.vis_keysel):  
         layout.operator(key.ABRA_OT_key_selected.bl_idname, text='', icon_value=ic_key_selected.icon_id)
     if (prefs.vis_keyvis): 
@@ -364,6 +375,9 @@ def prefsBodyWrite(self, context):
         col.prop(prefs, "vis_goto_right", icon_value=ic_goto_right.icon_id)
     if (prefs.toolshelf_pages == "fastkey"):
         col.label(text="Tools that modify and manage keyframes")
+        col.prop(prefs, "vis_nudge_left", icon_value=ic_nudge_left.icon_id)
+        col.prop(prefs, "vis_nudge_right", icon_value=ic_nudge_right.icon_id)
+        col.prop(prefs, "vis_nudge_interval", icon_value=ic_nudge_interval.icon_id)
         col.prop(prefs, "vis_keysel", icon_value=ic_key_selected.icon_id)
         col.prop(prefs, "vis_keyvis", icon_value=ic_key_visible.icon_id)
         col.prop(prefs, "vis_keycopy", icon_value=ic_copy_keys.icon_id)

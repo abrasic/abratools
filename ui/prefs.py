@@ -115,6 +115,31 @@ class AbraToolsPrefs(AddonPreferences):
     )
 
     ##################
+
+    vis_nudge_left: BoolProperty(
+        name = key.ABRA_OT_nudge_left.bl_label,
+        description = key.ABRA_OT_nudge_left.bl_description,
+        default = False
+    )
+
+    vis_nudge_right: BoolProperty(
+        name = key.ABRA_OT_nudge_right.bl_label,
+        description = key.ABRA_OT_nudge_right.bl_description,
+        default = False
+    )
+
+    vis_nudge_interval: BoolProperty(
+        name = "Nudge Interval",
+        description = "The number of how many frames your keyframes move when they are nudged in either direction",
+        default = False
+    )
+
+    nudge_interval: IntProperty(
+        name = "Nudge Interval",
+        description = "The number of how many frames your keyframes move when they are nudged in either direction",
+        default = 1,
+        min = 1,
+    )
     
     vis_keysel: BoolProperty(
         name = key.ABRA_OT_key_selected.bl_label,
