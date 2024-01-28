@@ -40,7 +40,6 @@ You can open the abraTools toolshelf by simply clicking the icon located in the 
 
 ![smartselect](https://github.com/abrasic/abratools/assets/43157991/8bb918fb-6a22-47c7-b121-30844906596e)
 
-
 ## Quick Motion Path Setup
 > Avoid the tedious work of setting up motion paths. One click and you're ready to rock.
 
@@ -71,6 +70,10 @@ Quickly see the curves that matter to you most.
 
 ![bake](https://user-images.githubusercontent.com/43157991/213976577-f5155bcc-649b-49da-ad10-76bc8f29e542.gif)
 
+## Quick Selection Tools
+> Quickly select and transform multiple strings of bones like fingers and toes.
+
+<img src='https://github.com/abrasic/abratools/assets/43157991/51c0ca06-402f-4a25-8e84-43577560e13c' height='325'>
 
 ## Selection Sets+
 > Access and manage your selection sets quicker.
