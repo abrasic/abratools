@@ -292,9 +292,7 @@ def prefsHeaderWrite(self, context):
     if (prefs.vis_cursortosel): 
         layout.operator(key.ABRA_OT_cursor_to_selected.bl_idname, text='', icon_value=ic_cursor_to_selected.icon_id)
     if (prefs.vis_cursor_gizmo):
-        layout.operator_context = "EXEC_DEFAULT"
         layout.operator(key.ABRA_OT_cursor_gizmo.bl_idname, text='', depress="aTCursorGizmo" in bpy.data.objects, icon_value=ic_cursor_gizmo.icon_id)
-        layout.operator_context = "INVOKE_DEFAULT"
     if (prefs.vis_toggle_cursor):
         cursor_mode = bpy.context.scene.tool_settings.transform_pivot_point == "CURSOR"
         layout.operator(key.ABRA_OT_toggle_cursor_pivot.bl_idname, text='', depress=cursor_mode, icon_value=ic_toggle_cursor_pivot.icon_id)

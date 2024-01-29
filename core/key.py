@@ -1085,7 +1085,7 @@ class ABRA_OT_cursor_gizmo(bpy.types.Operator):
     bl_description = "Toggles a gizmo that allows you to transform the 3D Cursor"
     bl_options = {"REGISTER", "UNDO"}
 
-    def execute(self, context):
+    def invoke(self, context, event):
         prefs = api.get_preferences()
         pose_bypass = False
         arm_object = ""
@@ -1094,53 +1094,81 @@ class ABRA_OT_cursor_gizmo(bpy.types.Operator):
         old = area.type
         area.type = 'VIEW_3D'
 
-        bpy.ops.view3d.snap_cursor_to_selected()
-
-        if bpy.context.mode == "POSE" and bpy.context.active_object.type == "ARMATURE":
-            pose_bypass = True
+        if event.shift:
             arm_object = context.active_object
-            if "aTCursorGizmoBridge" not in bpy.context.active_object.data.bones:
-                bpy.ops.object.editmode_toggle() # EDIT
-                bpy.ops.armature.select_all(action='DESELECT')
-                bpy.ops.armature.bone_primitive_add(name="aTCursorGizmoBridge") 
-                bpy.context.active_object.data.edit_bones.active = arm_object.data.edit_bones["aTCursorGizmoBridge"]
-                bpy.context.active_bone.length = 0.01
-                bpy.ops.object.editmode_toggle() # OBJECT
-        
-        if not "aTCursorGizmo" in bpy.data.objects:
-                if bpy.context.mode == "POSE":
-                    bpy.ops.object.posemode_toggle() # OBJECT
-                prefs.cursor_gizmo = True
+            if bpy.context.mode == "POSE" and "aTCursorGizmoBridge" in bpy.context.active_object.data.bones:
+                bpy.ops.pose.select_all(action='DESELECT')
+                bpy.context.active_object.data.bones.active = bpy.context.active_object.data.bones["aTCursorGizmoBridge"]
+                area.type = old
+                return {"FINISHED"}
+
+            elif bpy.context.mode == "OBJECT" and "aTCursorGizmo" in bpy.data.objects:
                 bpy.ops.object.select_all(action='DESELECT')
-                bpy.ops.object.empty_add(type='PLAIN_AXES', align='WORLD', location=context.scene.cursor.location, rotation=context.scene.cursor.rotation_euler, scale=(1, 1, 1))
-                bpy.context.object.name = "aTCursorGizmo"
-                bpy.context.object.empty_display_size = 0.01
-                bpy.context.object.empty_display_type = "ARROWS"
-                bpy.context.object.select_set(True)
-
-                if pose_bypass:
-                    constr = bpy.data.objects["aTCursorGizmo"].constraints.new(type='COPY_TRANSFORMS')
-                    constr.target = arm_object
-                    constr.subtarget = "aTCursorGizmoBridge"
-                    bpy.context.view_layer.objects.active = arm_object
-                    bpy.ops.object.posemode_toggle() # POSE
-                    bpy.ops.pose.select_all(action='DESELECT')
-                    arm_object.data.bones["aTCursorGizmoBridge"].select = True
-
-
+                bpy.data.objects["aTCursorGizmo"].select_set(True)
+                area.type = old
+                return {"FINISHED"}
+            
+            area.type = old
+            return {"CANCELLED"}
+            
         else:
-            prefs.cursor_gizmo = False
-            bpy.data.objects.remove(bpy.data.objects ['aTCursorGizmo'], do_unlink=True)
-            if pose_bypass and arm_object.type == "ARMATURE":
-                bpy.ops.object.editmode_toggle() # EDIT
-                bpy.ops.armature.select_all(action='DESELECT')
-                arm_object.data.edit_bones["aTCursorGizmoBridge"].select = True
-                bpy.ops.armature.delete()
-                bpy.ops.object.posemode_toggle() # POSE
+            bpy.ops.view3d.snap_cursor_to_selected()
 
-        area.type = old
-                
-        return {"FINISHED"}
+            if bpy.context.mode == "POSE" and bpy.context.active_object.type == "ARMATURE":
+                pose_bypass = True
+                arm_object = context.active_object
+                if "aTCursorGizmoBridge" not in bpy.context.active_object.data.bones:
+                    bpy.ops.object.editmode_toggle() # EDIT
+                    bpy.ops.armature.select_all(action='DESELECT')
+                    bpy.ops.armature.bone_primitive_add(name="aTCursorGizmoBridge") 
+                    
+                    bpy.context.active_object.data.edit_bones.active = arm_object.data.edit_bones["aTCursorGizmoBridge"]
+
+                    # Place this bone in a collection that's going to be visible
+                    if bpy.data.version > (4,0,0):
+                        tcol = bpy.context.active_object.data.collections.new("aT_temp_col")
+                        tcol.assign(arm_object.data.edit_bones["aTCursorGizmoBridge"])
+
+                    bpy.context.active_bone.length = 0.01
+                    bpy.ops.object.editmode_toggle() # OBJECT
+            
+            if not "aTCursorGizmo" in bpy.data.objects:
+                    if bpy.context.mode == "POSE":
+                        bpy.ops.object.posemode_toggle() # OBJECT
+                    prefs.cursor_gizmo = True
+                    bpy.ops.object.select_all(action='DESELECT')
+                    bpy.ops.object.empty_add(type='PLAIN_AXES', align='WORLD', location=context.scene.cursor.location, rotation=context.scene.cursor.rotation_euler, scale=(1, 1, 1))
+                    bpy.context.object.name = "aTCursorGizmo"
+                    bpy.context.object.empty_display_size = 0.01
+                    bpy.context.object.empty_display_type = "ARROWS"
+                    bpy.context.object.select_set(True)
+
+                    if pose_bypass:
+                        constr = bpy.data.objects["aTCursorGizmo"].constraints.new(type='COPY_TRANSFORMS')
+                        constr.target = arm_object
+                        constr.subtarget = "aTCursorGizmoBridge"
+                        bpy.context.view_layer.objects.active = arm_object
+                        bpy.ops.object.posemode_toggle() # POSE
+                        bpy.ops.pose.select_all(action='DESELECT')
+                        arm_object.data.bones["aTCursorGizmoBridge"].select = True
+
+            else:
+                prefs.cursor_gizmo = False
+                bpy.data.objects.remove(bpy.data.objects ['aTCursorGizmo'], do_unlink=True)
+                if pose_bypass and arm_object.type == "ARMATURE":
+                    bpy.ops.object.editmode_toggle() # EDIT
+                    bpy.ops.armature.select_all(action='DESELECT')
+                    arm_object.data.edit_bones["aTCursorGizmoBridge"].select = True
+                    bpy.ops.armature.delete()
+
+                    if "aT_temp_col" in arm_object.data.collections:
+                        arm_object.data.collections.remove(arm_object.data.collections["aT_temp_col"])
+                        
+                    bpy.ops.object.posemode_toggle() # POSE
+
+            area.type = old
+                    
+            return {"FINISHED"}
     
 @persistent
 def gizmo_func(self, context):
