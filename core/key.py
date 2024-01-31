@@ -776,7 +776,7 @@ class ABRA_OT_bake_keys(bpy.types.Operator):
                 bpy.context.scene.timeline_markers.remove(bpy.context.scene.timeline_markers[-1])
                 bpy.context.scene.timeline_markers.remove(bpy.context.scene.timeline_markers["aT_tmp"])
 
-                if bpy.data.version > (4,0,0):
+                if bpy.app.version > (4,0,0):
                     bpy.ops.graph.bake_keys()
                 else:
                     bpy.ops.graph.sample()
@@ -1125,7 +1125,7 @@ class ABRA_OT_cursor_gizmo(bpy.types.Operator):
                     bpy.context.active_object.data.edit_bones.active = arm_object.data.edit_bones["aTCursorGizmoBridge"]
 
                     # Place this bone in a collection that's going to be visible
-                    if bpy.data.version > (4,0,0):
+                    if bpy.app.version > (4,0,0):
                         tcol = bpy.context.active_object.data.collections.new("aT_temp_col")
                         tcol.assign(arm_object.data.edit_bones["aTCursorGizmoBridge"])
 
