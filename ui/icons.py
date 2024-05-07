@@ -18,6 +18,7 @@ icons.load("cursor_to_selected", os.path.join(icons_dir, "cursor_to_selected.png
 icons.load("delete_path", os.path.join(icons_dir, "delete_path.png"), 'IMAGE')
 icons.load("delete_keys", os.path.join(icons_dir, "delete_keys.png"), 'IMAGE')
 icons.load("delete_static_channels", os.path.join(icons_dir, "delete_static_channels.png"), 'IMAGE')
+icons.load("global_offset", os.path.join(icons_dir, "global_offset.png"), 'IMAGE')
 icons.load("goto_left", os.path.join(icons_dir, "goto_left.png"), 'IMAGE')
 icons.load("goto_right", os.path.join(icons_dir, "goto_right.png"), 'IMAGE')
 icons.load("isolate_curves", os.path.join(icons_dir, "isolate_curves.png"), 'IMAGE')

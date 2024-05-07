@@ -3,6 +3,7 @@ import bpy, math
 from ..core import api, key, quickView, customScripts
 from .icons import icons_coll
 
+init_go_exec = False
 prefsHeaderOld = None
 prefsBodyOld = None
 prefsSidebarOld = None
@@ -23,6 +24,7 @@ ic_cursor_to_selected = ic["cursor_to_selected"]
 ic_delete_keys = ic["delete_keys"]
 ic_delete_path = ic["delete_path"]
 ic_delete_static_channels = ic["delete_static_channels"]
+ic_global_offset = ic["global_offset"]
 ic_goto_left = ic["goto_left"]
 ic_goto_right = ic["goto_right"]
 ic_isolate_curves = ic["isolate_curves"]
@@ -151,7 +153,19 @@ def drawToggle(self, context):
     self.layout.operator("at.toggleprefs",text="",icon_value=ic_logo.icon_id)
 
 def vpToggleBtn(self, context):
-    self.layout.operator("at.vptoggleprefs",text="",icon_value=ic_logo.icon_id)
+    prefs = api.get_preferences()
+    layout = self.layout
+    lcol = layout.row()
+    if prefs.global_offset:
+        global init_go_exec
+        if not init_go_exec:
+            bpy.app.handlers.depsgraph_update_post.append(key.global_offset_func)
+            init_go_exec = True
+        lcol.alert = True
+        lcol.label(text="Global Offset ON")
+        api.write_text("Global Offset ON")
+    
+    lcol.operator("at.vptoggleprefs",text="",icon_value=ic_logo.icon_id)
 
 def updateHeader(self, context):
     bpy.context.preferences.themes[0].preferences.space.header = self.header_col
@@ -247,6 +261,10 @@ def prefsHeaderWrite(self, context):
     if (prefs.vis_keybake): 
         layout.operator_context = "INVOKE_DEFAULT"
         layout.operator(key.ABRA_OT_bake_keys.bl_idname, text='', icon_value=ic_bake_on_nths.icon_id)
+        layout.operator_context = "EXEC_DEFAULT"
+    if (prefs.vis_global_offset): 
+        layout.operator_context = "INVOKE_DEFAULT"
+        layout.operator(key.ABRA_OT_global_offset.bl_idname, text='', depress=prefs.global_offset, icon_value=ic_global_offset.icon_id)
         layout.operator_context = "EXEC_DEFAULT"
     if (prefs.vis_share_active): 
         layout.operator(key.ABRA_OT_share_active_key_timing.bl_idname, text='', icon_value=ic_share_active.icon_id)
@@ -384,6 +402,7 @@ def prefsBodyWrite(self, context):
         col.prop(prefs, "vis_keypastepose", icon_value=ic_paste_pose.icon_id)
         col.prop(prefs, "vis_keydelete", icon_value=ic_delete_keys.icon_id)
         col.prop(prefs, "vis_keybake", icon_value=ic_bake_on_nths.icon_id)
+        col.prop(prefs, "vis_global_offset", icon_value=ic_global_offset.icon_id)
         col.prop(prefs, "vis_share_active", icon_value=ic_share_active.icon_id)
         col.prop(prefs, "vis_share_common", icon_value=ic_share_common.icon_id)
         col.prop(prefs, "vis_copy_timing", icon_value=ic_copy_timing.icon_id)
@@ -452,7 +471,7 @@ def prefsBodyWrite(self, context):
         
         col.separator()
 
-        col.label(text="Dependencies", icon="LIGHTPROBE_CUBEMAP")
+        col.label(text="Dependencies", icon="CUBE")
         addonsBox = col.box()
 
         addon = addonsBox.grid_flow(columns=2)

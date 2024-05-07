@@ -67,6 +67,10 @@ def unregister():
 
     bpy.app.handlers.frame_change_post.remove(quickView.overlay_func)
     bpy.app.handlers.depsgraph_update_post.remove(key.gizmo_func)
+    bpy.app.handlers.depsgraph_update_post.remove(key.global_offset_func)
+
+    from .core import api
+    api.remove_text()
 
     del bpy.types.Scene.set_selection
     del bpy.types.Scene.at_time_clipboard

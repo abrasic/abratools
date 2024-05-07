@@ -87,6 +87,24 @@ class ABRA_OT_retimepanel(bpy.types.Operator):
         layout.prop(prefs,"retime_hiddenobjects")
         layout.prop(prefs,"retime_markers")
 
+class ABRA_OT_offsetpanel(bpy.types.Operator):
+    bl_label = "Global Offset"
+    bl_idname = "message.offsetpanel"
+    bl_options = {"REGISTER", "UNDO"}
+ 
+    def execute(self, context):
+        self.report({'INFO'}, "Changes saved")
+        return {'FINISHED'}
+ 
+    def invoke(self, context, event):
+        return context.window_manager.invoke_props_dialog(self, width = 122)
+ 
+    def draw(self, context):
+        prefs = api.get_preferences()
+        layout = self.layout
+        layout.prop(prefs, "offset_range_only")
+        layout.prop(prefs, "offset_live_feedback")
+
 class ABRA_OT_bakepanel(bpy.types.Operator):
     bl_label = "Bake Keys"
     bl_idname = "message.bakepanel"
@@ -335,6 +353,7 @@ class ABRA_OT_axispanel(bpy.types.Operator):
 cls = (ABRA_OT_mpathpanel,
 ABRA_OT_selsetspanel,
 ABRA_OT_retimepanel,
+ABRA_OT_offsetpanel,
 ABRA_OT_bakepanel,
 ABRA_OT_axispanel,
 Set_Selector,

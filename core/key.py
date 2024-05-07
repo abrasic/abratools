@@ -1,7 +1,10 @@
-import bpy, re, time
+import blf, bpy, re, time
 import numpy as np
 from bpy.app.handlers import persistent
 from . import api
+gop = None
+go_text = None
+ak_choice = False
 
 # $$\   $$\ $$$$$$$$\ $$\     $$\ $$$$$$\ $$\   $$\  $$$$$$\  
 # $$ | $$  |$$  _____|\$$\   $$  |\_$$  _|$$$\  $$ |$$  __$$\ 
@@ -386,6 +389,74 @@ class ABRA_OT_paste_timing(bpy.types.Operator):
             area.type = old
             self.report({"WARNING"}, "No data in clipboard")
             return{"CANCELLED"}
+        
+class ABRA_OT_global_offset(bpy.types.Operator):
+    bl_idname = "screen.at_global_offset"
+    bl_label = "Global Offset"
+    bl_description = "While enabled, changes you make to the transforms of the current frame will be applied to all others keys. Shift + Click this tool for additional settings"
+    bl_options = {"REGISTER"}
+
+    def invoke(self, context, event):
+        if event.shift:
+            bpy.ops.message.offsetpanel("INVOKE_DEFAULT")
+            return {"FINISHED"}
+        else:
+            global ak_choice
+            prefs = api.get_preferences()
+            prefs.global_offset = not prefs.global_offset
+
+            if prefs.global_offset:
+                bpy.app.handlers.depsgraph_update_post.append(global_offset_func)
+                ak_choice = bpy.context.scene.tool_settings.use_keyframe_insert_auto
+                if ak_choice:
+                    bpy.context.scene.tool_settings.use_keyframe_insert_auto = False
+                    self.report({"INFO"}, "Auto-Key disabled while Global Offset is in use")
+            
+            if not prefs.global_offset:
+                bpy.app.handlers.depsgraph_update_post.remove(global_offset_func)
+                bpy.context.scene.tool_settings.use_keyframe_insert_auto = ak_choice
+
+            api.write_text("Global Offset ON") if prefs.global_offset else api.remove_text()
+            context.area.tag_redraw()
+            bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1)
+            
+        return {"FINISHED"}
+
+@persistent
+def global_offset_func(self, context):
+    global gop
+    eop = bpy.context.active_operator
+
+    prefs = api.get_preferences()
+    if prefs.global_offset:
+        bpy.context.scene.tool_settings.use_keyframe_insert_auto = False
+
+        if eop is gop and prefs.offset_live_feedback == False:
+            return
+        gop = bpy.context.active_operator
+        
+        range = api.get_frame_range()
+        if bpy.context.scene.frame_current < range[0] or bpy.context.scene.frame_current > range[1]:
+            return
+        else:
+            for obj in bpy.context.selected_objects:
+                action = obj.animation_data.action
+                curves = action.fcurves
+
+                for curve in curves:
+                    if curve.data_path.endswith("rotation_mode"):
+                        continue
+                    delta_y = api.get_curve_delta(context, obj, curve)
+                    for k in curve.keyframe_points:
+                        if prefs.offset_range_only:
+                            range = api.get_frame_range()
+                            if k.co_ui.x < range[0] or k.co_ui.x > range[1]:
+                                continue
+                            k.co_ui.y = k.co_ui.y + delta_y
+                        else:
+                            k.co_ui.y = k.co_ui.y + delta_y
+
+                    curve.update()
 
 class ABRA_OT_share_common_key_timing(bpy.types.Operator):
     bl_idname = "screen.at_common_key_timing"
@@ -1172,7 +1243,6 @@ class ABRA_OT_cursor_gizmo(bpy.types.Operator):
     
 @persistent
 def gizmo_func(self, context):
-    api.dprint("Gizmo Call")
     prefs = api.get_preferences()
     if prefs.cursor_gizmo and "aTCursorGizmo" in bpy.data.objects and "EMPTY":
         if bpy.data.objects["aTCursorGizmo"].type == "EMPTY":
@@ -1501,6 +1571,7 @@ ABRA_OT_key_paste,
 ABRA_OT_key_copy_pose,
 ABRA_OT_key_paste_pose,
 ABRA_OT_key_delete,
+ABRA_OT_global_offset,
 ABRA_OT_share_active_key_timing,
 ABRA_OT_share_common_key_timing,
 ABRA_OT_copy_timing,

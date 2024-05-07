@@ -189,6 +189,30 @@ class AbraToolsPrefs(AddonPreferences):
         default = True,
     )
 
+    vis_global_offset: BoolProperty(
+        name = key.ABRA_OT_global_offset.bl_label,
+        description = key.ABRA_OT_global_offset.bl_description,
+        default = False,
+    )
+
+    global_offset: BoolProperty(
+        name = "Global Offset Enabled",
+        description = "For internal use. Checks if user enabled Global Offset",
+        default = False,
+    )
+
+    offset_range_only: BoolProperty(
+        name = "Range Only",
+        description = "When enabled, only keys inside of the frame range will be offset",
+        default = False,
+    )
+
+    offset_live_feedback: BoolProperty(
+        name = "Real-Time",
+        description = "May cause lag on heavier scenes or complex F-Curves. When enabled, keys will be offset in the Graph Editor as you transform objects in real-time",
+        default = False,
+    )
+
     vis_share_active: BoolProperty(
         name = key.ABRA_OT_share_active_key_timing.bl_label,
         description = key.ABRA_OT_share_active_key_timing.bl_description,

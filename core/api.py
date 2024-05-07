@@ -1,6 +1,7 @@
-import bpy, addon_utils, os, math, importlib.util
+import bpy, blf, addon_utils, os, math, importlib.util
 import numpy as np
 from . import api
+vp_text = None
 
 def get_preferences():
     """Returns AddonPreferences type"""
@@ -458,6 +459,45 @@ def get_control_points_from_best_fit(pts, err):
     ctrl_left = np_normalize(pts[1] - pts[0])
     ctrl_right = np_normalize(pts[-2] - pts[-1])
     return fit_curve(pts, ctrl_left, ctrl_right, err)
+
+### Global Offset Delta 
+# Courtesy of AnimAide ( rip :'( )
+def get_curve_delta(context, obj, curve):
+    frame = bpy.context.scene.frame_current
+    nla_frame = int(bpy.context.object.animation_data.nla_tweak_strip_time_to_scene(frame))
+    diff = nla_frame - frame
+
+    try:
+        val = obj.path_resolve(curve.data_path)
+    except:
+        val = None
+
+    if val:
+        try:
+            target = val[curve.array_index]
+        except TypeError:
+            target = val
+        return target - curve.evaluate(frame-diff)
+    else:
+        return 0
+    
+def write_text(text):
+    global vp_text
+    def callback(self, context):
+        blf.position(0, 45, 45, 0)
+        blf.color(0, 1, 0.17, 0.17, 0.75)
+        blf.size(0, 16.0)
+        blf.draw(0, text)
+
+    if not vp_text:
+        vp_text = bpy.types.SpaceView3D.draw_handler_add(callback, (None, None), 'WINDOW', 'POST_PIXEL')
+
+def remove_text():
+    global vp_text
+
+    if vp_text:
+        bpy.types.SpaceView3D.draw_handler_remove(vp_text, 'WINDOW')
+        vp_text = None
 
 ### CURVE FITTING FUNCTIONS
 # Courtesy of https://stackoverflow.com/questions/75489204
