@@ -189,6 +189,12 @@ class AbraToolsPrefs(AddonPreferences):
         default = True,
     )
 
+    vis_rotation_switcher: BoolProperty(
+        name = key.ABRA_OT_rotation_switcher.bl_label,
+        description = key.ABRA_OT_rotation_switcher.bl_description,
+        default = False,
+    )
+
     vis_global_offset: BoolProperty(
         name = key.ABRA_OT_global_offset.bl_label,
         description = key.ABRA_OT_global_offset.bl_description,

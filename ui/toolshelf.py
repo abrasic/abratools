@@ -42,6 +42,7 @@ ic_paste_timing = ic["paste_timing"]
 ic_range_to_selection = ic["range_to_selection"]
 ic_range_to_markers = ic["range_to_markers"]
 ic_retime_scene = ic["retime_scene"]
+ic_rotation_switcher = ic["rotation_switcher"]
 ic_share_active = ic["share_active"]
 ic_share_common = ic["share_common"]
 ic_select_children = ic["select_children"]
@@ -262,6 +263,10 @@ def prefsHeaderWrite(self, context):
         layout.operator_context = "INVOKE_DEFAULT"
         layout.operator(key.ABRA_OT_bake_keys.bl_idname, text='', icon_value=ic_bake_on_nths.icon_id)
         layout.operator_context = "EXEC_DEFAULT"
+    if (prefs.vis_rotation_switcher): 
+        layout.operator_context = "INVOKE_DEFAULT"
+        layout.operator(key.ABRA_OT_rotation_switcher.bl_idname, text='', icon_value=ic_rotation_switcher.icon_id)
+        layout.operator_context = "EXEC_DEFAULT"
     if (prefs.vis_global_offset): 
         layout.operator_context = "INVOKE_DEFAULT"
         layout.operator(key.ABRA_OT_global_offset.bl_idname, text='', depress=prefs.global_offset, icon_value=ic_global_offset.icon_id)
@@ -402,6 +407,7 @@ def prefsBodyWrite(self, context):
         col.prop(prefs, "vis_keypastepose", icon_value=ic_paste_pose.icon_id)
         col.prop(prefs, "vis_keydelete", icon_value=ic_delete_keys.icon_id)
         col.prop(prefs, "vis_keybake", icon_value=ic_bake_on_nths.icon_id)
+        col.prop(prefs, "vis_rotation_switcher", icon_value=ic_rotation_switcher.icon_id)
         col.prop(prefs, "vis_global_offset", icon_value=ic_global_offset.icon_id)
         col.prop(prefs, "vis_share_active", icon_value=ic_share_active.icon_id)
         col.prop(prefs, "vis_share_common", icon_value=ic_share_common.icon_id)

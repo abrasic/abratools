@@ -1,7 +1,7 @@
-import bpy
+import bpy, json
 
 from . import prefs
-from ..core import api
+from ..core import api, key
 
 class ABRA_OT_mpathpanel(bpy.types.Operator):
     bl_label = "Motion Path Settings"
@@ -12,7 +12,7 @@ class ABRA_OT_mpathpanel(bpy.types.Operator):
         return {'FINISHED'}
  
     def invoke(self, context, event):
-        return context.window_manager.invoke_props_dialog(self, width = 350)
+        return context.window_manager.invoke_popup(self, width = 350)
  
     def draw(self, context):
         prefs = api.get_preferences()
@@ -64,6 +64,82 @@ class ABRA_OT_mpathpanel(bpy.types.Operator):
             else:
                 layout.label(text="Unsupported object")
                 layout.label(text="Try selecting something in object/pose mode")
+class ABRA_OT_rotationpanel(bpy.types.Operator):
+    bl_label = "Rotation Modes"
+    bl_idname = "message.rotationpanel"
+    bl_options = {"REGISTER", "UNDO"}
+ 
+    def execute(self, context):
+        api.dprint("EXECUTE")
+        return {'FINISHED'}
+ 
+    def invoke(self, context, event):
+        return context.window_manager.invoke_popup(self, width = 227)
+ 
+    def draw(self, context):
+        prefs = api.get_preferences()
+        layout = self.layout
+        data = json.loads(key.rot_scores.scores)
+        max_data = json.loads(key.rot_scores.scores_max)
+
+        data_sorted = sorted(data, key=data.get)
+
+        if key.rot_scores.range_max == key.rot_scores.range_min:
+            layout.label(text="Frame " + str(int(key.rot_scores.range_min)))
+        else:
+            layout.label(text="Keys " + str(int(key.rot_scores.range_min)) +"-"+ str(int(key.rot_scores.range_max)))
+
+        if bpy.context.mode == "POSE":
+            bone = bpy.context.active_pose_bone
+            layout.label(text=str(bone.name),icon="BONE_DATA")
+            if bone.rotation_mode in ["QUATERNION", "AXIS_ANGLE"]:
+                layout.label(text="Bone is not in an Euler mode",icon="ERROR")
+                layout.label(text="Only Euler F-Curves will be affected")
+                layout.separator()
+        else:
+            obj = bpy.context.active_object
+            layout.label(text=str(obj.name),icon="OBJECT_DATA")
+            if obj.rotation_mode in ["QUATERNION", "AXIS_ANGLE"]:
+                layout.label(text="Bone is not in an Euler mode",icon="ERROR")
+                layout.label(text="Only Euler F-Curves will be affected")
+                layout.separator()
+
+        layout.separator()
+        row_head = layout.row()
+        row_head.label(text="")
+        row_head.label(text="")
+
+        if max_data:
+            row_head.label(text="Average")
+            row_head.label(text="Max")
+        else:
+            row_head.label(text="Gimbal")
+
+        for order, score in data.items():
+            row = layout.row()
+            if key.rot_scores.current == order:
+                row.operator(key.ABRA_OT_switch_rotation.bl_idname, text=order, icon="DOT").order = order
+            elif score == data[data_sorted[0]]:
+                row.operator(key.ABRA_OT_switch_rotation.bl_idname, text=order, icon="CHECKMARK").order = order
+            else:
+                row.operator(key.ABRA_OT_switch_rotation.bl_idname, text=order).order = order
+            if score == data[data_sorted[0]]:
+                row.label(text="BEST")
+            else:
+                if score < 0.25:
+                    row.label(text="Good")
+                elif score < 0.4:
+                    row.label(text="OK")
+                else:
+                    row.alert = True
+                    row.label(text="")
+            
+            row.label(text=str(round(score*100,1))+"%")
+
+            if max_data:
+                row.label(text=str(round(max_data[order]*100,1))+"%")
+
+        #layout.prop(prefs, "rot_switch_filter")
 
 class ABRA_OT_retimepanel(bpy.types.Operator):
     bl_label = "Retime"
@@ -97,7 +173,7 @@ class ABRA_OT_offsetpanel(bpy.types.Operator):
         return {'FINISHED'}
  
     def invoke(self, context, event):
-        return context.window_manager.invoke_props_dialog(self, width = 122)
+        return context.window_manager.invoke_popup(self, width = 122)
  
     def draw(self, context):
         prefs = api.get_preferences()
@@ -115,7 +191,7 @@ class ABRA_OT_bakepanel(bpy.types.Operator):
         return {'FINISHED'}
  
     def invoke(self, context, event):
-        return context.window_manager.invoke_props_dialog(self, width = 250)
+        return context.window_manager.invoke_popup(self, width = 250)
  
     def draw(self, context):
         prefs = api.get_preferences()
@@ -290,7 +366,7 @@ class ABRA_OT_selsetspanel(bpy.types.Operator):
         return {'FINISHED'}
  
     def invoke(self, context, event):
-        return context.window_manager.invoke_props_dialog(self, width = 350)
+        return context.window_manager.invoke_popup(self, width = 350)
  
     def draw(self, context):
         layout = self.layout.row()
@@ -340,7 +416,7 @@ class ABRA_OT_axispanel(bpy.types.Operator):
         return {'FINISHED'}
  
     def invoke(self, context, event):
-        return context.window_manager.invoke_props_dialog(self, width = 90)
+        return context.window_manager.invoke_popup(self, width = 90)
  
     def draw(self, context):
         prefs = api.get_preferences()
@@ -352,6 +428,7 @@ class ABRA_OT_axispanel(bpy.types.Operator):
 
 cls = (ABRA_OT_mpathpanel,
 ABRA_OT_selsetspanel,
+ABRA_OT_rotationpanel,
 ABRA_OT_retimepanel,
 ABRA_OT_offsetpanel,
 ABRA_OT_bakepanel,

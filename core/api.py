@@ -81,9 +81,9 @@ def get_selected_keys(curve):
 
     return keysIndex if keysIndex else None
 
-def get_range_from_selected_keys():
+def get_range_from_selected_keys(selected=False):
     """Returns [min, max] of frame range of leftmost and rightmost selected keys"""
-    curves = get_visible_fcurves()
+    curves = get_visible_fcurves() if selected==False else get_selected_fcurves()
     minimum = None
     maximum = None
     if curves:
@@ -98,7 +98,7 @@ def get_range_from_selected_keys():
                     maximum = lastKey
 
         if minimum == None or maximum == None:
-            return [0,0]
+            return [bpy.context.scene.frame_current,bpy.context.scene.frame_current]
         elif minimum > maximum:
             omax = minimum
             minimum = maximum

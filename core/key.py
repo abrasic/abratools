@@ -390,6 +390,332 @@ class ABRA_OT_paste_timing(bpy.types.Operator):
             self.report({"WARNING"}, "No data in clipboard")
             return{"CANCELLED"}
         
+class rot_scores(bpy.types.PropertyGroup):
+    scores: bpy.props.StringProperty(default="{}")
+    scores_max: bpy.props.StringProperty(default="{}")
+    range_min: bpy.props.IntProperty(default=0)
+    range_max: bpy.props.IntProperty(default=0)
+    current: bpy.props.StringProperty(default="XYZ")
+
+class ABRA_OT_switch_rotation(bpy.types.Operator):
+    bl_idname = "screen.at_switch_rotation"
+    bl_label = "Switch Rotation"
+    bl_description = "Switches rotation order and bakes new order from matrix, preserving relative animation and avoiding gimbal lock"
+    bl_options = {"REGISTER", "UNDO"}
+
+    order: bpy.props.StringProperty(
+        name="order",
+        default = "XYZ"
+    )
+
+    def execute(self, context):
+        area = bpy.context.area
+        old = area.type
+        area.type = 'GRAPH_EDITOR'
+
+        prefs = api.get_preferences()
+        obj = bpy.context.active_object
+        fcurves = []
+        bone = ""
+
+        if bpy.context.mode == "POSE": #If in pose mode, grab active pose bone
+            api.dprint("Collecting Pose Bone Euler curves...")
+            bone = bpy.context.active_pose_bone
+            if obj and bone:
+                bone.keyframe_insert(data_path="rotation_euler", frame=1234567) # Temporary
+                all_fcurves = obj.animation_data.action.fcurves
+                if not api.fcurve_overload(all_fcurves):
+                    for f in all_fcurves:
+                        try:
+                            if f.data_path.split('"')[1] in bone.name:
+                                if f.data_path.split('.')[-1] == 'rotation_euler':
+                                    fcurves.append(f)        
+                        except IndexError:
+                            continue
+                else:
+                    area.type = old
+                    self.report({"ERROR"}, f"Preventing overload ({prefs.fcurve_scan_limit} FCurves max, {len(all_fcurves)} active)")
+                    return {"CANCELLED"}
+            else:
+                self.report("WARNING", "There is no active bone in the scene")
+                return {"CANCELLED"}
+        elif bpy.context.mode == "OBJECT": #Other
+            api.dprint("Collecting Object Euler curves...")
+            obj.keyframe_insert(data_path="rotation_euler", frame=1234567) # Temporary
+            all_fcurves = obj.animation_data.action.fcurves
+            if not api.fcurve_overload(all_fcurves):
+                for f in all_fcurves:
+                    if f.data_path == 'rotation_euler':
+                        fcurves.append(f)
+            else:
+                area.type = old
+                self.report({"ERROR"}, f"Preventing overload ({prefs.fcurve_scan_limit} FCurves max, {len(all_fcurves)} active)")
+                return {"CANCELLED"}
+                
+        else:
+            self.report("WARNING", "Only Object and Pose mode are supported")
+            return {"CANCELLED"}
+
+
+        current_mode = obj.rotation_mode
+        frame_targets = []
+
+        # Get all frames that contain keys on euler curves
+        for curve in fcurves:
+            if rot_scores.range_min == rot_scores.range_max:
+                frame_targets.append(rot_scores.range_min)   
+            else:
+                for keyf in curve.keyframe_points:
+                    if keyf.co_ui.x not in frame_targets and keyf.co_ui.x >= rot_scores.range_min and keyf.co_ui.x <= rot_scores.range_max:
+                        frame_targets.append(keyf.co_ui.x)    
+        
+        frame_targets.sort()
+
+        for frame in frame_targets:
+            for curve in fcurves:
+                curve.keyframe_points.insert(frame, curve.evaluate(frame), options={"NEEDED", "FAST"})
+        
+        bpy.context.view_layer.update()
+        old_frame = bpy.context.scene.frame_current
+        for frame in frame_targets:
+            bpy.context.scene.frame_current = int(frame)
+            bpy.context.view_layer.update()
+
+            if bpy.context.mode == "POSE":
+                global_matrix = obj.pose.bones[bone.name].matrix_basis.to_euler(self.order)
+            else:
+                global_matrix = obj.matrix_basis.to_euler(self.order)
+            
+            for curve in fcurves:
+                curve.keyframe_points.insert(frame, global_matrix[curve.array_index], options={"REPLACE"})
+
+        if bpy.context.mode == "POSE":
+            obj.pose.bones[bone.name].rotation_mode = self.order
+            for curve in all_fcurves:
+                if curve.data_path.split('.')[-1] == 'rotation_mode':
+                    for f in frame_targets:
+                        obj.pose.bones[bone.name].keyframe_delete(data_path="rotation_mode", frame=f)
+                    obj.pose.bones[bone.name].keyframe_insert(data_path="rotation_mode", frame=frame_targets[0])
+        else:
+            obj.rotation_mode = self.order
+            for curve in all_fcurves:
+                if curve.data_path == 'rotation_mode':
+                    for f in frame_targets:
+                        obj.keyframe_delete(data_path="rotation_mode", frame=f)
+                    obj.keyframe_insert(data_path="rotation_mode", frame=frame_targets[0])
+                
+
+        if bpy.context.mode == "POSE":
+            bone.keyframe_delete(data_path="rotation_euler", frame=1234567)
+        else:
+            obj.keyframe_delete(data_path="rotation_euler", frame=1234567)
+
+        bpy.context.scene.frame_current = old_frame
+                
+        area.type = old
+        return {'FINISHED'}
+class ABRA_OT_rotation_switcher(bpy.types.Operator):
+    bl_idname = "screen.at_rotation_switcher"
+    bl_label = "Rotation Switcher"
+    bl_description = "Bake out/switch selected keys into a new rotation order. Also determines best rotation-order for selected range"
+    bl_options = {"REGISTER", "UNDO"}
+
+    def execute(self, context):
+        area = bpy.context.area
+        old = area.type
+        area.type = 'GRAPH_EDITOR'
+
+        import math
+        prefs = api.get_preferences()
+        score_dict = {}
+        score_dict_max = {}
+        frame_targets = []
+        fcurves = []
+        bone = ""
+        global_matrix = {}
+        modes = ["XYZ", "XZY", "YXZ", "YZX", "ZXY", "ZYX"]
+        gimbals = [1,2,0,2,0,1]
+        mode_index = 0
+        order = list(modes[0])
+        obj = bpy.context.active_object
+
+        if obj:
+            if bpy.context.mode == "POSE": #If in pose mode, grab active pose bone
+                api.dprint("Collecting Pose Bone Euler curves...")
+                bone = bpy.context.active_pose_bone
+                if obj and bone:
+                    bone.keyframe_insert(data_path="rotation_euler", frame=1234567) # Temporary
+                    all_fcurves = obj.animation_data.action.fcurves
+                    if not api.fcurve_overload(all_fcurves):
+                        for f in all_fcurves:
+                            try:
+                                if f.data_path.split('"')[1] in bone.name:
+                                    if f.data_path.split('.')[-1] == 'rotation_euler':
+                                        f.keyframe_points[-1].select_control_point = False
+                                        fcurves.append(f)        
+                            except IndexError:
+                                continue
+                    else:
+                        area.type = old
+                        self.report({"ERROR"}, f"Preventing overload ({prefs.fcurve_scan_limit} FCurves max, {len(all_fcurves)} active)")
+                        return {"CANCELLED"}
+                else:
+                    self.report({"WARNING"}, "There is no active bone in the scene")
+                    area.type = old
+                    return {"CANCELLED"}
+            elif bpy.context.mode == "OBJECT": #Other
+                api.dprint("Collecting Object Euler curves...")
+                obj.keyframe_insert(data_path="rotation_euler", frame=1234567) # Temporary
+                all_fcurves = obj.animation_data.action.fcurves
+                if not api.fcurve_overload(all_fcurves):
+                    for f in all_fcurves:
+                        if f.data_path == 'rotation_euler':
+                            f.keyframe_points[-1].select_control_point = False
+                            fcurves.append(f)
+                else:
+                    area.type = old
+                    self.report({"ERROR"}, f"Preventing overload ({prefs.fcurve_scan_limit} FCurves max, {len(all_fcurves)} active)")
+                    return {"CANCELLED"}
+            else:
+                self.report({"WARNING"}, "Only Object and Pose mode are supported")
+                area.type = old
+                return {"CANCELLED"}
+        else:
+            self.report({"WARNING"}, "There is no active object in the scene")
+            area.type = old
+            return {"CANCELLED"}
+
+        api.dprint(fcurves, col="blue")
+
+        #F-Curves are not selected when keys are selected in Dope Sheet (Also only select euler curves)
+        for curve in all_fcurves:
+            curve.select = False
+        for curve in fcurves:
+            curve.select = True
+
+        # Get range from current selection
+        api.dprint("Determining selection method...")
+        range = api.get_range_from_selected_keys()
+        api.dprint(range)
+        if not range:
+            api.dprint("No visible selection, using current frame only")
+            range = [bpy.context.scene.frame_current, bpy.context.scene.frame_current]
+
+        api.dprint(fcurves)
+
+        rot_scores.range_min = range[0]
+        rot_scores.range_max = range[1]
+
+        if bpy.context.mode == "POSE":
+            rot_scores.current = bone.rotation_mode
+        else:
+            rot_scores.current = obj.rotation_mode
+
+        api.dprint("The working range for this execution is "+str(range))
+
+        for i, m in enumerate(modes):
+            if m == obj.rotation_mode:
+                mode_index = gimbals[i]
+                api.dprint("The gimbal index for rotation mode is "+ str(mode_index))
+                break
+
+        old_frame = bpy.context.scene.frame_current
+        for curve in fcurves:
+            if curve.array_index == mode_index:
+
+                if rot_scores.range_min == rot_scores.range_max:
+                    api.dprint("No keys are selected for range, using current frame only")
+                    if rot_scores.range_min == None:
+                        self.report({"WARNING"}, "Select one object or bone")
+                        area.type = old
+                        return {"CANCELLED"}
+                    api.dprint(int(rot_scores.range_min))
+                    bpy.context.scene.frame_current = int(rot_scores.range_min)
+                    bpy.context.view_layer.update()
+
+                    for i, mode in enumerate(modes):
+                        gimbal_culprit = [*mode][1]
+                        
+                        order_i=0
+                        for o in order:
+                            if any(item in order[order_i] for item in gimbal_culprit):
+                                break
+                            order_i+=1
+
+                        if bpy.context.mode == "POSE":
+                            global_matrix = bone.matrix_basis.to_euler(mode)
+                        else:
+                            global_matrix = obj.matrix_basis.to_euler(mode)
+
+                        key_rot = math.degrees(global_matrix[order_i])
+                        api.dprint("Scoring: "+str(mode)+" (" + str(global_matrix[order_i])+")")
+                        score = abs((key_rot + 90) % 180 - 90) / 90
+                        api.dprint(str(mode) + " SCORE IS "+str(score), col="yellow")
+                        score_dict[mode] = score
+                else:
+                    score_data = {}
+                    for key in curve.keyframe_points:
+                        if key.co_ui.x >= range[0] and key.co_ui.x <= range[1]:
+                            bpy.context.scene.frame_current = int(key.co_ui.x)-1
+                            bpy.context.view_layer.update()
+                            api.dprint("FRAME "+ str(bpy.context.scene.frame_current))
+
+                            for i, mode in enumerate(modes):
+                                gimbal_culprit = [*mode][1]
+                                
+                                order_i=0
+                                for o in order:
+                                    if any(item in order[order_i] for item in gimbal_culprit):
+                                        break
+                                    order_i+=1
+
+
+                                if bpy.context.mode == "POSE":
+                                    global_matrix = bone.matrix_basis.to_euler(mode)
+                                else:
+                                    global_matrix = obj.matrix_basis.to_euler(mode)
+
+                                key_rot = math.degrees(global_matrix[order_i])
+                                api.dprint("Scoring: "+str(mode)+" (" + str(global_matrix[order_i])+")")
+                                score = abs((key_rot + 90) % 180 - 90) / 90
+                                api.dprint(str(mode) + " SCORE IS "+str(score), col="yellow")
+
+                                if mode not in score_data.keys():
+                                    score_data[mode] = [score]
+                                else:
+                                    score_data[mode].append(score)
+                        
+                    api.dprint("-------------- FINAL SCORES --------------")
+                    for scores in score_data:
+                        avg_score = sum(score_data[scores]) / len(score_data[scores])
+                        score_max = max(score_data[scores])
+                        api.dprint(str(scores) + " AVERAGE: "+str(avg_score), col="yellow")
+                        api.dprint(str(scores) + " MAX: "+str(score_max), col="yellow")
+                        score_dict[scores] = avg_score
+                        score_dict_max[scores] = score_max
+
+            if bpy.context.mode == "POSE":
+                bone.keyframe_delete(data_path="rotation_euler", frame=1234567)
+            else:
+                obj.keyframe_delete(data_path="rotation_euler", frame=1234567)
+
+                                                
+        bpy.context.scene.frame_current = old_frame
+        api.dprint("DONE", col="green")
+
+        area.type = old
+
+        if not score_dict:
+            self.report({"WARNING"}, "Invalid selection. Does the object have Euler F-Curves?")
+            area.type = old
+            return {"CANCELLED"}
+
+        rot_scores.scores = str(score_dict).replace("'",'"')
+        rot_scores.scores_max = str(score_dict_max).replace("'",'"')
+        bpy.ops.message.rotationpanel("INVOKE_DEFAULT")
+
+        return {"FINISHED"}
+
 class ABRA_OT_global_offset(bpy.types.Operator):
     bl_idname = "screen.at_global_offset"
     bl_label = "Global Offset"
@@ -1561,7 +1887,7 @@ class ABRA_OT_tangent_autoclamp(bpy.types.Operator):
         
 ############################################
 
-cls = (clipboard,
+cls = (clipboard, rot_scores,
 ABRA_OT_nudge_left,
 ABRA_OT_nudge_right,
 ABRA_OT_key_selected,
@@ -1571,6 +1897,8 @@ ABRA_OT_key_paste,
 ABRA_OT_key_copy_pose,
 ABRA_OT_key_paste_pose,
 ABRA_OT_key_delete,
+ABRA_OT_switch_rotation,
+ABRA_OT_rotation_switcher,
 ABRA_OT_global_offset,
 ABRA_OT_share_active_key_timing,
 ABRA_OT_share_common_key_timing,
