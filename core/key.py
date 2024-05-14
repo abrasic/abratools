@@ -695,9 +695,15 @@ class ABRA_OT_rotation_switcher(bpy.types.Operator):
                         score_dict_max[scores] = score_max
 
             if bpy.context.mode == "POSE":
-                bone.keyframe_delete(data_path="rotation_euler", frame=1234567)
+                try:
+                    bone.keyframe_delete(data_path="rotation_euler", frame=1234567)
+                except RuntimeError:
+                    pass
             else:
-                obj.keyframe_delete(data_path="rotation_euler", frame=1234567)
+                try:
+                    obj.keyframe_delete(data_path="rotation_euler", frame=1234567)
+                except RuntimeError:
+                    pass
 
                                                 
         bpy.context.scene.frame_current = old_frame
