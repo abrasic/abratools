@@ -8,6 +8,10 @@ def get_preferences():
     name = __package__.split(".")[0]
     return bpy.context.preferences.addons[name].preferences
 
+def get_version():
+    from .. import bl_info
+    return bl_info['version']
+
 def dprint(text, col=None):
     prefs = get_preferences()
     if prefs.dev_debug:

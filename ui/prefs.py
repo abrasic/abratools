@@ -18,7 +18,8 @@ class AbraToolsPrefs(AddonPreferences):
             ('other', 'Other', '', '', 5),
             ('custom', 'Scripts', '', '', 6),
             None,
-            ('settings', 'Settings', '', '', 7),
+            ('update', 'Update', '', '', 7),
+            ('settings', 'Settings', '', '', 8),
 
         ],
         default='home'
@@ -473,6 +474,47 @@ class AbraToolsPrefs(AddonPreferences):
         name = "Debug Mode",
         default = False,
         description = "Developer use only. Prints additional content to the Blender console"
+    )
+
+    # UPDATER PREFS
+    update_check_commits: bpy.props.BoolProperty(
+        name = "Check for Indev Versions",
+        description = "When enabled, this will allow for downloading beta/unstable versions. This means you'll get the latest code changes but abraTools could be prone to more bugs/crashes",
+        default = False,
+    )
+
+    # These aren't shown in the UI but are required for the update script
+    auto_check_update: bpy.props.BoolProperty(
+        name = "Check Automatically",
+        description = "If enabled, auto-check for updates using an interval",
+        default = False,
+    )
+
+    updater_interval_months: bpy.props.IntProperty(
+        name='Months',
+        description = "Number of months between checking for updates",
+        default=0,
+        min=0
+    )
+    updater_interval_days: bpy.props.IntProperty(
+        name='Days',
+        description = "Number of days between checking for updates",
+        default=0,
+        min=0,
+    )
+    updater_interval_hours: bpy.props.IntProperty(
+        name='Hours',
+        description = "Number of hours between checking for updates",
+        default=0,
+        min=0,
+        max=23
+    )
+    updater_interval_minutes: bpy.props.IntProperty(
+        name='Minutes',
+        description = "Number of minutes between checking for updates",
+        default=0,
+        min=0,
+        max=59
     )
 
     ######## RETIME PANEL #########

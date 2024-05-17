@@ -2,6 +2,7 @@ import bpy, math
 
 from ..core import api, key, quickView, customScripts
 from .icons import icons_coll
+from ..update import addon_updater_ops
 
 init_go_exec = False
 prefsHeaderOld = None
@@ -460,6 +461,9 @@ def prefsBodyWrite(self, context):
             scriptBox = col.box()
             scriptBox.label(text="You don't have any custom scripts installed")
 
+    if (prefs.toolshelf_pages == "update"):
+        addon_updater_ops.update_settings_ui(None, None, col)
+
     if (prefs.toolshelf_pages == "settings"):
         row.scale_x = 2
         col.label(text="Appearance", icon="BRUSHES_ALL")
@@ -500,7 +504,8 @@ def prefsBodyWrite(self, context):
         devBox = col.box()
         devBox.prop(prefs, "dev_debug")
 
-    layout.label(text="aT | beta2")
+    ver = api.get_version()
+    layout.label(text="aT | "+str(ver[0])+"."+str(ver[1])+"."+str(ver[2]))
 
     return 
     

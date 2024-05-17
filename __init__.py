@@ -1,7 +1,7 @@
 bl_info = {
     'name': 'AbraTools',
     'author': 'Abrasic',
-    'version': (0, 2, 1),
+    'version': (0, 2, 2),
     'blender': (3, 0, 0),
     'description': 'Blender animation toolkit',
     'location' : '3D Viewport or Preferences > Header > aT',
@@ -14,6 +14,7 @@ bl_info = {
 import bpy, os, importlib.util, time
 from .core import key, quickView, customScripts
 from .ui import prefs, panels, toolshelf
+from .update import addon_updater_ops
 ################################
 
 classes = quickView.cls + key.cls + prefs.cls + panels.cls + toolshelf.cls + customScripts.cls
@@ -21,6 +22,8 @@ icons_coll = {}
 addon_keymaps = []
 
 def register():
+    addon_updater_ops.register(bl_info)
+
     atime = time.time()
     bpy.context.preferences.themes[0].preferences.space.header = bpy.context.preferences.themes[0].text_editor.space.header ## Temporary
     
