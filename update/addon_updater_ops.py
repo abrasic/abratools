@@ -945,10 +945,22 @@ def update_settings_ui(self, context, element=None):
     if not updater.auto_reload_post_update:
         saved_state = updater.json
         if "just_updated" in saved_state and saved_state["just_updated"]:
-            row.alert = True
-            row.operator("wm.quit_blender",
-                         text="Update complete. Restart required",
-                         icon="ERROR")
+            if updater.backup_restore_failed:
+                col = row.column()
+                col.alert = True
+                col.label(text="Restore Failed", icon="ERROR")
+                col.label(text="Are abraTools files being used by another program?")
+                col.label(text="abraTools before restore saved to <blender>/scripts/addons/{}_updater_backup_temp")
+                col.operator(
+                    "wm.quit_blender",
+                    text="Quit Blender",
+                    icon="ERROR")
+            else:
+                row.alert = True  # mark red
+                row.operator(
+                    "wm.quit_blender",
+                    text="Update complete. Restart required",
+                    icon="ERROR")
             return
 
     # Checking / managing updates.
@@ -1003,8 +1015,8 @@ def update_settings_ui(self, context, element=None):
     #                    text="", icon="FILE_REFRESH")
 
     elif updater.update_ready and not updater.manual_only:
-        ver_tuple = tuple(updater.update_version)
-        if ver_tuple[0] == "[":
+        ver_tuple = updater.update_version
+        if ver_tuple[0] == "[" or ver_tuple[0] == "(":
             ver_tuple = updater.version_tuple_from_text(ver_tuple)
         sub_col = col.row(align=True)
         sub_col.scale_y = 1
@@ -1023,7 +1035,10 @@ def update_settings_ui(self, context, element=None):
         col.operator("wm.url_open",
                      text=dl_now_txt).url = updater.website
     else:  # i.e. that updater.update_ready == False.
-        ver_tuple = tuple(updater.current_version)
+        ver_tuple = updater.current_version
+        print(ver_tuple)
+        if ver_tuple[0] == "[" or ver_tuple[0] == "(":
+            ver_tuple = updater.version_tuple_from_text(ver_tuple)
         sub_col = col.row(align=True)
         sub_col.scale_y = 1
         split = sub_col.split(align=True)
@@ -1035,7 +1050,6 @@ def update_settings_ui(self, context, element=None):
         split.scale_y = 2
         split.operator(AddonUpdaterCheckNow.bl_idname,
                        text="", icon="FILE_REFRESH")
-
 
     if not updater.manual_only:
         col = box.column(align=True)
@@ -1100,11 +1114,22 @@ def update_settings_ui_condensed(self, context, element=None):
     if not updater.auto_reload_post_update:
         saved_state = updater.json
         if "just_updated" in saved_state and saved_state["just_updated"]:
-            row.alert = True  # mark red
-            row.operator(
-                "wm.quit_blender",
-                text="Update complete. Restart required",
-                icon="ERROR")
+            if updater.backup_restore_failed:
+                col = row.column()
+                col.alert = True
+                col.label(text="Restore Failed", icon="ERROR")
+                col.label(text="Are abraTools files being used by another program?")
+                col.label(text="abraTools before restore saved to <blender>/scripts/addons/{}_updater_backup_temp")
+                col.operator(
+                    "wm.quit_blender",
+                    text="Quit Blender",
+                    icon="ERROR")
+            else:
+                row.alert = True  # mark red
+                row.operator(
+                    "wm.quit_blender",
+                    text="Update complete. Restart required",
+                    icon="ERROR")
             return
 
     col = row.column()
@@ -1361,7 +1386,7 @@ def register(bl_info):
     updater.backup_current = True  # True by default
 
     # Sample ignore patterns for when creating backup of current during update.
-    updater.backup_ignore_patterns = ["__pycache__", "scripts/*.py"]
+    updater.backup_ignore_patterns = ["__pycache__"]
     # Alternate example patterns:
     # updater.backup_ignore_patterns = [".git", "__pycache__", "*.bat", ".gitignore", "*.exe"]
 

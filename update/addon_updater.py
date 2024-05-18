@@ -31,6 +31,7 @@ import ssl
 import urllib.request
 import urllib
 import os
+import stat
 import json
 import zipfile
 import shutil
@@ -123,6 +124,7 @@ class SingletonUpdater:
         # to verify a valid import, in place of placeholder import
         self.show_popups = True  # UI uses to show popups or not.
         self.invalid_updater = False
+        self.backup_restore_failed = False
 
         # pre-assign basic select-link function
         def select_link_function(self, tag):
@@ -826,8 +828,11 @@ class SingletonUpdater:
         # Remove the temp folder.
         # Shouldn't exist but could if previously interrupted.
         if os.path.isdir(tempdest):
+            def enforce(function, path, exception):
+                os.chmod(path, stat.S_IWRITE)
+                function(path)
             try:
-                shutil.rmtree(tempdest)
+                shutil.rmtree(tempdest, onerror=enforce)
             except:
                 self.print_verbose(
                     "Failed to remove existing temp folder, continuing")
@@ -868,8 +873,20 @@ class SingletonUpdater:
 
         # Move instead contents back in place, instead of copy.
         shutil.move(backuploc, tempdest)
-        shutil.rmtree(self._addon_root)
-        os.rename(tempdest, self._addon_root)
+        def enforce(function, path, exception):
+            os.chmod(path, stat.S_IWRITE)
+            function(path)
+
+        try:
+            shutil.rmtree(self._addon_root, onerror=enforce)
+        except Exception as e:
+            self.print_verbose("Exception occurred while deleting a file: "+ str(e))
+            self.print_trace()
+
+        try:
+            os.rename(tempdest, self._addon_root)
+        except OSError as e: # This happens usually when a user has an abraTools file open in another software (sorry devs lmao)
+            self.backup_restore_failed = True
 
         self._json["backup_date"] = ""
         self._json["just_restored"] = True
