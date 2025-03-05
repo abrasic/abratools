@@ -1,7 +1,7 @@
 bl_info = {
     'name': 'AbraTools',
     'author': 'Abrasic',
-    'version': (0, 2, 3),
+    'version': (0, 2, 4),
     'blender': (3, 0, 0),
     'description': 'Blender animation toolkit',
     'location' : '3D Viewport or Preferences > Header > aT',
