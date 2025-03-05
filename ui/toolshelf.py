@@ -492,11 +492,12 @@ def prefsBodyWrite(self, context):
         addon.label(text="Native Add-on")
 
         addon = addonsBox.grid_flow(columns=2)
-        if api.is_addon_enabled("bone_selection_sets"):
-            addon.label(text="Bone Selection Sets (INSTALLED)", icon="CHECKBOX_HLT")
-        else:
-            addon.label(text="Bone Selection Sets", icon="CHECKBOX_DEHLT")
-        addon.label(text="Native Add-on")
+        if bpy.app.version < (4, 2, 0):
+            if api.is_addon_enabled("bone_selection_sets"):
+                addon.label(text="Bone Selection Sets (INSTALLED)", icon="CHECKBOX_HLT")
+            else:
+                addon.label(text="Bone Selection Sets", icon="CHECKBOX_DEHLT")
+            addon.label(text="Native Add-on")
 
         col.separator()
 
