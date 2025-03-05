@@ -376,7 +376,7 @@ class ABRA_OT_selsetspanel(bpy.types.Operator):
         active = bpy.context.active_object
         mode = bpy.context.mode
 
-        if api.is_addon_enabled("bone_selection_sets"):
+        if api.is_addon_enabled("bone_selection_sets") or bpy.app.version >= (4, 2, 0):
             if mode == "POSE":
                 row = layout.column()
                 if len(active.selection_sets) > 0:
