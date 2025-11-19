@@ -1,3 +1,6 @@
+> [!WARNING] 
+> AbraTools has been archived and is no longer being maintained. **We recommend that you do not use this plugin beyond Blender 4.2 as crashes may happen with certain features**. Also consider checking out the [AniMate Pro add-on](https://nda.gumroad.com/l/animatepro), which has some of the similar features and functionality of this add-on and much much more!
+
 # AbraTools Beta
 ### *AbraTools contains a list of many quality-of-life animation tools for Blender. It's made by animators, for animators.*
 
